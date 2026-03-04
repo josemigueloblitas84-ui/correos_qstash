@@ -1,4 +1,4 @@
-@extends('layouts.adminlte_guest')
+@extends('layouts.adminLTE_guest')
 
 @section('content')
 
@@ -40,10 +40,10 @@
             </div>
 
             <!-- Password -->
-            <x-password-input 
-              name="password" 
+            <x-password-input
+              name="password"
               placeholder="Contraseña"
-              required 
+              required
               autocomplete="current-password"
             />
 

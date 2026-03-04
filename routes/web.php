@@ -61,8 +61,11 @@ Route::middleware('auth', 'password.confirm')->group(function () {
 
     // Usuarios
     Route::get('/usuarios', [UserController::class, 'index'])->name('usuarios.index');
+    Route::get('/usuarios/create', [UserController::class, 'create'])->name('usuarios.create');
+    Route::post('/usuarios', [UserController::class, 'store'])->name('usuarios.store');
     Route::get('/usuarios/{id}/edit', [UserController::class, 'edit'])->name('usuarios.edit');
     Route::post('/usuarios/{id}', [UserController::class, 'update'])->name('usuarios.update');
+    Route::delete('/usuarios', [UserController::class, 'destroy'])->name('usuarios.destroy');
 });
 
 require __DIR__ . '/auth.php';

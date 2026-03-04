@@ -10,11 +10,11 @@
         <div class="container-fluid d-flex justify-content-between align-items-center">
             <h1>Usuarios</h1>
 
-            @can('nuevo permiso') 
-                <a href="{{ route('roles.create') }}" class="btn btn-primary">
-                    Crear Usuario #
+            {{-- @can('nuevo permiso')  --}}
+                <a href="{{ route('usuarios.create') }}" class="btn btn-primary">
+                    Crear Usuario
                 </a>
-            @endcan
+            {{-- @endcan --}}
         </div>
     </section>
 
@@ -51,15 +51,23 @@
                                         </td>
                                         <td>{{ $usuario->created_at->format('d / M / Y H:i:s') }}</td>
                                         <td>
-                                            @can('editar usuarios')
-                                                <a href="{{ route('usuarios.edit', $usuario->id) }}" 
+                                            {{-- @can('editar usuarios') --}}
+                                                <a href="{{ route('usuarios.edit', $usuario->id) }}"
                                                    class="btn btn-sm btn-warning">
                                                     Editar
                                                 </a>
-                                            @endcan
+                                            {{-- @endcan --}}
+
+                                            {{-- @can('eliminar usuarios') --}}
+                                                <a href="javascript:void(0)"
+                                                   onclick="eliminarUsuario({{ $usuario->id }})"
+                                                   class="btn btn-sm btn-danger">
+                                                    Eliminar
+                                                </a>
+                                            {{-- @endcan --}}
 
                                             {{--@can('permisos especiales')--}}
-                                                <a href="{{ route('usuarios.edit', $usuario->id) }}" 
+                                                <a href="{{ route('usuarios.edit', $usuario->id) }}"
                                                    class="btn btn-sm btn-info">
                                                     Permisos Especiales
                                                 </a>
@@ -88,10 +96,10 @@
 
 @section('scripts')
 <script>
-function eliminarRol(id) {
-    if (confirm('¿Desea eliminar el rol?')) {
+function eliminarUsuario(id) {
+    if (confirm('¿Desea eliminar el usuario?')) {
         $.ajax({
-            url: '{{ route("roles.destroy") }}',
+            url: '{{ route("usuarios.destroy") }}',
             type: 'DELETE',
             data: {id:id},
             dataType: 'json',
@@ -99,7 +107,7 @@ function eliminarRol(id) {
                 'X-CSRF-TOKEN': "{{ csrf_token() }}"
             },
             success: function(response) {
-                window.location.href = '{{ route("roles.index") }}';
+                window.location.href = '{{ route("usuarios.index") }}';
             }
         });
     }

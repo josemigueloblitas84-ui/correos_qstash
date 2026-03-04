@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Permisos;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Validator;
 
@@ -35,7 +36,10 @@ class UserController extends Controller
      */
     public function create()
     {
-        //
+        $roles = Role::orderBy('name', 'asc')->get();
+        return view('usuarios.create', [
+            'roles' => $roles
+        ]);
     }
 
     /**
@@ -43,7 +47,26 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'nombreUsuario' => 'required|min:3',
+            'correoUsuario' => 'required|email|unique:users,email',
+            'contrasenaUsuario' => 'required|min:8|same:confirmar_contrasenaUsuario',
+            'confirmar_contrasenaUsuario' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->route('usuarios.create')->withInput()->withErrors($validator);
+        }
+
+        $usuario = new User();
+        $usuario->name = $request->nombreUsuario;
+        $usuario->email = $request->correoUsuario;
+        $usuario->password = Hash::make($request->contrasenaUsuario);
+        $usuario->save();
+
+        $usuario->syncRoles($request->role);
+
+        return redirect()->route('usuarios.index')->with('success', 'Usuario creado exitosamente');
     }
 
     /**
@@ -100,8 +123,18 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request)
     {
-        //
+        $usuario = User::findOrFail($request->id);
+
+        if ($usuario == null) {
+            session()->flash('error', 'Usuario no encontrado');
+            return response()->json(['status' => false]);
+        }
+
+        $usuario->delete();
+
+        session()->flash('success', 'Usuario eliminado exitosamente');
+        return response()->json(['status' => true]);
     }
 }
