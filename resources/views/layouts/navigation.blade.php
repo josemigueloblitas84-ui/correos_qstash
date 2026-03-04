@@ -27,9 +27,7 @@
                 {{-- Roles --}}
                 {{--@can('ver roles') --}}
                      <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('roles.index')" :active="request()->routeIs('roles.index')">
-                        {{ __('Roles') }}
-                    </x-nav-link>
+        
                 </div>
                 {{--@endcan--}}
 
@@ -37,9 +35,7 @@
                 {{-- Usuarios --}}
                 {{--@can('ver usuarios')--}}
                      <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('usuarios.index')" :active="request()->routeIs('usuarios.index')">
-                        {{ __('Usuarios') }}
-                    </x-nav-link>
+                        
                 </div>
                 {{--@endcan--}}
 

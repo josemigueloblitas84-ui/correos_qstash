@@ -293,11 +293,10 @@
                 </li>
                 <li class="nav-header">QSTASH</li>
                 <li class="nav-item">
-                    <a href="{{ route('formulario') }}" class="nav-link">
-                        <i class="nav-icon far fa-envelope"></i>
-                        <p>
-                            Correos de QSTASH
-                        </p>
+                    <a href="{{route('usuarios.index')}}"
+                    class="nav-link {{ request()->routeIs('usuarios.index') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-users"></i>
+                        <p>Usuarios</p>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -305,6 +304,50 @@
                     class="nav-link {{ request()->routeIs('permisos.index') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-user-lock"></i>
                         <p>Permisos</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('roles.index') }}"
+                    class="nav-link {{ request()->routeIs('roles.index') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-user-tag"></i>
+                        <p>Roles</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon far fa-envelope"></i>
+                        <p>
+                            Correos de QSTASH
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="../mailbox/mailbox.html" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Bandeja de Entrada</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="../mailbox/compose.html" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Redactar</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="../mailbox/read-mail.html" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Leer</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('formulario') }}" class="nav-link">
+                        <i class="nav-icon far fa-envelope"></i>
+                        <p>
+                            Correos de QSTASH
+                        </p>
                     </a>
                 </li>
                 <li class="nav-header">EXAMPLES</li>
@@ -332,35 +375,6 @@
                             Kanban Board
                         </p>
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon far fa-envelope"></i>
-                        <p>
-                            Mailbox
-                            <i class="fas fa-angle-left right"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="../mailbox/mailbox.html" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Inbox</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="../mailbox/compose.html" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Compose</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="../mailbox/read-mail.html" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Read</p>
-                            </a>
-                        </li>
-                    </ul>
                 </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link">

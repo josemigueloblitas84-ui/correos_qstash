@@ -1,48 +1,86 @@
-<x-app-layout>
-    <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Roles / Crear
-            </h2>
-            <a href="{{ route('roles.index') }}"
-                class="ml-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Volver</a>
-        </div>
-    </x-slot>
+@extends('plantilla.app')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <form action="{{ route('roles.store') }}" method="POST">
-                        @csrf
-                        <div>
-                            <label for="name" class="text-lg font-medium">Nombre:</label>
-                            <div class="my-3">
-                                <input value="{{ old('name') }}" name="name" id="name" type="text"
-                                    placeholder="Ingrese el nombre" class="border-gray-300 shadow-sm w-1/2 rounded-lg">
-                                @error('name')
-                                    <p class="text-red-400 font-medium">{{ $message }}</p>
-                                @enderror
-                            </div>
+@section('title', 'Crear Rol')
 
-                            <div class="grid grid-cols-4 my-5">
-                                @if ($permisos->isNotEmpty())
-                                    @foreach ($permisos as $permiso)
-                                        <div class="mt-3">
-                                            <input type="checkbox" id="permiso-{{ $permiso->id }}" name="permisos[]" value="{{ $permiso->name }}"
-                                                class="rounded">
-                                            <label for="permiso-{{ $permiso->id }}" class="ml-2">{{ $permiso->name }}</label>
-                                        </div>
-                                    @endforeach
-                                @endif
-                            </div>
+@section('content')
 
-                            <button type="submit"
-                                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Enviar</button>
-                        </div>
-                    </form>
-                </div>
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Roles / Crear</h1>
             </div>
+            {{--<div class="col-sm-6 text-right">
+                <a href="{{ route('roles.index') }}" class="btn btn-primary">
+                    Volver
+                </a>
+            </div>--}}
         </div>
     </div>
-</x-app-layout>
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+
+        <div class="card card-primary">
+            <div class="card-body">
+
+                <form action="{{ route('roles.store') }}" method="POST">
+                    @csrf
+
+                    <div class="form-group">
+                        <label for="name">Nombre:</label>
+                        <input 
+                            value="{{ old('name') }}" 
+                            name="name" 
+                            id="name" 
+                            type="text"
+                            placeholder="Ingrese el nombre"
+                            class="form-control @error('name') is-invalid @enderror">
+
+                        @error('name')
+                            <div class="invalid-feedback d-block">
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label>Permisos:</label>
+
+                        <div class="row">
+                            @if ($permisos->isNotEmpty())
+                                @foreach ($permisos as $permiso)
+                                    <div class="col-md-3">
+                                        <div class="form-check">
+                                            <input 
+                                                type="checkbox"
+                                                id="permiso-{{ $permiso->id }}"
+                                                name="permisos[]"
+                                                value="{{ $permiso->name }}"
+                                                class="form-check-input">
+                                            <label 
+                                                for="permiso-{{ $permiso->id }}"
+                                                class="form-check-label">
+                                                {{ $permiso->name }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endif
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success">
+                        Crear
+                    </button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</section>
+
+@endsection

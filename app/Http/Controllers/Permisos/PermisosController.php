@@ -23,7 +23,7 @@ class PermisosController extends Controller
     // Este metodo mostrara la vista de permisos
     public function index()
     {
-        $permisos = Permission::orderBy('created_at', 'DESC')->paginate(10);
+        $permisos = Permission::orderBy('created_at', 'DESC')->get();
         return view('permisos.list', [
             'permisos' => $permisos
         ]);

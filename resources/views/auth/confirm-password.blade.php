@@ -3,7 +3,7 @@
 @section('content')
 
 <p class="login-box-msg">
-    Esta es una zona segura de la aplicación. Confirme su contraseña antes de continuar.
+    Esta es una zona segura del sistema. Confirme su contraseña antes de continuar.
 </p>
 
 <form method="POST" action="{{ route('password.confirm') }}">

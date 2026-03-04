@@ -10,14 +10,15 @@
 <div class="card">
     <div class="card-header d-flex justify-content-between">
         <h2>Permisos</h2>
-
+        @can('crear permisos')    
         <a href="{{ route('permisos.create') }}" class="btn btn-primary ">
             Crear Permiso
         </a>
+        @endcan
     </div>
 
     <div class="card-body p-0">
-        <table class="table table-bordered table-striped">
+        <table id="example1" class="table table-bordered table-striped">
             <thead>
                 <tr>
                     <th width="80">#</th>
@@ -31,19 +32,20 @@
                     <tr>
                         <td>{{ $permiso->id }}</td>
                         <td>{{ $permiso->name }}</td>
-                        <td>{{ $permiso->created_at->format('d / M / Y') }}</td>
+                        <td>{{ $permiso->created_at->format('d / M / Y H:i:s') }}</td>
                         <td>
+                            @can('editar permisos')
                             <a href="{{ route('permisos.edit', $permiso->id) }}" class="btn btn-warning btn-sm">Editar</a>
+                            @endcan
+
+                            @can('eliminar permisos')
                             <button onclick="eliminarPermiso({{ $permiso->id }})" class="btn btn-danger btn-sm">Eliminar</button>
+                            @endcan
                         </td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
-    </div>
-
-    <div class="card-footer">
-        {{ $permisos->links() }}
     </div>
 </div>
 </section>
