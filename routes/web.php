@@ -66,6 +66,13 @@ Route::middleware('auth', 'password.confirm')->group(function () {
     Route::get('/usuarios/{id}/edit', [UserController::class, 'edit'])->name('usuarios.edit');
     Route::post('/usuarios/{id}', [UserController::class, 'update'])->name('usuarios.update');
     Route::delete('/usuarios', [UserController::class, 'destroy'])->name('usuarios.destroy');
+
+    // Permisos especiales por usuario (directos)
+    Route::get('/usuarios/{id}/permisos-especiales', [UserController::class, 'editPermisosEspeciales'])
+        ->name('usuarios.permisos.edit');
+
+    Route::post('/usuarios/{id}/permisos-especiales', [UserController::class, 'updatePermisosEspeciales'])
+        ->name('usuarios.permisos.update');
 });
 
 require __DIR__ . '/auth.php';

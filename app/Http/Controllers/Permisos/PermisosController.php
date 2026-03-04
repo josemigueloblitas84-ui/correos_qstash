@@ -12,13 +12,13 @@ use Spatie\Permission\Models\Permission;
 class PermisosController extends Controller
 {
 
-    /*public function __construct()
+    public function __construct()
     {
         $this->middleware('permission:ver permisos')->only('index');
         $this->middleware('permission:crear permisos')->only(['create']);
         $this->middleware('permission:editar permisos')->only(['edit']);
         $this->middleware('permission:eliminar permisos')->only('destroy');
-    }*/
+    }
 
     // Este metodo mostrara la vista de permisos
     public function index()

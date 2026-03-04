@@ -21,7 +21,8 @@
         <!-- SidebarSearch Form -->
         <div class="form-inline">
             <div class="input-group" data-widget="sidebar-search">
-                <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
+                <input class="form-control form-control-sidebar" type="search" placeholder="Search"
+                    aria-label="Search">
                 <div class="input-group-append">
                     <button class="btn btn-sidebar">
                         <i class="fas fa-search fa-fw"></i>
@@ -32,7 +33,8 @@
 
         <!-- Sidebar Menu -->
         <nav class="mt-2">
-            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
+                data-accordion="false">
                 <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
                 <li class="nav-item">
@@ -207,36 +209,44 @@
                         </li>
                     </ul>
                 </li> --}}
-                <li class="nav-header">QSTASH</li>
+                <li class="nav-header">Roles y Permisos</li>
                 <li class="nav-item">
-                    <a href="{{route('usuarios.index')}}"
-                    class="nav-link {{ request()->routeIs('usuarios.index') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-users"></i>
-                        <p>Usuarios</p>
-                    </a>
+                    @can('ver usuarios')
+                        <a href="{{ route('usuarios.index') }}"
+                            class="nav-link {{ request()->routeIs('usuarios.index') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-users"></i>
+                            <p>Usuarios</p>
+                        </a>
+                    @endcan
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('permisos.index') }}"
-                    class="nav-link {{ request()->routeIs('permisos.index') ? 'active' : '' }}">
+                    @can('ver permisos')
+                        <a href="{{ route('permisos.index') }}"
+                        class="nav-link {{ request()->routeIs('permisos.index') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-user-lock"></i>
                         <p>Permisos</p>
                     </a>
+                    @endcan
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('roles.index') }}"
-                    class="nav-link {{ request()->routeIs('roles.index') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-user-tag"></i>
-                        <p>Roles</p>
-                    </a>
+                    @can('ver roles')
+                        <a href="{{ route('roles.index') }}"
+                            class="nav-link {{ request()->routeIs('roles.index') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-user-tag"></i>
+                            <p>Roles</p>
+                        </a>
+                    @endcan
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    @can('qstash')
+                        <a href="#" class="nav-link">
                         <i class="nav-icon far fa-envelope"></i>
                         <p>
-                            Correos de QSTASH
+                            Correos de QSTASH Test
                             <i class="fas fa-angle-left right"></i>
                         </p>
                     </a>
+                    @endcan
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
                             <a href="../mailbox/mailbox.html" class="nav-link">

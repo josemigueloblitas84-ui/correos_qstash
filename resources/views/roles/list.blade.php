@@ -10,11 +10,11 @@
         <div class="container-fluid d-flex justify-content-between align-items-center">
             <h1>Roles</h1>
 
-            {{-- @can('crear roles') --}}
+            @can('crear roles')
                 <a href="{{ route('roles.create') }}" class="btn btn-primary">
                     Crear Rol
                 </a>
-            {{-- @endcsan --}}
+            @endcan
         </div>
     </section>
 
@@ -51,20 +51,20 @@
                                         </td>
                                         <td>{{ $role->created_at->format('d / M / Y') }}</td>
                                         <td>
-                                            {{-- @can('editar roles') --}}
+                                            @can('editar roles')
                                                 <a href="{{ route('roles.edit', $role->id) }}"
                                                    class="btn btn-sm btn-warning">
                                                     Editar
                                                 </a>
-                                            {{-- @endcan --}}
+                                            @endcan
 
-                                            {{-- @can('eliminar roles') --}}
+                                            @can('eliminar roles')
                                                 <a href="javascript:void(0)"
                                                    onclick="eliminarRol({{ $role->id }})"
                                                    class="btn btn-sm btn-danger">
                                                     Eliminar
                                                 </a>
-                                            {{-- @endcan --}}
+                                            @endcan
                                         </td>
                                     </tr>
                                 @endforeach

@@ -8,17 +8,24 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Validator;
+use Spatie\Permission\Models\Permission;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
 
-    /*public function __construct()
+    public function __construct()
     {
         $this->middleware('permission:ver usuarios')->only('index');
-        // $this->middleware('permission:crear permisos')->only(['create']);
-        $this->middleware('permission:editar usuarios')->only(['edit']);
-        // $this->middleware('permission:eliminar permisos')->only('destroy');
-    }*/
+        $this->middleware('permission:crear usuarios')->only(['create', 'store']);
+        $this->middleware('permission:editar usuarios')->only(['edit', 'update']);
+        $this->middleware('permission:asignar permiso especial')->only([
+            'editPermisosEspeciales',
+            'updatePermisosEspeciales',
+        ]);
+        $this->middleware('permission:eliminar usuarios')->only('destroy');
+    }
+
 
     /**
      * Display a listing of the resource.
@@ -116,8 +123,42 @@ class UserController extends Controller
         $usuario->syncRoles($request->role);
 
         return redirect()->route('usuarios.index')->with('success', 'Usuario actualizado exitosamente');
+    }
 
+    public function editPermisosEspeciales(string $id)
+    {
+        $usuario = User::findOrFail($id);
+        $permisos = Permission::orderBy('name', 'asc')->get();
 
+        // Permisos directos (especiales)
+        $directPermissions = $usuario->getDirectPermissions()->pluck('name')->toArray();
+
+        // Permisos heredados por rol (solo para mostrar en pantalla)
+        $rolePermissions = $usuario->getPermissionsViaRoles()->pluck('name')->toArray();
+
+        return view('usuarios.permisos_especiales', [
+            'usuario' => $usuario,
+            'permisos' => $permisos,
+            'directPermissions' => $directPermissions,
+            'rolePermissions' => $rolePermissions,
+        ]);
+    }
+
+    public function updatePermisosEspeciales(Request $request, string $id)
+    {
+        $usuario = User::findOrFail($id);
+
+        $request->validate([
+            'permisos' => ['nullable', 'array'],
+            'permisos.*' => ['string', Rule::exists('permissions', 'name')],
+        ]);
+
+        // Solo sincroniza permisos directos del usuario (NO roles)
+        $usuario->syncPermissions($request->input('permisos', []));
+
+        return redirect()
+            ->route('usuarios.index')
+            ->with('success', 'Permisos especiales actualizados correctamente.');
     }
 
     /**
