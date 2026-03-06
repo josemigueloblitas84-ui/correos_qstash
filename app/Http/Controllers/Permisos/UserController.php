@@ -5,16 +5,19 @@ namespace App\Http\Controllers\Permisos;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
-use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Validation\Rule;
+use App\Http\Requests\Permisos\UserRequest;
+use App\Http\Requests\Permisos\UserUpdateRequest;
+use App\Services\Permisos\UserService;
 
 class UserController extends Controller
 {
 
-    public function __construct()
+    protected UserService $userService;
+
+    public function __construct(UserService $userService)
     {
         $this->middleware('permission:ver usuarios')->only('index');
         $this->middleware('permission:crear usuarios')->only(['create', 'store']);
@@ -24,15 +27,18 @@ class UserController extends Controller
             'updatePermisosEspeciales',
         ]);
         $this->middleware('permission:eliminar usuarios')->only('destroy');
+        $this->userService = $userService;
     }
-
 
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $usuarios = User::latest()->paginate(5);
+        $usuarios = User::with(['roles', 'permissions'])
+            ->latest()
+            ->paginate(5);
+
         return view('usuarios.list', [
             'usuarios' => $usuarios
         ]);
@@ -52,36 +58,12 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(UserRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'nombreUsuario' => 'required|min:3',
-            'correoUsuario' => 'required|email|unique:users,email',
-            'contrasenaUsuario' => 'required|min:8|same:confirmar_contrasenaUsuario',
-            'confirmar_contrasenaUsuario' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->route('usuarios.create')->withInput()->withErrors($validator);
-        }
-
-        $usuario = new User();
-        $usuario->name = $request->nombreUsuario;
-        $usuario->email = $request->correoUsuario;
-        $usuario->password = Hash::make($request->contrasenaUsuario);
-        $usuario->save();
-
-        $usuario->syncRoles($request->role);
+        // Almacenar el usuario utilizando el servicio
+        $this->userService->userStore($request);
 
         return redirect()->route('usuarios.index')->with('success', 'Usuario creado exitosamente');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
     }
 
     /**
@@ -103,24 +85,10 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UserUpdateRequest $request, string $id)
     {
         $usuario = User::findOrFail($id);
-
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|min:3',
-            'email' => 'required|email|unique:users,email,' . $id . ',id',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->route('usuarios.edit', $id)->withInput()->withErrors($validator);
-        }
-
-        $usuario->name = $request->name;
-        $usuario->email = $request->email;
-        $usuario->save();
-
-        $usuario->syncRoles($request->role);
+        $this->userService->userUpdate($usuario, $request);
 
         return redirect()->route('usuarios.index')->with('success', 'Usuario actualizado exitosamente');
     }

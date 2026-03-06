@@ -6,14 +6,20 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
-// use Illuminate\Routing\Controllers\HasMiddleware;
-// use Illuminate\Routing\Controllers\Middleware;
+use App\Http\Requests\Permisos\PermisoStoreRequest;
+use App\Http\Requests\Permisos\PermisoUpdateRequest;
+use App\Services\Permisos\PermisoService;
+
 
 class PermisosController extends Controller
 {
 
-    public function __construct()
+    protected PermisoService $permisoService;
+
+    public function __construct(PermisoService $permisoService)
     {
+        $this->permisoService = $permisoService;
+
         $this->middleware('permission:ver permisos')->only('index');
         $this->middleware('permission:crear permisos')->only(['create']);
         $this->middleware('permission:editar permisos')->only(['edit']);
@@ -27,7 +33,6 @@ class PermisosController extends Controller
         return view('permisos.list', [
             'permisos' => $permisos
         ]);
-
     }
 
     // Este metodo mostrara la vista de crear permisos
@@ -37,20 +42,12 @@ class PermisosController extends Controller
     }
 
     // Este metodo guardara el nuevo permiso en la base de datos
-    public function store(Request $request)
+    public function store(PermisoStoreRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|unique:permissions|min:3',
-        ]);
+        $this->permisoService->storePermiso($request);
 
-        if ($validator->passes()) {
-            Permission::create(['name' => $request->name]);
-            return redirect()->route('permisos.index')->with('success', 'Permiso creado exitosamente');
-        } else {
-            return redirect()->route('permisos.create')
-            ->withInput()
-            ->withErrors($validator);
-        }
+        return redirect()->route('permisos.index')
+            ->with('success', 'Permiso creado exitosamente');
     }
 
     // este metodo mostrara la vista de editar permisos
@@ -63,23 +60,14 @@ class PermisosController extends Controller
     }
 
     // este metodo actualizara el permiso en la base de datos
-    public function update($id, Request $request)
+    public function update(string $id, PermisoUpdateRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|min:3|unique:permissions,name,'.$id.',id',
-        ]);
+        $permiso = Permission::findOrFail($id);
 
-        if ($validator->passes()) {
-            $permiso = Permission::findOrfail($id);
-            $permiso->name = $request->name;
-            $permiso->save();
+        $this->permisoService->updatePermiso($permiso, $request);
 
-            return redirect()->route('permisos.index')->with('success', 'Permiso actualizado exitosamente');
-        } else {
-            return redirect()->route('permisos.edit', $id)
-            ->withInput()
-            ->withErrors($validator);
-        }
+        return redirect()->route('permisos.index')
+            ->with('success', 'Permiso actualizado exitosamente');
     }
 
     // este metodo eliminara el permiso de la base de datos
@@ -89,7 +77,7 @@ class PermisosController extends Controller
         $permiso = Permission::findOrfail($id);
 
         if ($permiso == null) {
-            session()->flash    ('error', 'El permiso no existe');
+            session()->flash('error', 'El permiso no existe');
             return response()->json(['status' => false]);
         }
 

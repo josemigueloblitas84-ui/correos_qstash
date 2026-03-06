@@ -14,13 +14,13 @@
 
 <div class="login-box">
     <div class="login-logo">
-        <img src="{{ asset('assets/img/logoFundacion.png') }}" alt="LogoFundacion" >
+        <img src="{{ asset('assets/img/logoFundacionTrans.png') }}" alt="LogoFundacion" >
     </div>
 
     <div class="card">
-        <div class="card-body login-card-body">
+        {{-- <div class="card-body login-card-body"> --}}
             @yield('content')
-        </div>
+        {{-- </div> --}}
     </div>
 </div>
 

@@ -33,6 +33,7 @@
                                     <th>Nombre</th>
                                     <th>Correo</th>
                                     <th>Rol</th>
+                                    <th width="320">Permisos Directos</th>
                                     <th width="200">Creación</th>
                                     <th width="200">Acciones</th>
                                 </tr>
@@ -40,6 +41,13 @@
                             <tbody>
                                 @if ($usuarios->isNotEmpty())
                                     @foreach ($usuarios as $usuario)
+                                        @php
+                                            $permisosAsignados = $usuario->permissions
+                                                ->pluck('name')
+                                                ->unique()
+                                                ->values();
+                                        @endphp
+
                                         <tr>
                                             <td>{{ $usuario->id }}</td>
                                             <td>{{ $usuario->name }}</td>
@@ -48,6 +56,17 @@
                                                 <span class="badge badge-info">
                                                     {{ $usuario->roles->pluck('name')->implode(', ') ?: 'Sin rol' }}
                                                 </span>
+                                            </td>
+                                            <td>
+                                                @if ($permisosAsignados->isNotEmpty())
+                                                    <div class="d-flex flex-wrap" style="gap: .25rem; white-space: normal;">
+                                                        @foreach ($permisosAsignados as $permiso)
+                                                            <span class="badge badge-dark">{{ $permiso }}</span>
+                                                        @endforeach
+                                                    </div>
+                                                @else
+                                                    <span class="badge badge-light">Sin permisos Directos</span>
+                                                @endif
                                             </td>
                                             <td>{{ $usuario->created_at->format('d / M / Y H:i:s') }}</td>
                                             <td>

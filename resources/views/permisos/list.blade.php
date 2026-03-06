@@ -8,14 +8,16 @@
 
     <section class="content">
         <div class="card">
-            <div class="card-header d-flex justify-content-between">
-                <h2>Permisos</h2>
-                @can('crear permisos')
-                <a href="{{ route('permisos.create') }}" class="btn btn-primary ">
-                    Crear Permiso
-                </a>
-                @endcan
-            </div>
+            <section class="content-header">
+                <div class="container-fluid d-flex justify-content-between align-items-center">
+                    <h2>Permisos</h2>
+                    @can('crear permisos')
+                        <a href="{{ route('permisos.create') }}" class="btn btn-primary ">
+                            Crear Permiso
+                        </a>
+                    @endcan
+                </div>
+            </section>
 
             <div class="card-body p-0">
                 <table id="example1" class="table table-bordered table-striped">

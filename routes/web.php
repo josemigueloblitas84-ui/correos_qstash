@@ -11,14 +11,8 @@ use App\Http\Controllers\Permisos\UserController;
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
 */
 
-//Prueba de Admin LTE, borrar luego
 Route::get('/prueba', function () {
     return view('plantilla.app');
 });
@@ -29,50 +23,49 @@ Route::get('/', function () {
         : redirect('/login');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::middleware(['auth', 'verified'])->group(function () {
 
-Route::get('/formulario', function () {
-    return view('formulario');
-})->middleware(['auth', 'verified'])->name('formulario');
+    Route::view('/dashboard', 'dashboard')->name('dashboard');
+    Route::view('/formulario', 'formulario')->name('formulario');
 
-Route::middleware('auth', 'password.confirm')->group(function () {
-    Route::get('/profile/show', [ProfileController::class, 'show'])->name('profile.show');
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit'); // Ya no es necesario, se usaahora el show
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::middleware('password.confirm')->group(function () {
+        Route::controller(ProfileController::class)->group(function () {
+            Route::get('/profile/show', 'show')->name('profile.show');
+            Route::get('/profile', 'edit')->name('profile.edit');
+            Route::patch('/profile', 'update')->name('profile.update');
+            Route::delete('/profile', 'destroy')->name('profile.destroy');
+        });
 
-    // permisos
-    Route::get('/permisos', [PermisosController::class, 'index'])->name('permisos.index');
-    Route::get('/permisos/create', [PermisosController::class, 'create'])->name('permisos.create');
-    Route::post('/permisos', [PermisosController::class, 'store'])->name('permisos.store');
-    Route::get('/permisos/{id}/edit', [PermisosController::class, 'edit'])->name('permisos.edit');
-    Route::post('/permisos/{id}', [PermisosController::class, 'update'])->name('permisos.update');
-    Route::delete('/permisos', [PermisosController::class, 'destroy'])->name('permisos.destroy');
+        Route::prefix('permisos')->name('permisos.')->controller(PermisosController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{id}/edit', 'edit')->name('edit');
+            Route::post('/{id}', 'update')->name('update');
+            Route::delete('/', 'destroy')->name('destroy');
+        });
 
-    // Roles
-    Route::get('/roles', [RolController::class, 'index'])->name('roles.index');
-    Route::get('/roles/create', [RolController::class, 'create'])->name('roles.create');
-    Route::post('/roles', [RolController::class, 'store'])->name('roles.store');
-    Route::get('/roles/{id}/edit', [RolController::class, 'edit'])->name('roles.edit');
-    Route::post('/roles/{id}', [RolController::class, 'update'])->name('roles.update');
-    Route::delete('/roles', [RolController::class, 'destroy'])->name('roles.destroy');
+        Route::prefix('roles')->name('roles.')->controller(RolController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{id}/edit', 'edit')->name('edit');
+            Route::post('/{id}', 'update')->name('update');
+            Route::delete('/', 'destroy')->name('destroy');
+        });
 
-    // Usuarios
-    Route::get('/usuarios', [UserController::class, 'index'])->name('usuarios.index');
-    Route::get('/usuarios/create', [UserController::class, 'create'])->name('usuarios.create');
-    Route::post('/usuarios', [UserController::class, 'store'])->name('usuarios.store');
-    Route::get('/usuarios/{id}/edit', [UserController::class, 'edit'])->name('usuarios.edit');
-    Route::post('/usuarios/{id}', [UserController::class, 'update'])->name('usuarios.update');
-    Route::delete('/usuarios', [UserController::class, 'destroy'])->name('usuarios.destroy');
+        Route::prefix('usuarios')->name('usuarios.')->controller(UserController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{id}/edit', 'edit')->name('edit');
+            Route::post('/{id}', 'update')->name('update');
+            Route::delete('/', 'destroy')->name('destroy');
 
-    // Permisos especiales por usuario (directos)
-    Route::get('/usuarios/{id}/permisos-especiales', [UserController::class, 'editPermisosEspeciales'])
-        ->name('usuarios.permisos.edit');
-
-    Route::post('/usuarios/{id}/permisos-especiales', [UserController::class, 'updatePermisosEspeciales'])
-        ->name('usuarios.permisos.update');
+            Route::get('/{id}/permisos-especiales', 'editPermisosEspeciales')->name('permisos.edit');
+            Route::post('/{id}/permisos-especiales', 'updatePermisosEspeciales')->name('permisos.update');
+        });
+    });
 });
 
 require __DIR__ . '/auth.php';
