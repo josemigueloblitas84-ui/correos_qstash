@@ -51,24 +51,21 @@ class PermisosController extends Controller
     }
 
     // este metodo mostrara la vista de editar permisos
-    public function edit($id)
+    public function edit(Permission $permiso)
     {
-        $permiso = Permission::findOrfail($id);
         return view('permisos.edit', [
             'permiso' => $permiso
         ]);
     }
 
-    // este metodo actualizara el permiso en la base de datos
-    public function update(string $id, PermisoUpdateRequest $request)
+    public function update(Permission $permiso, PermisoUpdateRequest $request)
     {
-        $permiso = Permission::findOrFail($id);
-
         $this->permisoService->updatePermiso($permiso, $request);
 
         return redirect()->route('permisos.index')
             ->with('success', 'Permiso actualizado exitosamente');
     }
+
 
     // este metodo eliminara el permiso de la base de datos
     public function destroy(Request $request)

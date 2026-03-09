@@ -22,17 +22,19 @@ class RolUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-        $roleId = $this->route('id');
+        $role = $this->route('role');
+
         return [
             'name' => [
                 'required',
                 'min:3',
-                Rule::unique('roles', 'name')->ignore($roleId, 'id'),
+                Rule::unique('roles', 'name')->ignore($role->id),
             ],
             'permisos' => 'nullable|array',
             'permisos.*' => 'exists:permissions,name',
         ];
     }
+
 
     public function messages(): array
     {

@@ -50,9 +50,8 @@ class RolController extends Controller
             ->with('success', 'Rol creado exitosamente');
     }
 
-    public function edit($id)
+    public function edit(Role $role)
     {
-        $role = Role::findOrFail($id);
         $hasPermisos = $role->permissions->pluck('name');
         $permisos = Permission::orderBy('name', 'ASC')->get();
 
@@ -63,15 +62,14 @@ class RolController extends Controller
         ]);
     }
 
-    public function update(String $id, RolUpdateRequest $request)
+    public function update(Role $role, RolUpdateRequest $request)
     {
-        $role = Role::findOrFail($id);
-
         $this->rolService->updateRol($role, $request);
 
         return redirect()->route('roles.index')
             ->with('success', 'Rol actualizado exitosamente');
     }
+
 
     public function destroy(Request $request)
     {

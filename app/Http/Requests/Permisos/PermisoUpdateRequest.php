@@ -22,16 +22,17 @@ class PermisoUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-        $id = $this->route('id');
+        $permiso = $this->route('permiso');
 
         return [
             'name' => [
                 'required',
                 'min:3',
-                Rule::unique('permissions', 'name')->ignore($id, 'id'),
+                Rule::unique('permissions', 'name')->ignore($permiso->id),
             ],
         ];
     }
+
 
     public function messages(): array
     {
