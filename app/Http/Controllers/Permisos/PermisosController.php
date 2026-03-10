@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Permisos;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
 use App\Http\Requests\Permisos\PermisoStoreRequest;
@@ -21,8 +20,8 @@ class PermisosController extends Controller
         $this->permisoService = $permisoService;
 
         $this->middleware('permission:ver permisos')->only('index');
-        $this->middleware('permission:crear permisos')->only(['create']);
-        $this->middleware('permission:editar permisos')->only(['edit']);
+        $this->middleware('permission:crear permisos')->only(['create', 'store']);
+        $this->middleware('permission:editar permisos')->only(['edit', 'update']);
         $this->middleware('permission:eliminar permisos')->only('destroy');
     }
 

@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Permisos\RolStoreRequest;
 use App\Http\Requests\Permisos\RolUpdateRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use App\Services\Permisos\RolService;
@@ -21,7 +20,7 @@ class RolController extends Controller
         $this->rolService = $rolService;
 
         $this->middleware('permission:crear roles')->only(['create', 'store']);
-        $this->middleware('permission:editar roles')->only(['edit', 'update']);
+        $this->middleware('permission:ver roles')->only(['edit', 'update']);
         $this->middleware('permission:editar roles')->only(['edit']);
         $this->middleware('permission:eliminar roles')->only('destroy');
     }
