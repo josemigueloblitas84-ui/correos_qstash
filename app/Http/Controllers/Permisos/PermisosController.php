@@ -28,9 +28,8 @@ class PermisosController extends Controller
     // Este metodo mostrara la vista de permisos
     public function index()
     {
-        $permisos = Permission::orderBy('created_at', 'DESC')->get();
         return view('permisos.list', [
-            'permisos' => $permisos
+            'permisos' => $this->permisoService->getAllPermisos()
         ]);
     }
 
@@ -69,15 +68,10 @@ class PermisosController extends Controller
     // este metodo eliminara el permiso de la base de datos
     public function destroy(Request $request)
     {
-        $id = $request->id;
-        $permiso = Permission::findOrfail($id);
-
-        if ($permiso == null) {
+        if (! $this->permisoService->deleteById($request->id)) {
             session()->flash('error', 'El permiso no existe');
             return response()->json(['status' => false]);
         }
-
-        $permiso->delete();
 
         session()->flash('success', 'Permiso eliminado exitosamente');
         return response()->json(['status' => true]);

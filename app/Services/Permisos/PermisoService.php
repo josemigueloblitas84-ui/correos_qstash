@@ -8,6 +8,11 @@ use App\Http\Requests\Permisos\PermisoUpdateRequest;
 
 class PermisoService
 {
+    public function getAllPermisos()
+    {
+        return Permission::orderBy('created_at', 'DESC')->get();
+    }
+
     public function storePermiso(PermisoStoreRequest $request): Permission
     {
         return Permission::create([
@@ -21,5 +26,18 @@ class PermisoService
         $permiso->save();
 
         return $permiso;
+    }
+
+    public function deleteById(?string $id): bool
+    {
+        $permiso = Permission::find($id);
+
+        if (! $permiso) {
+            return false;
+        }
+
+        $permiso->delete();
+
+        return true;
     }
 }

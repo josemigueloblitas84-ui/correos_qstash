@@ -51,14 +51,7 @@ class RolController extends Controller
 
     public function edit(Role $role)
     {
-        $hasPermisos = $role->permissions->pluck('name');
-        $permisos = Permission::orderBy('name', 'ASC')->get();
-
-        return view('roles.edit', [
-            'permisos' => $permisos,
-            'hasPermisos' => $hasPermisos,
-            'role' => $role
-        ]);
+        return view('roles.edit', $this->rolService->getEditData($role));
     }
 
     public function update(Role $role, RolUpdateRequest $request)
@@ -72,15 +65,10 @@ class RolController extends Controller
 
     public function destroy(Request $request)
     {
-        $id = $request->id;
-        $role = Role::find($id);
-
-        if ($role == null) {
+        if (! $this->rolService->deleteById($request->id)) {
             session()->flash('error', 'Rol no encontrado');
             return response()->json(['status' => false]);
         }
-
-        $role->delete();
 
         session()->flash('success', 'Rol eliminado exitosamente');
         return response()->json(['status' => true]);
