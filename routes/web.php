@@ -8,6 +8,7 @@ use App\Http\Controllers\Permisos\RolController;
 use App\Http\Controllers\Permisos\UserController;
 use App\Http\Controllers\FormMultiPasosController;
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\Agenda\DepartamentoController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -75,6 +76,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::put('/{articulo}', 'update')->name('update');
             Route::delete('/{articulo}', 'destroy')->name('destroy');
             Route::get('/agenda-registrada/data', 'agendaData')->name('agenda.data');
+        });
+
+        Route::prefix('departamentos')->name('departamentos.')->controller(DepartamentoController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/data', 'data')->name('data');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{id}', 'show')->name('show');
+            Route::put('/{id}', 'update')->name('update');
+            Route::patch('/{id}/toggle-status', 'toggleStatus')->name('toggle-status');
+            Route::delete('/{id}', 'destroy')->name('destroy');
         });
     });
 
