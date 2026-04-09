@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use App\Services\Support\ActivityLogger;
 
 class NewPasswordController extends Controller
 {
@@ -45,6 +46,15 @@ class NewPasswordController extends Controller
                     'password' => Hash::make($request->password),
                     'remember_token' => Str::random(60),
                 ])->save();
+
+                ActivityLogger::log(
+                    'Contrasena restablecida desde recovery',
+                    [],
+                    $user,
+                    $user,
+                    'auth',
+                    'password_reset'
+                );
 
                 event(new PasswordReset($user));
             }

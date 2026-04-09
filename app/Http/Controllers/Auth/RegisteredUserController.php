@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use App\Services\Support\ActivityLogger;
 
 class RegisteredUserController extends Controller
 {
@@ -45,6 +46,21 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         Auth::login($user);
+
+        ActivityLogger::log(
+            'Usuario registrado desde formulario web',
+            [
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                ],
+            ],
+            $user,
+            $user,
+            'auth',
+            'registered'
+        );
 
         return redirect(RouteServiceProvider::HOME);
     }

@@ -8,6 +8,7 @@ use App\Services\Permisos\PermisoService;
 use Spatie\Permission\Models\Permission;
 use App\Http\Requests\Permisos\PermisoStoreRequest;
 use App\Http\Requests\Permisos\PermisoUpdateRequest;
+use App\Services\Support\ActivityLogger;
 
 class PermisoController extends Controller
 {
@@ -56,7 +57,23 @@ class PermisoController extends Controller
     //Eliminar
     public function destroy(Permission $permission)
     {
+        $properties = [
+            'permission' => [
+                'id' => $permission->id,
+                'name' => $permission->name,
+            ],
+        ];
+
         $permission->delete();
+
+        ActivityLogger::log(
+            'Permiso eliminado desde API',
+            $properties,
+            null,
+            logName: 'permisos',
+            event: 'deleted'
+        );
+
         return response()->json(["message" => "Permiso eliminado correctamente"]);
     }
 }

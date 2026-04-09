@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use App\Services\Support\ActivityLogger;
 
 class ProfileController extends Controller
 {
@@ -36,13 +37,33 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $before = [
+            'name' => $user->name,
+            'email' => $user->email,
+        ];
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        $user->fill($request->validated());
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        $request->user()->save();
+        $user->save();
+
+        ActivityLogger::log(
+            'Perfil actualizado',
+            [
+                'old' => $before,
+                'attributes' => [
+                    'name' => $user->name,
+                    'email' => $user->email,
+                ],
+            ],
+            $user,
+            logName: 'perfil',
+            event: 'updated'
+        );
 
         return Redirect::route('profile.show')->with('status', 'profile-updated');
     }
@@ -57,10 +78,26 @@ class ProfileController extends Controller
         ]);
 
         $user = $request->user();
+        $properties = [
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+            ],
+        ];
 
         Auth::logout();
 
         $user->delete();
+
+        ActivityLogger::log(
+            'Cuenta eliminada',
+            $properties,
+            null,
+            $user,
+            'perfil',
+            'deleted'
+        );
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

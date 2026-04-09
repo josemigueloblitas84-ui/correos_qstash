@@ -7,7 +7,7 @@ use App\Http\Controllers\Permisos\PermisosController;
 use App\Http\Controllers\Permisos\RolController;
 use App\Http\Controllers\Permisos\UserController;
 use App\Http\Controllers\FormMultiPasosController;
-
+use App\Http\Controllers\ActivityLogController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -76,6 +76,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::delete('/{articulo}', 'destroy')->name('destroy');
             Route::get('/agenda-registrada/data', 'agendaData')->name('agenda.data');
         });
+    });
+
+    //Ruta de los Logs
+    Route::prefix('logs')->name('logs.')->controller(ActivityLogController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/data', 'data')->name('data');
     });
 });
 

@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Requests\Permisos\UserRequest;
 use App\Http\Requests\Permisos\UserUpdateRequest;
+use App\Services\Support\ActivityLogger;
 
 class UserController extends Controller
 {
@@ -65,12 +66,28 @@ class UserController extends Controller
     public function updatePermisosEspeciales(Request $request, $id)
     {
         $usuario = User::findOrFail($id);
+        $previousPermissions = $usuario->getDirectPermissions()->pluck('name')->values()->all();
 
         $request->validate([
             'permisos' => 'array',
         ]);
 
         $usuario->syncPermissions($request->permisos ?? []);
+
+        ActivityLogger::log(
+            'Permisos especiales de usuario actualizados desde API',
+            [
+                'old' => [
+                    'direct_permissions' => $previousPermissions,
+                ],
+                'attributes' => [
+                    'direct_permissions' => $usuario->getDirectPermissions()->pluck('name')->values()->all(),
+                ],
+            ],
+            $usuario,
+            logName: 'usuarios',
+            event: 'permissions_updated'
+        );
 
         return response()->json([
             "message" => "Permisos directos actualizados correctamente"
@@ -80,7 +97,25 @@ class UserController extends Controller
     //Eliminar
     public function destroy(User $user)
     {
+        $properties = [
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+            ],
+            'roles' => $user->roles()->pluck('name')->values()->all(),
+        ];
+
         $user->delete();
+
+        ActivityLogger::log(
+            'Usuario eliminado desde API',
+            $properties,
+            null,
+            logName: 'usuarios',
+            event: 'deleted'
+        );
+
         return response()->json(['message' => 'Usuario eliminado correctamente']);
     }
 }

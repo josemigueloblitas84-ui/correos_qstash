@@ -5,6 +5,7 @@ namespace App\Services\Permisos;
 use Spatie\Permission\Models\Role;
 use App\Http\Requests\Permisos\RolStoreRequest;
 use App\Http\Requests\Permisos\RolUpdateRequest;
+use App\Services\Support\ActivityLogger;
 
 class RolService
 {
@@ -21,16 +22,51 @@ class RolService
         ]);
 
         $role->syncPermissions($request->permisos ?? []);
+        $role->load('permissions');
+
+        ActivityLogger::log(
+            'Rol creado',
+            [
+                'role' => [
+                    'id' => $role->id,
+                    'name' => $role->name,
+                ],
+                'permissions' => $role->permissions->pluck('name')->values()->all(),
+            ],
+            $role,
+            logName: 'roles',
+            event: 'created'
+        );
 
         return $role;
     }
 
     public function updateRol(Role $role, RolUpdateRequest $request): Role
     {
+        $before = [
+            'name' => $role->name,
+            'permissions' => $role->permissions()->pluck('name')->values()->all(),
+        ];
+
         $role->name = $request->name;
         $role->save();
 
         $role->syncPermissions($request->permisos ?? []);
+        $role->load('permissions');
+
+        ActivityLogger::log(
+            'Rol actualizado',
+            [
+                'old' => $before,
+                'attributes' => [
+                    'name' => $role->name,
+                    'permissions' => $role->permissions->pluck('name')->values()->all(),
+                ],
+            ],
+            $role,
+            logName: 'roles',
+            event: 'updated'
+        );
 
         return $role;
     }

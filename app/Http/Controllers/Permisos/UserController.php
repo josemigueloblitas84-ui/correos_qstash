@@ -11,6 +11,7 @@ use Illuminate\Validation\Rule;
 use App\Http\Requests\Permisos\UserRequest;
 use App\Http\Requests\Permisos\UserUpdateRequest;
 use App\Services\Permisos\UserService;
+use App\Services\Support\ActivityLogger;
 
 class UserController extends Controller
 {
@@ -115,6 +116,7 @@ class UserController extends Controller
     public function updatePermisosEspeciales(Request $request, string $id)
     {
         $usuario = User::findOrFail($id);
+        $previousPermissions = $usuario->getDirectPermissions()->pluck('name')->values()->all();
 
         $request->validate([
             'permisos' => ['nullable', 'array'],
@@ -123,6 +125,22 @@ class UserController extends Controller
 
         // Solo sincroniza permisos directos del usuario (NO roles)
         $usuario->syncPermissions($request->input('permisos', []));
+        $usuario->load('permissions');
+
+        ActivityLogger::log(
+            'Permisos especiales de usuario actualizados',
+            [
+                'old' => [
+                    'direct_permissions' => $previousPermissions,
+                ],
+                'attributes' => [
+                    'direct_permissions' => $usuario->getDirectPermissions()->pluck('name')->values()->all(),
+                ],
+            ],
+            $usuario,
+            logName: 'usuarios',
+            event: 'permissions_updated'
+        );
 
         return redirect()
             ->route('usuarios.index')
@@ -135,13 +153,24 @@ class UserController extends Controller
     public function destroy(Request $request)
     {
         $usuario = User::findOrFail($request->id);
-
-        if ($usuario == null) {
-            session()->flash('error', 'Usuario no encontrado');
-            return response()->json(['status' => false]);
-        }
+        $properties = [
+            'user' => [
+                'id' => $usuario->id,
+                'name' => $usuario->name,
+                'email' => $usuario->email,
+            ],
+            'roles' => $usuario->roles()->pluck('name')->values()->all(),
+        ];
 
         $usuario->delete();
+
+        ActivityLogger::log(
+            'Usuario eliminado',
+            $properties,
+            null,
+            logName: 'usuarios',
+            event: 'deleted'
+        );
 
         session()->flash('success', 'Usuario eliminado exitosamente');
         return response()->json(['status' => true]);

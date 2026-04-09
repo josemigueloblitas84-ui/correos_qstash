@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use App\Services\Permisos\RolService;
+use App\Services\Support\ActivityLogger;
 
 class RolController extends Controller
 {
@@ -83,7 +84,23 @@ class RolController extends Controller
             return response()->json(['status' => false]);
         }
 
+        $properties = [
+            'role' => [
+                'id' => $role->id,
+                'name' => $role->name,
+            ],
+            'permissions' => $role->permissions()->pluck('name')->values()->all(),
+        ];
+
         $role->delete();
+
+        ActivityLogger::log(
+            'Rol eliminado',
+            $properties,
+            null,
+            logName: 'roles',
+            event: 'deleted'
+        );
 
         session()->flash('success', 'Rol eliminado exitosamente');
         return response()->json(['status' => true]);

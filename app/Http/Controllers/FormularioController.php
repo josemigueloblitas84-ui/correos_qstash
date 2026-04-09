@@ -9,6 +9,7 @@ use App\Mail\FormularioMail;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Support\Facades\Log;
+use App\Services\Support\ActivityLogger;
 
 class FormularioController extends Controller
 {
@@ -58,6 +59,22 @@ public function store(Request $request)
         'adjuntos' => $adjuntos,
     ]);
 
+    ActivityLogger::log(
+        'Formulario enviado a QStash',
+        [
+            'formulario' => [
+                'nombre' => $validated['nombre'],
+                'email' => $validated['email'],
+                'adjuntos_count' => count($adjuntos),
+            ],
+            'qstash' => [
+                'status' => $response->status(),
+            ],
+        ],
+        logName: 'formularios',
+        event: 'submitted'
+    );
+
 
     return response()->json([
         'status' => $response->status(),
@@ -75,6 +92,19 @@ public function enviarEmail(Request $request)
 
         Mail::to('oblitasjosemiguel4@gmail.com')
             ->send(new FormularioMail($datos));
+
+        ActivityLogger::log(
+            'Correo del formulario procesado por QStash',
+            [
+                'formulario' => [
+                    'nombre' => $datos['nombre'] ?? null,
+                    'email' => $datos['email'] ?? null,
+                    'adjuntos_count' => count($datos['adjuntos'] ?? []),
+                ],
+            ],
+            logName: 'formularios',
+            event: 'processed'
+        );
 
         return response()->json([
             'status' => 'Correo enviado correctamente'

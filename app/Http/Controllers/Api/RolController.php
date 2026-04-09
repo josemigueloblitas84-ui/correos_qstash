@@ -8,6 +8,7 @@ use App\Services\Permisos\RolService;
 use Spatie\Permission\Models\Role;
 use App\Http\Requests\Permisos\RolStoreRequest;
 use App\Http\Requests\Permisos\RolUpdateRequest;
+use App\Services\Support\ActivityLogger;
 
 class RolController extends Controller
 {
@@ -59,7 +60,24 @@ class RolController extends Controller
     //Eliminar
     public function destroy(Role $role)
     {
+        $properties = [
+            'role' => [
+                'id' => $role->id,
+                'name' => $role->name,
+            ],
+            'permissions' => $role->permissions()->pluck('name')->values()->all(),
+        ];
+
         $role->delete();
+
+        ActivityLogger::log(
+            'Rol eliminado desde API',
+            $properties,
+            null,
+            logName: 'roles',
+            event: 'deleted'
+        );
+
         return response()->json(["message" => "Rol eliminado correctamente"]);
     }
 }

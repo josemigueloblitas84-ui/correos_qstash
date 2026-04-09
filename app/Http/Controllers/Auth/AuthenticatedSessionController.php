@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use App\Services\Support\ActivityLogger;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -29,6 +30,16 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        ActivityLogger::log(
+            'Inicio de sesión web',
+            [
+                'guard' => 'web',
+            ],
+            $request->user(),
+            logName: 'auth',
+            event: 'login'
+        );
+
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 
@@ -37,6 +48,21 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $user = $request->user();
+
+        if ($user !== null) {
+            ActivityLogger::log(
+                'Cierre de sesión web',
+                [
+                    'guard' => 'web',
+                ],
+                $user,
+                $user,
+                'auth',
+                'logout'
+            );
+        }
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();

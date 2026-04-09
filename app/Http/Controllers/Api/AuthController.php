@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use App\Services\Support\ActivityLogger;
 
 class AuthController extends Controller
 {
@@ -33,6 +34,22 @@ class AuthController extends Controller
         ];
 
         $token = JWT::encode($payload, env('JWT_SECRET'), 'HS256');
+
+        ActivityLogger::log(
+            'Usuario registrado desde API',
+            [
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                ],
+                'guard' => 'api',
+            ],
+            $user,
+            $user,
+            'auth',
+            'registered'
+        );
 
         return response()->json([
             'user' => $user,
@@ -64,6 +81,17 @@ class AuthController extends Controller
 
         $jwt = JWT::encode($payload, env('JWT_SECRET'), 'HS256');
 
+        ActivityLogger::log(
+            'Inicio de sesión API',
+            [
+                'guard' => 'api',
+            ],
+            $user,
+            $user,
+            'auth',
+            'login'
+        );
+
         return response()->json(['token' => $jwt]);
     }
 
@@ -81,6 +109,7 @@ class AuthController extends Controller
     {
         $token = $request->bearerToken();
         $decoded = JWT::decode($token, new Key(env('JWT_SECRET'), 'HS256'));
+        $user = User::find($decoded->sub);
 
         $payload =[
             'iss' => "FundacionUnifranz",
@@ -91,11 +120,37 @@ class AuthController extends Controller
 
         $newToken = JWT::encode($payload, env('JWT_SECRET'), 'HS256');
 
+        if ($user !== null) {
+            ActivityLogger::log(
+                'Token API renovado',
+                [
+                    'guard' => 'api',
+                ],
+                $user,
+                $user,
+                'auth',
+                'token_refreshed'
+            );
+        }
+
         return response()->json(['token' => $newToken]);
     }
 
     public function logout()
     {
+        if (auth()->user() !== null) {
+            ActivityLogger::log(
+                'Cierre de sesión API',
+                [
+                    'guard' => 'api',
+                ],
+                auth()->user(),
+                auth()->user(),
+                'auth',
+                'logout'
+            );
+        }
+
         return response()->json(['message' => 'Cerraste sesión']);
     }
 }

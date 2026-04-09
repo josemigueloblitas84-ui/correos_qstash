@@ -87,6 +87,15 @@
                     </a>
                     @endcan
                 </li>
+                <li class="nav-item">
+                    @can('ver logs')
+                    <a href="{{ route('logs.index')}}"
+                    class="nav-link {{request()->routeIs('logs.index') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-history"></i>
+                    <p>Historial de Actividad</p>
+                    </a>
+                    @endcan
+                </li>
                 {{-- <li class="nav-item">
                     @can('qstash')
                     <a href="#" class="nav-link">
