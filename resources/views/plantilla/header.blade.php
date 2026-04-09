@@ -1,154 +1,177 @@
-<nav class="main-header navbar navbar-expand navbar-white navbar-light">
-    <!-- Left navbar links -->
-    <ul class="navbar-nav">
-        <li class="nav-item">
-            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-        </li>
-    </ul>
+<nav class="app-header navbar navbar-expand bg-body">
+    <!--begin::Container-->
+    <div class="container-fluid">
+        <!--begin::Start Navbar Links-->
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
+                    <i class="bi bi-list"></i>
+                </a>
+            </li>
+            <li class="nav-item d-none d-md-block">
+                <a href="#" class="nav-link">Home</a>
+            </li>
+            <li class="nav-item d-none d-md-block">
+                <a href="#" class="nav-link">Contact</a>
+            </li>
+        </ul>
+        <!--end::Start Navbar Links-->
 
-    <!-- Right navbar links -->
-    <ul class="navbar-nav ml-auto">
-        <!-- Navbar Search -->
-        <li class="nav-item">
-            <a class="nav-link" data-widget="navbar-search" href="#" role="button">
-                <i class="fas fa-search"></i>
-            </a>
-            <div class="navbar-search-block">
-                <form class="form-inline">
-                    <div class="input-group input-group-sm">
-                        <input class="form-control form-control-navbar" type="search" placeholder="Search"
-                            aria-label="Search">
-                        <div class="input-group-append">
-                            <button class="btn btn-navbar" type="submit">
-                                <i class="fas fa-search"></i>
-                            </button>
-                            <button class="btn btn-navbar" type="button" data-widget="navbar-search">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </li>
+        <!--begin::End Navbar Links-->
+        <ul class="navbar-nav ms-auto">
+            <!--begin::Navbar Search-->
+            <li class="nav-item">
+                <a class="nav-link" data-widget="navbar-search" href="#" role="button">
+                    <i class="bi bi-search"></i>
+                </a>
+            </li>
+            <!--end::Navbar Search-->
 
-        <!-- Messages Dropdown Menu -->
-        <li class="nav-item dropdown">
-            <a class="nav-link" data-toggle="dropdown" href="#">
-                <i class="far fa-comments"></i>
-                <span class="badge badge-danger navbar-badge">3</span>
-            </a>
-            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                <a href="#" class="dropdown-item">
-                    <!-- Message Start -->
-                    <div class="media">
-                        <img src="{{ asset('assets/img/user1-128x128.jpg') }}" alt="User Avatar"
-                            class="img-size-50 mr-3 img-circle">
-                        <div class="media-body">
-                            <h3 class="dropdown-item-title">
-                                Brad Diesel
-                                <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
-                            </h3>
-                            <p class="text-sm">Call me whenever you can...</p>
-                            <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
+            <!--begin::Messages Dropdown Menu-->
+            <li class="nav-item dropdown">
+                <a class="nav-link" data-bs-toggle="dropdown" href="#">
+                    <i class="bi bi-chat-text"></i>
+                    <span class="navbar-badge badge text-bg-danger">3</span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
+                    <a href="#" class="dropdown-item">
+                        <!--begin::Message-->
+                        <div class="d-flex">
+                            <div class="flex-shrink-0">
+                                <img src="./assets/img/user1-128x128.jpg" alt="User Avatar"
+                                    class="img-size-50 rounded-circle me-3" />
+                            </div>
+                            <div class="flex-grow-1">
+                                <h3 class="dropdown-item-title">
+                                    Brad Diesel
+                                    <span class="float-end fs-7 text-danger"><i class="bi bi-star-fill"></i></span>
+                                </h3>
+                                <p class="fs-7">Call me whenever you can...</p>
+                                <p class="fs-7 text-secondary">
+                                    <i class="bi bi-clock-fill me-1"></i> 4 Hours Ago
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                    <!-- Message End -->
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item">
-                    <!-- Message Start -->
-                    <div class="media">
-                        <img src="{{ asset('assets/img/user8-128x128.jpg') }}" alt="User Avatar"
-                            class="img-size-50 img-circle mr-3">
-                        <div class="media-body">
-                            <h3 class="dropdown-item-title">
-                                John Pierce
-                                <span class="float-right text-sm text-muted"><i class="fas fa-star"></i></span>
-                            </h3>
-                            <p class="text-sm">I got your message bro</p>
-                            <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
+                        <!--end::Message-->
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item">
+                        <!--begin::Message-->
+                        <div class="d-flex">
+                            <div class="flex-shrink-0">
+                                <img src="./assets/img/user8-128x128.jpg" alt="User Avatar"
+                                    class="img-size-50 rounded-circle me-3" />
+                            </div>
+                            <div class="flex-grow-1">
+                                <h3 class="dropdown-item-title">
+                                    John Pierce
+                                    <span class="float-end fs-7 text-secondary">
+                                        <i class="bi bi-star-fill"></i>
+                                    </span>
+                                </h3>
+                                <p class="fs-7">I got your message bro</p>
+                                <p class="fs-7 text-secondary">
+                                    <i class="bi bi-clock-fill me-1"></i> 4 Hours Ago
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                    <!-- Message End -->
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item">
-                    <!-- Message Start -->
-                    <div class="media">
-                        <img src="{{ asset('assets/img/user3-128x128.jpg') }}" alt="User Avatar"
-                            class="img-size-50 img-circle mr-3">
-                        <div class="media-body">
-                            <h3 class="dropdown-item-title">
-                                Nora Silvester
-                                <span class="float-right text-sm text-warning"><i class="fas fa-star"></i></span>
-                            </h3>
-                            <p class="text-sm">The subject goes here</p>
-                            <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
+                        <!--end::Message-->
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item">
+                        <!--begin::Message-->
+                        <div class="d-flex">
+                            <div class="flex-shrink-0">
+                                <img src="./assets/img/user3-128x128.jpg" alt="User Avatar"
+                                    class="img-size-50 rounded-circle me-3" />
+                            </div>
+                            <div class="flex-grow-1">
+                                <h3 class="dropdown-item-title">
+                                    Nora Silvester
+                                    <span class="float-end fs-7 text-warning">
+                                        <i class="bi bi-star-fill"></i>
+                                    </span>
+                                </h3>
+                                <p class="fs-7">The subject goes here</p>
+                                <p class="fs-7 text-secondary">
+                                    <i class="bi bi-clock-fill me-1"></i> 4 Hours Ago
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                    <!-- Message End -->
+                        <!--end::Message-->
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
+                </div>
+            </li>
+            <!--end::Messages Dropdown Menu-->
+
+            <!--begin::Notifications Dropdown Menu-->
+            <li class="nav-item dropdown">
+                <a class="nav-link" data-bs-toggle="dropdown" href="#">
+                    <i class="bi bi-bell-fill"></i>
+                    <span class="navbar-badge badge text-bg-warning">15</span>
                 </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
-            </div>
-        </li>
-        <!-- Notifications Dropdown Menu -->
-        <li class="nav-item dropdown">
-            <a class="nav-link" data-toggle="dropdown" href="#">
-                <i class="far fa-bell"></i>
-                <span class="badge badge-warning navbar-badge">15</span>
-            </a>
-            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                <span class="dropdown-item dropdown-header">15 Notifications</span>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item">
-                    <i class="fas fa-envelope mr-2"></i> 4 new messages
-                    <span class="float-right text-muted text-sm">3 mins</span>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
+                    <span class="dropdown-item dropdown-header">15 Notifications</span>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item">
+                        <i class="bi bi-envelope me-2"></i> 4 new messages
+                        <span class="float-end text-secondary fs-7">3 mins</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item">
+                        <i class="bi bi-people-fill me-2"></i> 8 friend requests
+                        <span class="float-end text-secondary fs-7">12 hours</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item">
+                        <i class="bi bi-file-earmark-fill me-2"></i> 3 new reports
+                        <span class="float-end text-secondary fs-7">2 days</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item dropdown-footer"> See All Notifications </a>
+                </div>
+            </li>
+            <!--end::Notifications Dropdown Menu-->
+
+            <!--begin::Fullscreen Toggle-->
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-lte-toggle="fullscreen">
+                    <i data-lte-icon="maximize" class="bi bi-arrows-fullscreen"></i>
+                    <i data-lte-icon="minimize" class="bi bi-fullscreen-exit" style="display: none"></i>
                 </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item">
-                    <i class="fas fa-users mr-2"></i> 8 friend requests
-                    <span class="float-right text-muted text-sm">12 hours</span>
+            </li>
+            <!--end::Fullscreen Toggle-->
+
+            <!--begin::User Menu Dropdown-->
+            <li class="nav-item dropdown">
+                <a class="nav-link" data-bs-toggle="dropdown" href="#">
+                    <i class="bi bi-person-circle"></i>
+                    <span class="d-none d-sm-inline ms-2">{{ auth()->user()->name }}</span>
                 </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item">
-                    <i class="fas fa-file mr-2"></i> 3 new reports
-                    <span class="float-right text-muted text-sm">2 days</span>
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
-            </div>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" data-widget="fullscreen" href="#" role="button">
-                <i class="fas fa-expand-arrows-alt"></i>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
-                <i class="fas fa-th-large"></i>
-            </a>
-        </li>
-        <!-- User Dropdown Menu -->
-<li class="nav-item dropdown">
-    <a class="nav-link" data-toggle="dropdown" href="#">
-        <i class="fas fa-user-circle"></i>
-        <span class="d-none d-sm-inline ml-2">{{ auth()->user()->name }}</span>
-    </a>
-    <div class="dropdown-menu dropdown-menu-right">
-        <a href="{{ route('profile.show') }}" class="dropdown-item">
-            <i class="fas fa-user-cog mr-2"></i>
-            Perfil
-        </a>
-        <div class="dropdown-divider"></div>
-        <form method="POST" action="{{ route('logout') }}" class="dropdown-item p-0">
-            @csrf
-            <button type="submit" class="btn btn-link w-100 text-left" style="text-decoration: none; color: #666;">
-                <i class="fas fa-sign-out-alt mr-2"></i>
-                Cerrar Sesión
-            </button>
-        </form>
+
+                <div class="dropdown-menu dropdown-menu-end">
+                    <a href="{{ route('profile.show') }}" class="dropdown-item">
+                        <i class="bi bi-person-gear me-2"></i>
+                        Perfil
+                    </a>
+
+                    <div class="dropdown-divider"></div>
+
+                    <form method="POST" action="{{ route('logout') }}" class="dropdown-item p-0">
+                        @csrf
+                        <button type="submit" class="btn btn-link w-100 text-start"
+                            style="text-decoration: none; color: #666;">
+                            <i class="bi bi-box-arrow-right me-2"></i>
+                            Cerrar Sesión
+                        </button>
+                    </form>
+                </div>
+            </li>
+            <!--end::User Menu Dropdown-->
+        </ul>
+        <!--end::End Navbar Links-->
     </div>
-</li>
-    </ul>
+    <!--end::Container-->
 </nav>

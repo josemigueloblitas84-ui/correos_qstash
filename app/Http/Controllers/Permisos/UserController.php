@@ -37,7 +37,7 @@ class UserController extends Controller
     {
         $usuarios = User::with(['roles', 'permissions'])
             ->latest()
-            ->paginate(5);
+            ->get();
 
         return view('usuarios.list', [
             'usuarios' => $usuarios

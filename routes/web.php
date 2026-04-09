@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Permisos\PermisosController;
 use App\Http\Controllers\Permisos\RolController;
 use App\Http\Controllers\Permisos\UserController;
+use App\Http\Controllers\FormMultiPasosController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,7 +20,7 @@ Route::get('/prueba', function () {
 
 Route::get('/', function () {
     return auth()->check()
-        ? redirect('/dashboard')
+        ? redirect('/formMultiPasos/create')
         : redirect('/login');
 });
 
@@ -64,6 +65,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             Route::get('/{id}/permisos-especiales', 'editPermisosEspeciales')->name('permisos.edit');
             Route::post('/{id}/permisos-especiales', 'updatePermisosEspeciales')->name('permisos.update');
+        });
+
+        Route::prefix('formMultiPasos')->name('articulos.')->controller(FormMultiPasosController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{articulo}/edit', 'edit')->name('edit');
+            Route::put('/{articulo}', 'update')->name('update');
+            Route::delete('/{articulo}', 'destroy')->name('destroy');
+            Route::get('/agenda-registrada/data', 'agendaData')->name('agenda.data');
         });
     });
 });
