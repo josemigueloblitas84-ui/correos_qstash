@@ -9,6 +9,8 @@ use App\Http\Controllers\Permisos\UserController;
 use App\Http\Controllers\FormMultiPasosController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\Agenda\DepartamentoController;
+use App\Http\Controllers\Agenda\TipoPersonalController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -90,11 +92,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::delete('/{id}', 'destroy')->name('destroy');
         });
 
+        Route::prefix('tipos-personal')->name('tipos-personal.')->controller(TipoPersonalController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/data', 'data')->name('data');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{id}', 'show')->name('show');
+            Route::put('/{id}', 'update')->name('update');
+            Route::delete('/{id}', 'destroy')->name('destroy');
+        });
+
     //Ruta de los Logs
     Route::prefix('logs')->name('logs.')->controller(ActivityLogController::class)->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/data', 'data')->name('data');
     });
 });
+
 
 require __DIR__ . '/auth.php';
