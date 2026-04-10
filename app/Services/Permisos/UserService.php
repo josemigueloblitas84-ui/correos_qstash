@@ -23,6 +23,7 @@ class UserService
         $usuario->email = $request->correoUsuario;
         $usuario->password = Hash::make($request->contrasenaUsuario);
         $usuario->departamento_id = $request->departamento_id;
+        $usuario->tipo_personal_id = $request->tipo_personal_id;
         $usuario->save();
 
         $usuario->syncRoles($request->role);
@@ -52,12 +53,14 @@ class UserService
             'name' => $usuario->name,
             'email' => $usuario->email,
             'departamentos_id' => $usuario->departamento_id,
+            'tipo_personal_id' => $usuario->tipo_personal_id,
             'roles' => $usuario->roles()->pluck('name')->values()->all(),
         ];
 
         $usuario->name = $request->name;
         $usuario->email = $request->email;
         $usuario->departamento_id = $request->departamento_id;
+        $usuario->tipo_personal_id = $request->tipo_personal_id;
         $usuario->save();
 
         $usuario->syncRoles($request->role ?? []);
@@ -71,6 +74,7 @@ class UserService
                     'name' => $usuario->name,
                     'email' => $usuario->email,
                     'departamento_id' => $usuario->departamento_id,
+                    'tipo_personal_id' => $usuario->tipo_personal_id,
                     'roles' => $usuario->roles->pluck('name')->values()->all(),
                 ],
             ],

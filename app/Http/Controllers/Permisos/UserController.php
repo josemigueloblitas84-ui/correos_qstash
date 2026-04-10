@@ -13,14 +13,20 @@ use App\Http\Requests\Permisos\UserUpdateRequest;
 use App\Services\Permisos\UserService;
 use App\Services\Support\ActivityLogger;
 use App\Services\Agenda\DepartamentoService;
+use App\Services\Agenda\TipoPersonalService;
 
 class UserController extends Controller
 {
 
     protected UserService $userService;
     protected DepartamentoService $departamentoService;
+    protected TipoPersonalService $tipoPersonalService;
 
-    public function __construct(UserService $userService, DepartamentoService $departamentoService)
+    public function __construct(
+        UserService $userService,
+        DepartamentoService $departamentoService,
+        TipoPersonalService $tipoPersonalService
+    )
     {
         $this->middleware('permission:ver usuarios')->only('index');
         $this->middleware('permission:crear usuarios')->only(['create', 'store']);
@@ -32,6 +38,7 @@ class UserController extends Controller
         $this->middleware('permission:eliminar usuarios')->only('destroy');
         $this->userService = $userService;
         $this->departamentoService = $departamentoService;
+        $this->tipoPersonalService = $tipoPersonalService;
     }
 
     /**
@@ -40,8 +47,13 @@ class UserController extends Controller
     public function index()
     {
         $usuarios = User::query()
-        ->leftJoin('departamentos', 'users.departamento_id', '=' , 'departamentos.id')
-            ->select('users.*', 'departamentos.nombre_depa as departamento_nombre')
+            ->leftJoin('departamentos', 'users.departamento_id', '=', 'departamentos.id')
+            ->leftJoin('tipos_personal', 'users.tipo_personal_id', '=', 'tipos_personal.id')
+            ->select(
+                'users.*',
+                'departamentos.nombre_depa as departamento_nombre',
+                'tipos_personal.tipo as tipo_personal_nombre'
+            )
             ->with(['roles', 'permissions'])
             ->latest('users.id')
             ->get();
@@ -58,10 +70,12 @@ class UserController extends Controller
     {
         $roles = Role::orderBy('name', 'asc')->get();
         $departamentos = $this->departamentoService->getActiveForSelect();
+        $tiposPersonal = $this->tipoPersonalService->getForSelect();
 
         return view('usuarios.create', [
             'roles' => $roles,
-            'departamentos' => $departamentos
+            'departamentos' => $departamentos,
+            'tiposPersonal' => $tiposPersonal,
         ]);
     }
 
@@ -84,12 +98,14 @@ class UserController extends Controller
         $usuario = User::findOrFail($id);
         $roles = Role::orderBy('name', 'asc')->get();
         $departamentos = $this->departamentoService->getActiveForSelect();
+        $tiposPersonal = $this->tipoPersonalService->getForSelect();
         $hasRoles = $usuario->roles->pluck('id');
 
         return view('usuarios.edit', [
             'usuario' => $usuario,
             'roles' => $roles,
             'departamentos' => $departamentos,
+            'tiposPersonal' => $tiposPersonal,
             'hasRoles' => $hasRoles
         ]);
     }

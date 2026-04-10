@@ -67,25 +67,49 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                <label for="departamento_id" class="form-label">Departamento:</label>
-                                <select
-                                    name="departamento_id"
-                                    id="departamento_id"
-                                    class="form-select @error('departamento_id') is-invalid @enderror">
-                                    <option value="">Seleccione un departamento</option>
-                                    @foreach ($departamentos as $departamento)
-                                        <option value="{{ $departamento->id }}"
-                                            {{ old('departamento_id', $usuario->departamento_id) == $departamento->id ? 'selected' : '' }}>
-                                            {{ $departamento->nombre_depa }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                    <label for="departamento_id" class="form-label">Departamento:</label>
+                                    <select
+                                        name="departamento_id"
+                                        id="departamento_id"
+                                        class="form-select @error('departamento_id') is-invalid @enderror">
+                                        <option value="">Seleccione un departamento</option>
+                                        @foreach ($departamentos as $departamento)
+                                            <option value="{{ $departamento->id }}"
+                                                {{ old('departamento_id', $usuario->departamento_id) == $departamento->id ? 'selected' : '' }}>
+                                                {{ $departamento->nombre_depa }}
+                                            </option>
+                                        @endforeach
+                                    </select>
 
-                                @error('departamento_id')
-                                    <div class="invalid-feedback d-block">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
+                                    @error('departamento_id')
+                                        <div class="invalid-feedback d-block">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="tipo_personal_id" class="form-label">Tipo de Personal:</label>
+                                    <select
+                                        name="tipo_personal_id"
+                                        id="tipo_personal_id"
+                                        class="form-select @error('tipo_personal_id') is-invalid @enderror">
+                                        <option value="">Seleccione un tipo de personal</option>
+                                        @foreach ($tiposPersonal as $tipoPersonal)
+                                            <option value="{{ $tipoPersonal->id }}"
+                                                {{ old('tipo_personal_id', $usuario->tipo_personal_id) == $tipoPersonal->id ? 'selected' : '' }}>
+                                                {{ $tipoPersonal->tipo }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+
+                                    @error('tipo_personal_id')
+                                        <div class="invalid-feedback d-block">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
                                 </div>
                             </div>
                         </div>

@@ -71,18 +71,35 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                        <label for="departamento_id" class="form-label fw-bold">Departamento:</label>
-                                        <select class="form-select" id="departamento_id" name="departamento_id">
-                                            <option value="">Seleccione un departamento</option>
-                                            @foreach ($departamentos as $departamento)
-                                                <option value="{{ $departamento->id }}" {{ old('departamento_id') == $departamento->id ? 'selected' : '' }}>
-                                                    {{ $departamento->nombre_depa }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        @error('departamento_id')
-                                            <small class="text-danger">{{ $message }}</small>
-                                        @enderror
+                                            <label for="departamento_id" class="form-label fw-bold">Departamento:</label>
+                                            <select class="form-select" id="departamento_id" name="departamento_id">
+                                                <option value="">Seleccione un departamento</option>
+                                                @foreach ($departamentos as $departamento)
+                                                    <option value="{{ $departamento->id }}" {{ old('departamento_id') == $departamento->id ? 'selected' : '' }}>
+                                                        {{ $departamento->nombre_depa }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('departamento_id')
+                                                <small class="text-danger">{{ $message }}</small>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="tipo_personal_id" class="form-label fw-bold">Tipo de Personal:</label>
+                                            <select class="form-select" id="tipo_personal_id" name="tipo_personal_id">
+                                                <option value="">Seleccione un tipo de personal</option>
+                                                @foreach ($tiposPersonal as $tipoPersonal)
+                                                    <option value="{{ $tipoPersonal->id }}" {{ old('tipo_personal_id') == $tipoPersonal->id ? 'selected' : '' }}>
+                                                        {{ $tipoPersonal->tipo }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('tipo_personal_id')
+                                                <small class="text-danger">{{ $message }}</small>
+                                            @enderror
                                         </div>
                                     </div>
                                 </div>

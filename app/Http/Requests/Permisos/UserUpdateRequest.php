@@ -32,6 +32,7 @@ class UserUpdateRequest extends FormRequest
                 Rule::unique('users', 'email')->ignore($id),
             ],
             'departamento_id' => ['required', Rule::exists('departamentos', 'id')],
+            'tipo_personal_id' => ['required', Rule::exists('tipos_personal', 'id')],
             'role' => ['nullable', 'array'],
             'role.*' => ['string', Rule::exists('roles', 'name')],
         ];
@@ -42,11 +43,13 @@ class UserUpdateRequest extends FormRequest
         return [
             'name.required' => 'El nombre es obligatorio.',
             'name.min' => 'El nombre debe tener al menos :min caracteres.',
-            'email.required' => 'El correo electrónico es obligatorio.',
-            'email.email' => 'El correo electrónico debe ser válido.',
-            'email.unique' => 'El correo electrónico ya está en uso.',
+            'email.required' => 'El correo electronico es obligatorio.',
+            'email.email' => 'El correo electronico debe ser valido.',
+            'email.unique' => 'El correo electronico ya esta en uso.',
             'departamento_id.required' => 'Debe seleccionar un departamento.',
-            'departamento_id.exists' => 'El departamento seleccionado no es válido.',
+            'departamento_id.exists' => 'El departamento seleccionado no es valido.',
+            'tipo_personal_id.required' => 'Debe seleccionar un tipo de personal.',
+            'tipo_personal_id.exists' => 'El tipo de personal seleccionado no es valido.',
             'role.array' => 'Los roles deben enviarse correctamente.',
             'role.*.exists' => 'Uno de los roles seleccionados no existe.',
         ];

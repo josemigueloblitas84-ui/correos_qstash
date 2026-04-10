@@ -45,4 +45,12 @@ class TipoPersonalService
             ->where('id', $id)
             ->delete() > 0;
     }
+
+    public function getForSelect()
+    {
+        return DB::table('tipos_personal')
+            ->select('id', 'tipo')
+            ->orderBy('tipo', 'asc')
+            ->get();
+    }
 }

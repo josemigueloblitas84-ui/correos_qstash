@@ -31,6 +31,7 @@
                                 <th>Nombre</th>
                                 <th>Correo</th>
                                 <th>Departamento</th>
+                                <th>Tipo de Personal</th>
                                 <th>Rol</th>
                                 <th width="320">Permisos Directos</th>
                                 <th width="200">Creación</th>
@@ -52,6 +53,7 @@
                                         <td>{{ $usuario->name }}</td>
                                         <td>{{ $usuario->email }}</td>
                                         <td>{{ $usuario->departamento_nombre ?? 'Sin departamento' }}</td>
+                                        <td>{{ $usuario->tipo_personal_nombre ?? 'Sin tipo' }}</td>
                                         <td>
                                             <span class="badge text-bg-info">
                                                 {{ $usuario->roles->pluck('name')->implode(', ') ?: 'Sin rol' }}
@@ -93,7 +95,7 @@
                                 @endforeach
                             @else
                                 <tr>
-                                    <td colspan="7" class="text-center py-4">
+                                    <td colspan="9" class="text-center py-4">
                                         No hay usuarios registrados.
                                     </td>
                                 </tr>

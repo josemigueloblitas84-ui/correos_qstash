@@ -29,7 +29,7 @@ class UserRequest extends FormRequest
             'contrasenaUsuario' => 'required|min:8|same:confirmar_contrasenaUsuario',
             'confirmar_contrasenaUsuario' => 'required',
             'departamento_id' => 'required|exists:departamentos,id',
-
+            'tipo_personal_id' => 'required|exists:tipos_personal,id',
         ];
     }
 
@@ -45,8 +45,10 @@ class UserRequest extends FormRequest
             'contrasenaUsuario.min' => 'La contrasena debe tener al menos :min caracteres.',
             'contrasenaUsuario.same' => 'Las contrasenas no coinciden.',
             'confirmar_contrasenaUsuario.required' => 'Debe confirmar la contrasena.',
-            'departamentos_id.required' => 'Debe seleccionar un departamento.',
-            'departamentos_id.exists' => 'El departamento seleccionado no es valido.',
+            'departamento_id.required' => 'Debe seleccionar un departamento.',
+            'departamento_id.exists' => 'El departamento seleccionado no es valido.',
+            'tipo_personal_id.required' => 'Debe seleccionar un tipo de personal.',
+            'tipo_personal_id.exists' => 'El tipo de personal seleccionado no es valido.',
         ];
     }
 }
