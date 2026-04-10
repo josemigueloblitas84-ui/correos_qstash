@@ -27,7 +27,7 @@
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form action="{{ route('usuarios.store') }}" method="POST">
+                        <form action="{{ route('usuarios.store') }}" method="POST" autocomplete="off">
                             @csrf
                             <div class="card-body">
                                 <div class="mb-3">
