@@ -30,6 +30,7 @@
                                 <th width="80">#</th>
                                 <th>Nombre</th>
                                 <th>Correo</th>
+                                <th>Departamento</th>
                                 <th>Rol</th>
                                 <th width="320">Permisos Directos</th>
                                 <th width="200">Creación</th>
@@ -50,6 +51,7 @@
                                         <td>{{ $usuario->id }}</td>
                                         <td>{{ $usuario->name }}</td>
                                         <td>{{ $usuario->email }}</td>
+                                        <td>{{ $usuario->departamento_nombre ?? 'Sin departamento' }}</td>
                                         <td>
                                             <span class="badge text-bg-info">
                                                 {{ $usuario->roles->pluck('name')->implode(', ') ?: 'Sin rol' }}

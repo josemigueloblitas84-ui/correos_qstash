@@ -68,6 +68,25 @@
                                     @enderror
                                 </div>
 
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                        <label for="departamento_id" class="form-label fw-bold">Departamento:</label>
+                                        <select class="form-select" id="departamento_id" name="departamento_id">
+                                            <option value="">Seleccione un departamento</option>
+                                            @foreach ($departamentos as $departamento)
+                                                <option value="{{ $departamento->id }}" {{ old('departamento_id') == $departamento->id ? 'selected' : '' }}>
+                                                    {{ $departamento->nombre_depa }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('departamento_id')
+                                            <small class="text-danger">{{ $message }}</small>
+                                        @enderror
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="mb-3">
                                     <label class="d-block form-label fw-bold">Roles</label>
 

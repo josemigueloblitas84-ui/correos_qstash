@@ -12,13 +12,15 @@ use App\Http\Requests\Permisos\UserRequest;
 use App\Http\Requests\Permisos\UserUpdateRequest;
 use App\Services\Permisos\UserService;
 use App\Services\Support\ActivityLogger;
+use App\Services\Agenda\DepartamentoService;
 
 class UserController extends Controller
 {
 
     protected UserService $userService;
+    protected DepartamentoService $departamentoService;
 
-    public function __construct(UserService $userService)
+    public function __construct(UserService $userService, DepartamentoService $departamentoService)
     {
         $this->middleware('permission:ver usuarios')->only('index');
         $this->middleware('permission:crear usuarios')->only(['create', 'store']);
@@ -29,6 +31,7 @@ class UserController extends Controller
         ]);
         $this->middleware('permission:eliminar usuarios')->only('destroy');
         $this->userService = $userService;
+        $this->departamentoService = $departamentoService;
     }
 
     /**
@@ -36,8 +39,11 @@ class UserController extends Controller
      */
     public function index()
     {
-        $usuarios = User::with(['roles', 'permissions'])
-            ->latest()
+        $usuarios = User::query()
+        ->leftJoin('departamentos', 'users.departamento_id', '=' , 'departamentos.id')
+            ->select('users.*', 'departamentos.nombre_depa as departamento_nombre')
+            ->with(['roles', 'permissions'])
+            ->latest('users.id')
             ->get();
 
         return view('usuarios.list', [
@@ -51,8 +57,11 @@ class UserController extends Controller
     public function create()
     {
         $roles = Role::orderBy('name', 'asc')->get();
+        $departamentos = $this->departamentoService->getActiveForSelect();
+
         return view('usuarios.create', [
-            'roles' => $roles
+            'roles' => $roles,
+            'departamentos' => $departamentos
         ]);
     }
 
@@ -74,11 +83,13 @@ class UserController extends Controller
     {
         $usuario = User::findOrFail($id);
         $roles = Role::orderBy('name', 'asc')->get();
+        $departamentos = $this->departamentoService->getActiveForSelect();
         $hasRoles = $usuario->roles->pluck('id');
 
         return view('usuarios.edit', [
             'usuario' => $usuario,
             'roles' => $roles,
+            'departamentos' => $departamentos,
             'hasRoles' => $hasRoles
         ]);
     }

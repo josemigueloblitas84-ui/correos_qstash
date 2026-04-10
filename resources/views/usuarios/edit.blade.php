@@ -64,6 +64,32 @@
                             @enderror
                         </div>
 
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                <label for="departamento_id" class="form-label">Departamento:</label>
+                                <select
+                                    name="departamento_id"
+                                    id="departamento_id"
+                                    class="form-select @error('departamento_id') is-invalid @enderror">
+                                    <option value="">Seleccione un departamento</option>
+                                    @foreach ($departamentos as $departamento)
+                                        <option value="{{ $departamento->id }}"
+                                            {{ old('departamento_id', $usuario->departamento_id) == $departamento->id ? 'selected' : '' }}>
+                                            {{ $departamento->nombre_depa }}
+                                        </option>
+                                    @endforeach
+                                </select>
+
+                                @error('departamento_id')
+                                    <div class="invalid-feedback d-block">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="mb-3">
                             <label class="form-label">Roles:</label>
 

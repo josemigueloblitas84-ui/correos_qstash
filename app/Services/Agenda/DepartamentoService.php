@@ -64,4 +64,13 @@ class DepartamentoService
 
         return $nuevoEstado;
     }
+
+    public function getActiveForSelect()
+    {
+        return DB::table('departamentos')
+            ->select('id', 'nombre_depa')
+            ->where('estado_depa', 'activo')
+            ->orderBy('nombre_depa', 'asc')
+            ->get();
+    }
 }
