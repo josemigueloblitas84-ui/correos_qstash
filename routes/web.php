@@ -31,6 +31,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('/formulario', 'formulario')->name('formulario');
 
     Route::middleware('password.confirm')->group(function () {
+        //Solo es para rutas delicadas
+    });
         Route::controller(ProfileController::class)->group(function () {
             Route::get('/profile/show', 'show')->name('profile.show');
             Route::get('/profile', 'edit')->name('profile.edit');
@@ -87,7 +89,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::patch('/{id}/toggle-status', 'toggleStatus')->name('toggle-status');
             Route::delete('/{id}', 'destroy')->name('destroy');
         });
-    });
 
     //Ruta de los Logs
     Route::prefix('logs')->name('logs.')->controller(ActivityLogController::class)->group(function () {
