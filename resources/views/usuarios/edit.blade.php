@@ -32,10 +32,10 @@
 
                         <div class="mb-3">
                             <label for="name" class="form-label">Nombre:</label>
-                            <input 
-                                value="{{ old('name', $usuario->name) }}" 
-                                name="name" 
-                                id="name" 
+                            <input
+                                value="{{ old('name', $usuario->name) }}"
+                                name="name"
+                                id="name"
                                 type="text"
                                 placeholder="Ingrese el nombre"
                                 class="form-control @error('name') is-invalid @enderror">
@@ -49,10 +49,10 @@
 
                         <div class="mb-3">
                             <label for="email" class="form-label">Correo:</label>
-                            <input 
-                                value="{{ old('email', $usuario->email) }}" 
-                                name="email" 
-                                id="email" 
+                            <input
+                                value="{{ old('email', $usuario->email) }}"
+                                name="email"
+                                id="email"
                                 type="text"
                                 placeholder="Ingrese el correo"
                                 class="form-control @error('email') is-invalid @enderror">
@@ -114,7 +114,7 @@
                             </div>
                         </div>
 
-                        <div class="mb-3">
+                        {{-- <div class="mb-3">
                             <label class="form-label">Roles:</label>
 
                             <div class="row">
@@ -122,14 +122,14 @@
                                     @foreach ($roles as $role)
                                         <div class="col-md-3">
                                             <div class="form-check">
-                                                <input 
+                                                <input
                                                     {{ $hasRoles->contains($role->id) ? 'checked' : '' }}
                                                     type="checkbox"
                                                     id="role-{{ $role->id }}"
                                                     name="role[]"
                                                     value="{{ $role->name }}"
                                                     class="form-check-input">
-                                                <label 
+                                                <label
                                                     for="role-{{ $role->id }}"
                                                     class="form-check-label">
                                                     {{ $role->name }}
@@ -139,7 +139,7 @@
                                     @endforeach
                                 @endif
                             </div>
-                        </div>
+                        </div> --}}
 
                         <button type="submit" class="btn btn-warning">
                             Actualizar

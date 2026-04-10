@@ -104,7 +104,7 @@
                                     </div>
                                 </div>
 
-                                <div class="mb-3">
+                                {{-- <div class="mb-3">
                                     <label class="d-block form-label fw-bold">Roles</label>
 
                                     @if ($roles->isNotEmpty())
@@ -124,7 +124,7 @@
                                             @endforeach
                                         </div>
                                     @endif
-                                </div>
+                                </div> --}}
 
                                 {{--
                                 <div class="mb-3">
@@ -147,7 +147,7 @@
                             <!-- /.card-body -->
 
                             <div class="card-footer">
-                                <button type="submit" class="btn btn-primary">Crear Usuario</button>
+                                <button type="submit" class="btn btn-primary my-2">Crear Usuario</button>
                             </div>
                         </form>
                     </div>

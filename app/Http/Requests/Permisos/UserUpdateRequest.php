@@ -33,8 +33,6 @@ class UserUpdateRequest extends FormRequest
             ],
             'departamento_id' => ['required', Rule::exists('departamentos', 'id')],
             'tipo_personal_id' => ['required', Rule::exists('tipos_personal', 'id')],
-            'role' => ['nullable', 'array'],
-            'role.*' => ['string', Rule::exists('roles', 'name')],
         ];
     }
 
@@ -50,8 +48,6 @@ class UserUpdateRequest extends FormRequest
             'departamento_id.exists' => 'El departamento seleccionado no es valido.',
             'tipo_personal_id.required' => 'Debe seleccionar un tipo de personal.',
             'tipo_personal_id.exists' => 'El tipo de personal seleccionado no es valido.',
-            'role.array' => 'Los roles deben enviarse correctamente.',
-            'role.*.exists' => 'Uno de los roles seleccionados no existe.',
         ];
     }
 }

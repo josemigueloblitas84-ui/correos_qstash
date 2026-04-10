@@ -26,7 +26,7 @@ class UserService
         $usuario->tipo_personal_id = $request->tipo_personal_id;
         $usuario->save();
 
-        $usuario->syncRoles($request->role);
+        // $usuario->syncRoles([]);
         $usuario->load('roles');
 
         ActivityLogger::log(
@@ -63,7 +63,7 @@ class UserService
         $usuario->tipo_personal_id = $request->tipo_personal_id;
         $usuario->save();
 
-        $usuario->syncRoles($request->role ?? []);
+        // $usuario->syncRoles($request->role ?? []);
         $usuario->load('roles');
 
         ActivityLogger::log(

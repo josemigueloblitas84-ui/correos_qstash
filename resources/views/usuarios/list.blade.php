@@ -42,10 +42,7 @@
                             @if ($usuarios->isNotEmpty())
                                 @foreach ($usuarios as $usuario)
                                     @php
-                                        $permisosAsignados = $usuario->permissions
-                                            ->pluck('name')
-                                            ->unique()
-                                            ->values();
+                                        $permisosAsignados = $usuario->permissions->pluck('name')->unique()->values();
                                     @endphp
 
                                     <tr>
@@ -70,26 +67,47 @@
                                         </td>
                                         <td>{{ $usuario->created_at->format('d / M / Y H:i:s') }}</td>
                                         <td>
-                                            @can('editar usuarios')
-                                                <a href="{{ route('usuarios.edit', $usuario->id) }}"
-                                                    class="btn btn-warning btn-sm">
-                                                    Editar
-                                                </a>
-                                            @endcan
+                                            <div class="d-flex flex-wrap gap-2 align-items-center">
+                                                @can('editar usuarios')
+                                                    <a href="{{ route('usuarios.edit', $usuario->id) }}"
+                                                        class="btn btn-sm btn-primary">
+                                                        Editar
+                                                    </a>
+                                                @endcan
 
-                                            @can('eliminar usuarios')
-                                                <button onclick="eliminarUsuario({{ $usuario->id }})"
-                                                    class="btn btn-danger btn-sm">
-                                                    Eliminar
-                                                </button>
-                                            @endcan
+                                                <div class="dropdown">
+                                                    <button class="btn btn-sm btn-secondary dropdown-toggle"
+                                                        type="button"
+                                                        data-bs-toggle="dropdown"
+                                                        aria-expanded="false">
+                                                        Gestionar
+                                                    </button>
+                                                    <ul class="dropdown-menu dropdown-menu-end">
+                                                        <li>
+                                                            <a class="dropdown-item"
+                                                                href="{{ route('usuarios.roles.edit', $usuario->id) }}">
+                                                                Roles
+                                                            </a>
+                                                        </li>
 
-                                            @can('asignar permiso especial')
-                                                <a href="{{ route('usuarios.permisos.edit', $usuario->id) }}"
-                                                    class="btn btn-info btn-sm text-white">
-                                                    Permisos Especiales
-                                                </a>
-                                            @endcan
+                                                        @can('asignar permiso especial')
+                                                            <li>
+                                                                <a class="dropdown-item"
+                                                                    href="{{ route('usuarios.permisos.edit', $usuario->id) }}">
+                                                                    Permisos especiales
+                                                                </a>
+                                                            </li>
+                                                        @endcan
+                                                    </ul>
+                                                </div>
+
+                                                @can('eliminar usuarios')
+                                                    <button onclick="eliminarUsuario({{ $usuario->id }})"
+                                                        class="btn btn-sm btn-danger">
+                                                        Eliminar
+                                                    </button>
+                                                @endcan
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -112,22 +130,24 @@
 @endsection
 
 @push('scripts')
-<script>
-    function eliminarUsuario(id) {
-        if (confirm('¿Desea eliminar el usuario?')) {
-            $.ajax({
-                url: '{{ route('usuarios.destroy') }}',
-                type: 'DELETE',
-                data: { id: id },
-                dataType: 'json',
-                headers: {
-                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
-                },
-                success: function() {
-                    location.reload();
-                }
-            });
+    <script>
+        function eliminarUsuario(id) {
+            if (confirm('¿Desea eliminar el usuario?')) {
+                $.ajax({
+                    url: '{{ route('usuarios.destroy') }}',
+                    type: 'DELETE',
+                    data: {
+                        id: id
+                    },
+                    dataType: 'json',
+                    headers: {
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                    },
+                    success: function() {
+                        location.reload();
+                    }
+                });
+            }
         }
-    }
-</script>
+    </script>
 @endpush

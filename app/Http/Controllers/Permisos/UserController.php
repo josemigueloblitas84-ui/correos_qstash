@@ -26,8 +26,7 @@ class UserController extends Controller
         UserService $userService,
         DepartamentoService $departamentoService,
         TipoPersonalService $tipoPersonalService
-    )
-    {
+    ) {
         $this->middleware('permission:ver usuarios')->only('index');
         $this->middleware('permission:crear usuarios')->only(['create', 'store']);
         $this->middleware('permission:editar usuarios')->only(['edit', 'update']);
@@ -68,12 +67,11 @@ class UserController extends Controller
      */
     public function create()
     {
-        $roles = Role::orderBy('name', 'asc')->get();
+        // $roles = Role::orderBy('name', 'asc')->get();
         $departamentos = $this->departamentoService->getActiveForSelect();
         $tiposPersonal = $this->tipoPersonalService->getForSelect();
 
         return view('usuarios.create', [
-            'roles' => $roles,
             'departamentos' => $departamentos,
             'tiposPersonal' => $tiposPersonal,
         ]);
@@ -201,5 +199,36 @@ class UserController extends Controller
 
         session()->flash('success', 'Usuario eliminado exitosamente');
         return response()->json(['status' => true]);
+    }
+
+    public function editRoles(string $id)
+    {
+        $usuario = User::findOrFail($id);
+        $roles = Role::orderBy('name', 'asc')->get();
+        $currentRole = $usuario->roles->first()?->name;
+
+        return view('usuarios.roles', [
+            'usuario' => $usuario,
+            'roles' => $roles,
+            'currentRole' => $currentRole,
+        ]);
+    }
+
+    public function updateRoles(Request $request, string $id)
+    {
+        $usuario = User::findOrFail($id);
+
+        $request->validate([
+            'role' => ['required', Rule::exists('roles', 'name')],
+        ], [
+            'role.required' => 'Debe seleccionar un rol.',
+            'role.exists' => 'El rol seleccionado no es valido.',
+        ]);
+
+        $usuario->syncRoles([$request->role]);
+
+        return redirect()
+            ->route('usuarios.index')
+            ->with('success', 'Rol asignado correctamente.');
     }
 }
