@@ -151,6 +151,14 @@
                         </p>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{{ route('tipos-personal.index') }}" class="nav-link {{ request()->routeIs('tipos-personal.*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-user-graduate"></i>
+                        <p>
+                            Tipo de Personal
+                        </p>
+                    </a>
+                </li>
                 {{--<li class="nav-item">
                     <a href="./generate/theme.html" class="nav-link">
                         <i class="nav-icon bi bi-palette"></i>

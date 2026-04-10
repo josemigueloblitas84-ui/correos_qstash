@@ -35,6 +35,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('password.confirm')->group(function () {
         //Solo es para rutas delicadas
     });
+    
         Route::controller(ProfileController::class)->group(function () {
             Route::get('/profile/show', 'show')->name('profile.show');
             Route::get('/profile', 'edit')->name('profile.edit');
