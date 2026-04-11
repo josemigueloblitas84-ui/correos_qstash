@@ -136,28 +136,28 @@
                     </a>
                 </li> --}}
                 <li class="nav-item">
+                    @can('ver agenda')
                     <a href="{{ route('articulos.create') }}" class="nav-link {{ request()->routeIs('articulos.create') ? 'active' : '' }}">
                         <i class="nav-icon far fa-file-alt"></i>
-                        <p>
-                            Agendar
-                        </p>
+                        <p>Agendar</p>
                     </a>
+                    @endcan
                 </li>
                 <li class="nav-item">
+                    @can('ver departamentos')
                     <a href="{{ route('departamentos.index') }}" class="nav-link {{ request()->routeIs('departamentos.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-building"></i>
-                        <p>
-                            Departamentos
-                        </p>
+                        <p>Departamentos</p>
                     </a>
+                    @endcan
                 </li>
                 <li class="nav-item">
+                    @can('ver tipos de personal')
                     <a href="{{ route('tipos-personal.index') }}" class="nav-link {{ request()->routeIs('tipos-personal.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-user-graduate"></i>
-                        <p>
-                            Tipo de Personal
-                        </p>
+                        <p>Tipo de Personal</p>
                     </a>
+                    @endcan
                 </li>
                 {{--<li class="nav-item">
                     <a href="./generate/theme.html" class="nav-link">

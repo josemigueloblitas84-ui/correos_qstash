@@ -10,12 +10,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const agendaPreviewWrapper = document.getElementById('agendaPreviewWrapper');
     const agendaWeeklyWrapper = document.getElementById('agendaWeeklyWrapper');
     const agendaTable = document.getElementById('agendaRegistradaTable');
-    const periodoDelField = form.querySelector('[name="periodo_del"]');
-    const periodoAlField = form.querySelector('[name="periodo_al"]');
+    const periodoDelField = form.querySelector('[name="fecha_desde"]');
+    const periodoAlField = form.querySelector('[name="fecha_hasta"]');
+    const departamentoField = form.querySelector('[name="cod_unidad"]');
+    const solicitanteField = form.querySelector('[name="cod_solicitante"]');
     const agendaWeekStartField = document.getElementById('agendaWeekStart');
     const agendaWeekEndField = document.getElementById('agendaWeekEnd');
     const agendaDailyFromHourField = document.getElementById('agendaDailyFromHour');
     const agendaDailyFromMinuteField = document.getElementById('agendaDailyFromMinute');
+    const cargoVisualField = document.getElementById('cargo_visual');
     const agendaDailyToHourField = document.getElementById('agendaDailyToHour');
     const agendaDailyToMinuteField = document.getElementById('agendaDailyToMinute');
     const agendaActivityNameField = document.getElementById('agendaActivityName');
@@ -26,11 +29,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const agendaWeeklyBody = document.getElementById('agendaWeeklyBody');
     const agendaHeaderFields = [
         'fecha',
-        'departamento_unidad',
-        'nombre_apellido',
-        'cargo',
-        'periodo_del',
-        'periodo_al',
+        'cod_unidad',
+        'cod_solicitante',
+        'fecha_desde',
+        'fecha_hasta',
         'hora_inicio_hora',
         'hora_inicio_minuto',
         'hora_fin_hora',
@@ -41,6 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let agendarDataTable = null;
     let agendaReady = false;
+    let isSubmittingAgenda = false;
 
     const formValidationConfig = {
         fecha: {
@@ -48,30 +51,17 @@ document.addEventListener('DOMContentLoaded', function () {
             required: true,
             message: 'La fecha es obligatoria.',
         },
-        departamento_unidad: {
+        cod_unidad: {
             label: 'departamento o unidad',
             required: true,
             message: 'Debes seleccionar un departamento o unidad.',
         },
-        nombre_apellido: {
+        cod_solicitante: {
             label: 'nombre y apellido',
             required: true,
-            minLength: 5,
-            maxLength: 150,
-            regex: /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?:[ A-Za-zÁÉÍÓÚÜÑáéíóúüñ().,\-]*[A-Za-zÁÉÍÓÚÜÑáéíóúüñ])?$/,
-            message: 'El nombre y apellido solo puede contener letras y espacios.',
-            sanitize: (value) => value.replace(/[0-9]/g, '').replace(/^\s+/, '').replace(/\s{2,}/g, ' '),
+            message: 'Debes seleccionar un usuario.',
         },
-        cargo: {
-            label: 'cargo',
-            required: true,
-            minLength: 2,
-            maxLength: 100,
-            regex: /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+(?:[ A-Za-zÁÉÍÓÚÜÑáéíóúüñ().,\-]*[A-Za-zÁÉÍÓÚÜÑáéíóúüñ])?$/,
-            message: 'El cargo solo puede contener letras y espacios.',
-            sanitize: (value) => value.replace(/[0-9]/g, '').replace(/^\s+/, '').replace(/\s{2,}/g, ' '),
-        },
-        periodo_del: {
+        fecha_desde: {
             label: 'periodo del',
             required: true,
             custom: (value) => {
@@ -80,14 +70,14 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             message: 'El periodo inicial es obligatorio.',
         },
-        periodo_al: {
+        fecha_hasta: {
             label: 'periodo al',
             required: true,
             custom: (value) => {
-                const periodoDel = form.querySelector('[name="periodo_del"]')?.value;
+                const periodoDel = form.querySelector('[name="fecha_desde"]')?.value;
 
                 if (!periodoDel) {
-                    return 'Primero debes de seleccionar el periodo inicial.';
+                    return 'Primero debes seleccionar el periodo inicial.';
                 }
 
                 return value >= periodoDel || 'El periodo final debe ser mayor o igual al periodo inicial';
@@ -179,13 +169,13 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     const fillWeeklyAgendaForm = () => {
-        const periodoDel = form.querySelector('[name="periodo_del"]')?.value || '';
-        const periodoAl = form.querySelector('[name="periodo_al"]')?.value || '';
+        const periodoDel = form.querySelector('[name="fecha_desde"]')?.value || '';
+        const periodoAl = form.querySelector('[name="fecha_hasta"]')?.value || '';
         const horaInicioHora = form.querySelector('[name="hora_inicio_hora"]')?.value || '';
         const horaInicioMinuto = form.querySelector('[name="hora_inicio_minuto"]')?.value || '';
         const horaFinHora = form.querySelector('[name="hora_fin_hora"]')?.value || '';
         const horaFinMinuto = form.querySelector('[name="hora_fin_minuto"]')?.value || '';
-        const cargo = form.querySelector('[name="cargo"]')?.value || '';
+        const cargo = cargoVisualField?.value || '';
 
         if (agendaWeekStartField) {
             agendaWeekStartField.value = periodoDel;
@@ -316,11 +306,11 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             columns: [
                 { data: 'id', name: 'id' },
-                { data: 'fecha_registro', name: 'fecha_registro' },
+                { data: 'fecha_registro', name: 'fecha' },
                 { data: 'departamento', name: 'departamento' },
                 { data: 'nombre_apellido', name: 'nombre_apellido' },
-                { data: 'periodo', name: 'periodo' },
-                { data: 'horario_trabajo', name: 'horario_trabajo' },
+                { data: 'periodo', name: 'fecha_desde', orderable: false, searchable: false },
+                { data: 'horario_trabajo', name: 'hora_desde', orderable: false, searchable: false },
                 { data: 'acciones', name: 'acciones', orderable: false, searchable: false },
             ],
         });
@@ -328,6 +318,32 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const validateAgendaForm = () => {
         return window.WizardValidationUtils.validateFields(agendaHeaderFields, formValidationConfig);
+    };
+
+    const submitAgendaHeader = async () => {
+        const formData = new FormData(form);
+
+        const response = await fetch(form.action, {
+            method: form.method || 'POST',
+            headers: {
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: formData,
+        });
+
+        const responseData = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+            if (response.status === 422 && responseData.errors) {
+                const firstMessage = Object.values(responseData.errors).flat()[0];
+                throw new Error(firstMessage || 'No se pudo guardar la agenda.');
+            }
+
+            throw new Error(responseData.message || 'No se pudo guardar la agenda.');
+        }
+
+        return responseData;
     };
 
     const syncTimePairValidation = (fieldNames) => {
@@ -380,23 +396,67 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     if (agendaValidateButton) {
-        agendaValidateButton.addEventListener('click', function () {
+        agendaValidateButton.addEventListener('click', async function (event) {
+            event.preventDefault();
+
+            if (isSubmittingAgenda) {
+                return;
+            }
+
             if (!validateAgendaForm()) {
                 resetAgendaState();
                 return;
             }
 
-            agendaReady = true;
+            isSubmittingAgenda = true;
+            agendaValidateButton.disabled = true;
 
-            if (agendaPreviewWrapper) {
-                agendaPreviewWrapper.classList.remove('d-none');
-            }
+            Swal.fire({
+                title: 'Guardando...',
+                text: 'Registrando encabezado de agenda',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+            });
 
-            hideWeeklyAgendaForm();
-            initAgendaDataTable();
+            try {
+                const result = await submitAgendaHeader();
 
-            if (agendarDataTable) {
-                agendarDataTable.ajax.reload();
+                agendaReady = true;
+
+                if (agendaPreviewWrapper) {
+                    agendaPreviewWrapper.classList.remove('d-none');
+                }
+
+                hideWeeklyAgendaForm();
+                initAgendaDataTable();
+
+                if (agendarDataTable) {
+                    agendarDataTable.ajax.reload(function () {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Registro guardado',
+                            text: result.message || 'La agenda se registró correctamente.',
+                        });
+                    }, false);
+                } else {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Registro guardado',
+                        text: result.message || 'La agenda se registró correctamente.',
+                    });
+                }
+            } catch (error) {
+                resetAgendaState();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'No se pudo registrar la agenda.',
+                });
+            } finally {
+                isSubmittingAgenda = false;
+                agendaValidateButton.disabled = false;
             }
         });
     }
@@ -425,6 +485,58 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             showWeeklyAgendaForm();
+        });
+    }
+    const cargarUsuariosPorDepartamento = async (departamentoId) => {
+        if (!solicitanteField) {
+            return;
+        }
+
+        solicitanteField.innerHTML = '<option value="">Cargando usuarios...</option>';
+
+        if (!departamentoId) {
+            solicitanteField.innerHTML = '<option value="">Seleccione un departamento primero</option>';
+            return;
+        }
+
+        try {
+            const url = config.usuariosPorDepartamentoUrl.replace('__ID__', departamentoId);
+            const response = await fetch(url);
+            const usuarios = await response.json();
+
+            solicitanteField.innerHTML = '<option value="">Seleccione un usuario</option>';
+
+            usuarios.forEach((usuario) => {
+                const option = document.createElement('option');
+                option.value = usuario.id;
+                option.textContent = usuario.name;
+                option.dataset.tipoPersonal = usuario.tipo_personal_nombre ?? '';
+                solicitanteField.appendChild(option);
+            });
+        } catch (error) {
+            solicitanteField.innerHTML = '<option value="">Error al cargar usuarios</option>';
+        }
+    };
+    if (departamentoField) {
+        departamentoField.addEventListener('change', function () {
+            cargarUsuariosPorDepartamento(this.value);
+            if(cargoVisualField) {
+                cargoVisualField.value = '';
+            }
+            
+            resetAgendaState();
+        });
+    }
+    if (solicitanteField) {
+        solicitanteField.addEventListener('change', function () {
+            const selectedOption = this.options[this.selectedIndex];
+            const tipoPersonal = selectedOption?.dataset?.tipoPersonal || '';
+
+            if (cargoVisualField) {
+                cargoVisualField.value = tipoPersonal;
+            }
+
+            resetAgendaState();
         });
     }
 });

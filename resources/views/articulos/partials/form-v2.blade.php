@@ -21,7 +21,7 @@
                                         type="date"
                                         id="fecha"
                                         name="fecha"
-                                        value="{{ old('fecha', $articulo->fecha ?? now()->format('Y-m-d')) }}"
+                                        value="{{ old('fecha', data_get($articulo ?? null, 'fecha', now()->format('Y-m-d'))) }}"
                                         class="form-control @error('fecha') is-invalid @enderror"
                                         readonly
                                         required>
@@ -31,117 +31,113 @@
                                 </div>
 
                                 <div class="agenda-field">
-                                    <label for="departamento_unidad" class="form-label fw-semibold">Departamento o Unidad:</label>
+                                    <label for="cod_unidad" class="form-label fw-semibold">Departamento o Unidad:</label>
                                     <select
-                                        id="departamento_unidad"
-                                        name="departamento_unidad"
-                                        class="form-select @error('departamento_unidad') is-invalid @enderror"
+                                        id="cod_unidad"
+                                        name="cod_unidad"
+                                        class="form-select @error('cod_unidad') is-invalid @enderror"
                                         required>
                                         <option value="">Seleccione</option>
-                                        <option value="Administracion" @selected(old('departamento_unidad', $articulo->departamento_unidad ?? '') === 'Administracion')>Administracion</option>
-                                        <option value="Recursos Humanos" @selected(old('departamento_unidad', $articulo->departamento_unidad ?? '') === 'Recursos Humanos')>Recursos Humanos</option>
-                                        <option value="Finanzas" @selected(old('departamento_unidad', $articulo->departamento_unidad ?? '') === 'Finanzas')>Finanzas</option>
-                                        <option value="Sistemas" @selected(old('departamento_unidad', $articulo->departamento_unidad ?? '') === 'Sistemas')>Sistemas</option>
+                                        @foreach ($departamentos as $departamento)
+                                            <option value="{{ $departamento->id }}" @selected(old('cod_unidad') == $departamento->id)>
+                                                {{ $departamento->nombre_depa }}
+                                            </option>
+                                        @endforeach
                                     </select>
-                                    @error('departamento_unidad')
+                                    @error('cod_unidad')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
                                 </div>
 
                                 <div class="agenda-field agenda-field-wide">
-                                    <label for="nombre_apellido" class="form-label fw-semibold">Nombre y Apellido:</label>
-                                    <input
-                                        type="text"
-                                        id="nombre_apellido"
-                                        name="nombre_apellido"
-                                        value="{{ old('nombre_apellido', $articulo->nombre_apellido ?? '') }}"
-                                        class="form-control @error('nombre_apellido') is-invalid @enderror"
+                                    <label for="cod_solicitante" class="form-label fw-semibold">Nombre y Apellido:</label>
+                                    <select name="cod_solicitante" id="cod_solicitante"
+                                        class="form-select @error('cod_solicitante') is-invalid @enderror"
                                         required>
-                                    @error('nombre_apellido')
+                                        <option value="">Seleccione un departartamento primero</option>
+                                    </select>
+                                    @error('cod_solicitante')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
                                 </div>
 
                                 <div class="agenda-field">
-                                    <label for="cargo" class="form-label fw-semibold">Cargo:</label>
+                                    <label for="cargo_visual" class="form-label fw-semibold">Cargo:</label>
                                     <input
                                         type="text"
-                                        id="cargo"
-                                        name="cargo"
-                                        value="{{ old('cargo', $articulo->cargo ?? '') }}"
-                                        class="form-control @error('cargo') is-invalid @enderror"
-                                        required>
-                                    @error('cargo')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
+                                        id="cargo_visual"
+                                        class="form-control"
+                                        value=""
+                                        placeholder="Se completara automaticamente"
+                                        readonly>
                                 </div>
 
                                 <div class="agenda-field">
-                                    <label for="periodo_del" class="form-label fw-semibold">Periodo Del:</label>
+                                    <label for="fecha_desde" class="form-label fw-semibold">Periodo Del:</label>
                                     <input
                                         type="date"
-                                        id="periodo_del"
-                                        name="periodo_del"
-                                        value="{{ old('periodo_del', $articulo->periodo_del ?? now()->format('Y-m-d')) }}"
+                                        id="fecha_desde"
+                                        name="fecha_desde"
+                                        value="{{ old('fecha_desde', now()->format('Y-m-d')) }}"
                                         min="{{ now()->format('Y-m-d') }}"
-                                        class="form-control @error('periodo_del') is-invalid @enderror"
+                                        class="form-control @error('fecha_desde') is-invalid @enderror"
                                         required>
-                                    @error('periodo_del')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @error('fecha_desde')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
                                 </div>
 
                                 <div class="agenda-field">
-                                    <label for="periodo_al" class="form-label fw-semibold">Al:</label>
+                                    <label for="fecha_hasta" class="form-label fw-semibold">Al:</label>
                                     <input
                                         type="date"
-                                        id="periodo_al"
-                                        name="periodo_al"
-                                        value="{{ old('periodo_al', $articulo->periodo_al ?? '') }}"
-                                        min="{{ old('periodo_del', $articulo->periodo_del ?? now()->format('Y-m-d')) }}"
-                                        class="form-control @error('periodo_al') is-invalid @enderror"
+                                        id="fecha_hasta"
+                                        name="fecha_hasta"
+                                        value="{{ old('fecha_hasta') }}"
+                                        min="{{ old('fecha_desde', now()->format('Y-m-d')) }}"
+                                        class="form-control @error('fecha_hasta') is-invalid @enderror"
                                         required>
-                                    @error('periodo_al')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @error('fecha_hasta')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
                                 </div>
 
                                 <div class="agenda-field">
-                                    <label class="form-label fw-semibold">Horario de trabajo De Hrs.:</label>
-                                    <div class="agenda-time-group">
-                                        <div class="agenda-time-select">
-                                            <select
-                                                name="hora_inicio_hora"
-                                                class="form-select @error('hora_inicio_hora') is-invalid @enderror"
-                                                required>
-                                                <option value="">0</option>
-                                                @for ($i = 0; $i <= 23; $i++)
-                                                    @php $hora = str_pad($i, 2, '0', STR_PAD_LEFT); @endphp
-                                                    <option value="{{ $hora }}" @selected(old('hora_inicio_hora', $articulo->hora_inicio_hora ?? '') === $hora)>{{ $hora }}</option>
-                                                @endfor
-                                            </select>
+                                        <label class="form-label fw-semibold">Horario de trabajo De Hrs.:</label>
+                                        <div class="agenda-time-group">
+                                            <div class="agenda-time-select">
+                                                <select
+                                                    name="hora_inicio_hora"
+                                                    class="form-select @error('hora_inicio_hora') is-invalid @enderror"
+                                                    required>
+                                                    <option value="">0</option>
+                                                    @for ($i = 0; $i <= 23; $i++)
+                                                        @php $hora = str_pad($i, 2, '0', STR_PAD_LEFT); @endphp
+                                                        <option value="{{ $hora }}" @selected(old('hora_inicio_hora') === $hora)>{{ $hora }}</option>
+                                                    @endfor
+                                                </select>
+                                            </div>
+                                            <span class="agenda-time-separator">:</span>
+                                            <div class="agenda-time-select">
+                                                <select
+                                                    name="hora_inicio_minuto"
+                                                    class="form-select @error('hora_inicio_minuto') is-invalid @enderror"
+                                                    required>
+                                                    <option value="">00</option>
+                                                    @foreach (['00', '15', '30', '45'] as $min)
+                                                        <option value="{{ $min }}" @selected(old('hora_inicio_minuto') === $min)>{{ $min }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
                                         </div>
-                                        <span class="agenda-time-separator">:</span>
-                                        <div class="agenda-time-select">
-                                            <select
-                                                name="hora_inicio_minuto"
-                                                class="form-select @error('hora_inicio_minuto') is-invalid @enderror"
-                                                required>
-                                                <option value="">00</option>
-                                                @foreach (['00', '15', '30', '45'] as $min)
-                                                    <option value="{{ $min }}" @selected(old('hora_inicio_minuto', $articulo->hora_inicio_minuto ?? '') === $min)>{{ $min }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
+                                        <small class="text-muted">Hora Inicio.</small>
+                                        @error('hora_inicio_hora')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+                                        @error('hora_inicio_minuto')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
                                     </div>
-                                    <small class="text-muted">Hora Inicio.</small>
-                                    @error('hora_inicio_hora')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                    @error('hora_inicio_minuto')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
 
                                 <div class="agenda-field">
                                     <label class="form-label fw-semibold">A Hrs. :</label>
@@ -154,7 +150,7 @@
                                                 <option value="">0</option>
                                                 @for ($i = 0; $i <= 23; $i++)
                                                     @php $hora = str_pad($i, 2, '0', STR_PAD_LEFT); @endphp
-                                                    <option value="{{ $hora }}" @selected(old('hora_fin_hora', $articulo->hora_fin_hora ?? '') === $hora)>{{ $hora }}</option>
+                                                    <option value="{{ $hora }}" @selected(old('hora_fin_hora') === $hora)>{{ $hora }}</option>
                                                 @endfor
                                             </select>
                                         </div>
@@ -166,17 +162,17 @@
                                                 required>
                                                 <option value="">00</option>
                                                 @foreach (['00', '15', '30', '45'] as $min)
-                                                    <option value="{{ $min }}" @selected(old('hora_fin_minuto', $articulo->hora_fin_minuto ?? '') === $min)>{{ $min }}</option>
+                                                    <option value="{{ $min }}" @selected(old('hora_fin_minuto') === $min)>{{ $min }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
                                     </div>
                                     <small class="text-muted">Hora final.</small>
                                     @error('hora_fin_hora')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
                                     @error('hora_fin_minuto')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
                                 </div>
 
@@ -345,6 +341,7 @@
     window.formV2Config = {
         todayString: '{{ now()->format('Y-m-d') }}',
         agendaDataUrl: '{{ route('articulos.agenda.data') }}',
+        usuariosPorDepartamentoUrl: '{{ url('formMultiPasos/usuarios-por-departamento') }}/__ID__',
     };
 </script>
 <script src="{{ asset('assets/js/form-v2.js') }}"></script>

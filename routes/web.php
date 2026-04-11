@@ -33,7 +33,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('/formulario', 'formulario')->name('formulario');
 
     Route::middleware('password.confirm')->group(function () {
-        //Solo es para rutas delicadas
+        // Solo es para rutas delicadas
     });
 
     Route::controller(ProfileController::class)->group(function () {
@@ -72,12 +72,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/{id}/roles', 'editRoles')->name('roles.edit');
         Route::post('/{id}/roles', 'updateRoles')->name('roles.update');
 
-
         Route::get('/{id}/permisos-especiales', 'editPermisosEspeciales')->name('permisos.edit');
         Route::post('/{id}/permisos-especiales', 'updatePermisosEspeciales')->name('permisos.update');
     });
 
     Route::prefix('formMultiPasos')->name('articulos.')->controller(FormMultiPasosController::class)->group(function () {
+        Route::get('/usuarios-por-departamento/{id}', 'usuariosPorDepartamento')->name('usuarios.departamento');
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
         Route::post('/', 'store')->name('store');
@@ -106,12 +106,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/{id}', 'destroy')->name('destroy');
     });
 
-    //Ruta de los Logs
+    // Ruta de los Logs
     Route::prefix('logs')->name('logs.')->controller(ActivityLogController::class)->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/data', 'data')->name('data');
     });
 });
-
 
 require __DIR__ . '/auth.php';
