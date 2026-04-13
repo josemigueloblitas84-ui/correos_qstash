@@ -300,16 +300,18 @@
 
                                         <div class="col-lg-6">
                                             <label for="agendaActivityName" class="form-label fw-semibold">Actividad</label>
-                                            <input type="text" class="form-control" id="agendaActivityName" placeholder="Filtrar">
+                                            <input type="text" class="form-control" id="agendaActivityName" placeholder="Ingrese la Actividad">
                                         </div>
 
                                         <div class="col-lg-3">
-                                            <label for="agendaEquipo" class="form-label fw-semibold">Equipo</label>
+                                            <label for="agendaEquipo" class="form-label fw-semibold">Departamento</label>
                                             <select class="form-select" id="agendaEquipo">
                                                 <option value="">Seleccione</option>
-                                                <option value="Equipo 1">Equipo 1</option>
-                                                <option value="Equipo 2">Equipo 2</option>
-                                                <option value="Equipo 3">Equipo 3</option>
+                                                @foreach ($departamentos as $departamento)
+                                                    <option value="{{ $departamento->id }}">
+                                                        {{ $departamento->nombre_depa }}
+                                                    </option>
+                                                @endforeach
                                             </select>
                                         </div>
 
@@ -341,6 +343,7 @@
     window.formV2Config = {
         todayString: '{{ now()->format('Y-m-d') }}',
         agendaDataUrl: '{{ route('articulos.agenda.data') }}',
+        activityStoreUrl: '{{ route('articulos.actividades.store') }}',
         usuariosPorDepartamentoUrl: '{{ url('formMultiPasos/usuarios-por-departamento') }}/__ID__',
     };
 </script>

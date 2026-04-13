@@ -81,6 +81,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
         Route::post('/', 'store')->name('store');
+        Route::post('/agenda-actividades', 'storeActividad')->name('actividades.store');
         Route::get('/{articulo}/edit', 'edit')->name('edit');
         Route::put('/{articulo}', 'update')->name('update');
         Route::delete('/{articulo}', 'destroy')->name('destroy');

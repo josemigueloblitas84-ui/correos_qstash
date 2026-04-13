@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 //use App\Models\Articulo;
+use App\Http\Requests\Agenda\AgendaActividadStoreRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Yajra\DataTables\Facades\DataTables;
 use App\Services\Agenda\DepartamentoService;
+use App\Services\Agenda\AgendaActividadService;
 use App\Services\Agenda\AgendaService;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -17,11 +19,17 @@ class formMultiPasosController extends Controller
 {
     protected DepartamentoService $departamentoService;
     protected AgendaService $agendaService;
+    protected AgendaActividadService $agendaActividadService;
 
-    public function __construct(DepartamentoService $departamentoService, AgendaService $agendaService)
+    public function __construct(
+        DepartamentoService $departamentoService,
+        AgendaService $agendaService,
+        AgendaActividadService $agendaActividadService
+    )
     {
         $this->departamentoService = $departamentoService;
         $this->agendaService = $agendaService;
+        $this->agendaActividadService = $agendaActividadService;
     }
 
     public function index(): View
@@ -97,11 +105,12 @@ class formMultiPasosController extends Controller
             'hora_fin_minuto.required' => 'Debe seleccionar los minutos finales.',
         ]);
 
-        $this->agendaService->store($validated, auth()->id());
+        $agendaId = $this->agendaService->store($validated, auth()->id());
 
         if ($request->expectsJson()) {
             return response()->json([
                 'message' => 'Agenda registrada correctamente.',
+                'agenda_id' => $agendaId,
             ]);
         }
 
@@ -218,6 +227,19 @@ class formMultiPasosController extends Controller
             })
             ->rawColumns(['acciones'])
             ->make(true);
+    }
+
+    public function storeActividad(AgendaActividadStoreRequest $request): JsonResponse
+    {
+        $actividadId = $this->agendaActividadService->store(
+            $request->validated(),
+            auth()->id()
+        );
+
+        return response()->json([
+            'message' => 'Actividad registrada correctamente.',
+            'actividad_id' => $actividadId,
+        ], 201);
     }
 
     public function usuariosPorDepartamento($id): JsonResponse

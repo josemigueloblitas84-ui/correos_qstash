@@ -22,11 +22,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const agendaDailyToHourField = document.getElementById('agendaDailyToHour');
     const agendaDailyToMinuteField = document.getElementById('agendaDailyToMinute');
     const agendaActivityNameField = document.getElementById('agendaActivityName');
+    const agendaEquipoField = document.getElementById('agendaEquipo');
+    const agendaRegisterActivityButton = document.getElementById('agendaRegisterActivityButton');
     const activityModeInputs = Array.from(form.querySelectorAll('input[name="agenda_activity_mode"]'));
     const agendaDailyCard = document.getElementById('agendaDailyCard');
     const agendaWeeklyCard = document.getElementById('agendaWeeklyCard');
     const agendaDailyBody = document.getElementById('agendaDailyBody');
     const agendaWeeklyBody = document.getElementById('agendaWeeklyBody');
+    const csrfToken = form.querySelector('input[name="_token"]')?.value || '';
     const agendaHeaderFields = [
         'fecha',
         'cod_unidad',
@@ -44,6 +47,8 @@ document.addEventListener('DOMContentLoaded', function () {
     let agendarDataTable = null;
     let agendaReady = false;
     let isSubmittingAgenda = false;
+    let isSubmittingActivity = false;
+    let currentAgendaId = null;
 
     const formValidationConfig = {
         fecha: {
@@ -203,6 +208,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (agendaActivityNameField && !agendaActivityNameField.value.trim()) {
             agendaActivityNameField.value = cargo;
+        }
+
+        if (agendaEquipoField && !agendaEquipoField.value) {
+            agendaEquipoField.value = departamentoField?.value || '';
         }
     };
 
@@ -371,8 +380,165 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const resetAgendaState = () => {
         agendaReady = false;
+        currentAgendaId = null;
         hideAgendaPreview();
         hideWeeklyAgendaForm();
+    };
+
+    const getActivityPayload = () => {
+        const selectedMode = activityModeInputs.find((input) => input.checked)?.value || 'daily';
+        const isWeeklyMode = selectedMode === 'weekly';
+        const horaDesde = `${agendaDailyFromHourField?.value || ''}:${agendaDailyFromMinuteField?.value || ''}`;
+        const horaHasta = `${agendaDailyToHourField?.value || ''}:${agendaDailyToMinuteField?.value || ''}`;
+
+        return {
+            agenda_id: currentAgendaId,
+            actividad: agendaActivityNameField?.value?.trim() || '',
+            departamento_id: agendaEquipoField?.value || '',
+            tipo_actividad: isWeeklyMode ? 'S' : 'D',
+            fecha_del: isWeeklyMode ? (agendaWeekStartField?.value || '') : null,
+            fecha_hasta: isWeeklyMode ? (agendaWeekEndField?.value || '') : null,
+            hora_desde_actividad: isWeeklyMode ? null : horaDesde,
+            hora_hasta_actividad: isWeeklyMode ? null : horaHasta,
+        };
+    };
+
+    const validateActivityPayload = (payload) => {
+        if (!payload.agenda_id) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Primero debes registrar o seleccionar una agenda.',
+            });
+
+            return false;
+        }
+
+        if (!payload.actividad) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'La actividad es obligatoria.',
+            });
+
+            return false;
+        }
+
+        if (!payload.departamento_id) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Debe seleccionar un equipo.',
+            });
+
+            return false;
+        }
+
+        if (payload.tipo_actividad === 'S') {
+            if (!payload.fecha_del || !payload.fecha_hasta) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Debe completar la fecha desde y la fecha hasta.',
+                });
+
+                return false;
+            }
+
+            if (payload.fecha_hasta < payload.fecha_del) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'La fecha hasta debe ser mayor o igual a la fecha desde.',
+                });
+
+                return false;
+            }
+        }
+
+        if (payload.tipo_actividad === 'D') {
+            if (payload.hora_desde_actividad.length !== 5 || payload.hora_hasta_actividad.length !== 5) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Debe completar las horas de la actividad diaria.',
+                });
+
+                return false;
+            }
+
+            if (payload.hora_hasta_actividad <= payload.hora_desde_actividad) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'La hora final debe ser mayor a la hora inicial.',
+                });
+
+                return false;
+            }
+        }
+
+        return true;
+    };
+
+    const submitAgendaActivity = async (payload) => {
+        const response = await fetch(config.activityStoreUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: JSON.stringify(payload),
+        });
+
+        const responseData = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+            if (response.status === 422 && responseData.errors) {
+                const firstMessage = Object.values(responseData.errors).flat()[0];
+                throw new Error(firstMessage || 'No se pudo registrar la actividad.');
+            }
+
+            throw new Error(responseData.message || 'No se pudo registrar la actividad.');
+        }
+
+        return responseData;
+    };
+
+    const clearActivityForm = () => {
+        if (agendaActivityNameField) {
+            agendaActivityNameField.value = '';
+        }
+
+        if (agendaEquipoField) {
+            agendaEquipoField.value = departamentoField?.value || '';
+        }
+
+        if (agendaWeekStartField) {
+            agendaWeekStartField.value = periodoDelField?.value || '';
+        }
+
+        if (agendaWeekEndField) {
+            agendaWeekEndField.value = periodoAlField?.value || '';
+        }
+
+        if (agendaDailyFromHourField) {
+            agendaDailyFromHourField.value = form.querySelector('[name="hora_inicio_hora"]')?.value || '';
+        }
+
+        if (agendaDailyFromMinuteField) {
+            agendaDailyFromMinuteField.value = form.querySelector('[name="hora_inicio_minuto"]')?.value || '';
+        }
+
+        if (agendaDailyToHourField) {
+            agendaDailyToHourField.value = form.querySelector('[name="hora_fin_hora"]')?.value || '';
+        }
+
+        if (agendaDailyToMinuteField) {
+            agendaDailyToMinuteField.value = form.querySelector('[name="hora_fin_minuto"]')?.value || '';
+        }
     };
 
     syncPeriodoAlMin();
@@ -424,6 +590,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const result = await submitAgendaHeader();
 
                 agendaReady = true;
+                currentAgendaId = result.agenda_id || null;
 
                 if (agendaPreviewWrapper) {
                     agendaPreviewWrapper.classList.remove('d-none');
@@ -484,7 +651,56 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
+            currentAgendaId = trigger.dataset.id || currentAgendaId;
+            agendaReady = Boolean(currentAgendaId);
             showWeeklyAgendaForm();
+        });
+    }
+
+    if (agendaRegisterActivityButton) {
+        agendaRegisterActivityButton.addEventListener('click', async function () {
+            if (isSubmittingActivity) {
+                return;
+            }
+
+            const payload = getActivityPayload();
+
+            if (!validateActivityPayload(payload)) {
+                return;
+            }
+
+            isSubmittingActivity = true;
+            agendaRegisterActivityButton.disabled = true;
+
+            Swal.fire({
+                title: 'Guardando...',
+                text: 'Registrando actividad',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+            });
+
+            try {
+                const result = await submitAgendaActivity(payload);
+
+                clearActivityForm();
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Registro guardado',
+                    text: result.message || 'La actividad se registró correctamente.',
+                });
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'No se pudo registrar la actividad.',
+                });
+            } finally {
+                isSubmittingActivity = false;
+                agendaRegisterActivityButton.disabled = false;
+            }
         });
     }
     const cargarUsuariosPorDepartamento = async (departamentoId) => {

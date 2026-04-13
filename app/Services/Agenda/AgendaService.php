@@ -7,7 +7,7 @@ use App\Services\Support\ActivityLogger;
 
 class AgendaService
 {
-    public function store(array $data, int $userId): void
+    public function store(array $data, int $userId): int
     {
         $horaDesde = $data['hora_inicio_hora'] . ':' . $data['hora_inicio_minuto'];
         $horaHasta = $data['hora_fin_hora'] . ':' . $data['hora_fin_minuto'];
@@ -47,6 +47,8 @@ class AgendaService
             logName: 'agendas',
             event: 'created'
         );
+
+        return $agendaId;
     }
 
     public function getAllForDataTable()
