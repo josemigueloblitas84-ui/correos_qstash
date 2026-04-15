@@ -92,57 +92,35 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td class="text-center">1</td>
-                                    <td class="text-center">01-04-2026</td>
-                                    <td class="text-center">09:00:00</td>
-                                    <td class="text-center">17:00:00</td>
-                                    <td class="text-center fw-semibold">08:00:00</td>
-                                    <td>
-                                        <select class="form-select form-select-sm dashboard-hours-activity-select" aria-label="Actividad realizada">
-                                            <option selected>17475 169 Revision correos institucionales.</option>
-                                            <option>17475 170 Apoyo en registro de agenda.</option>
-                                            <option>17475 171 Validacion de informe diario.</option>
-                                        </select>
-                                    </td>
-                                    <td class="text-center">
-                                        <span class="dashboard-hours-status">Normal</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="text-center">2</td>
-                                    <td class="text-center">02-04-2026</td>
-                                    <td class="text-center">09:00:00</td>
-                                    <td class="text-center">17:00:00</td>
-                                    <td class="text-center fw-semibold">08:00:00</td>
-                                    <td>
-                                        <select class="form-select form-select-sm dashboard-hours-activity-select" aria-label="Actividad realizada">
-                                            <option selected>17475 172 Seguimiento de actividades programadas.</option>
-                                            <option>17475 173 Elaboracion de reporte diario.</option>
-                                            <option>17475 174 Coordinacion con equipo asignado.</option>
-                                        </select>
-                                    </td>
-                                    <td class="text-center">
-                                        <span class="dashboard-hours-status">Normal</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="text-center">3</td>
-                                    <td class="text-center">03-04-2026</td>
-                                    <td class="text-center">09:00:00</td>
-                                    <td class="text-center">17:00:00</td>
-                                    <td class="text-center fw-semibold">08:00:00</td>
-                                    <td>
-                                        <select class="form-select form-select-sm dashboard-hours-activity-select" aria-label="Actividad realizada">
-                                            <option selected>17475 175 Actualizacion de documentos internos.</option>
-                                            <option>17475 176 Revision de solicitudes pendientes.</option>
-                                            <option>17475 177 Soporte en control de informes.</option>
-                                        </select>
-                                    </td>
-                                    <td class="text-center">
-                                        <span class="dashboard-hours-status">Normal</span>
-                                    </td>
-                                </tr>
+                                @forelse ($controlHorasRows as $registro)
+                                    <tr>
+                                        <td class="text-center">{{ $loop->iteration }}</td>
+                                        <td class="text-center">{{ $registro['fecha'] }}</td>
+                                        <td class="text-center">{{ $registro['hora_inicio'] }}</td>
+                                        <td class="text-center">{{ $registro['hora_fin'] }}</td>
+                                        <td class="text-center fw-semibold">{{ $registro['total_hora'] }}</td>
+                                        <td>
+                                            <select
+                                                class="form-select form-select-sm dashboard-hours-activity-select"
+                                                aria-label="Actividades realizadas el {{ $registro['fecha'] }}">
+                                                @forelse ($registro['actividades'] as $actividad)
+                                                    <option>{{ $actividad['texto'] }}</option>
+                                                @empty
+                                                    <option>Sin actividades registradas</option>
+                                                @endforelse
+                                            </select>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="dashboard-hours-status">{{ $registro['horario'] }}</span>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="7" class="text-center py-4">
+                                            No hay registros de horas validadas.
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>

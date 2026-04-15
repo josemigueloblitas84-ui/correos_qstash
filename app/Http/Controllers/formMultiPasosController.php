@@ -244,17 +244,22 @@ class formMultiPasosController extends Controller
                 return $row->hora_desde . ' al ' . $row->hora_hasta;
             })
             ->addColumn('acciones', function ($row) {
-                return '<div class="d-flex flex-column align-items-start">'
-                    . '<div class="d-flex align-items-center mb-2" style="gap: 0.4rem;">'
-                    . '<button type="button" class="btn btn-danger btn-sm btn-eliminar-agenda" data-action="delete-agenda" data-id="' . $row->id . '" title="Eliminar agenda">'
-                    . '<i class="fas fa-trash-alt"></i>'
-                    . '</button>'
-                    . '<button type="button" class="btn btn-primary btn-sm btn-acceso-agenda" data-action="edit-agenda" data-id="' . $row->id . '" title="Abrir agenda">'
-                    . '<i class="fas fa-plus"></i>'
-                    . '</button>'
-                    . '</div>'
-                    . '<button type="button" class="btn btn-warning btn-sm btn-editar-agenda" data-action="edit-agenda" data-id="' . $row->id . '">Editar</button>'
-                    . '</div>';
+                $fechaRegistro = $row->fecha
+                    ? Carbon::parse($row->fecha)
+                    : null;
+
+                if ($fechaRegistro?->isSameDay(Carbon::today())) {
+                    return '<div class="d-flex align-items-center" style="gap: 0.4rem;">'
+                        . '<button type="button" class="btn btn-danger btn-sm btn-eliminar-agenda" data-action="delete-agenda" data-id="' . $row->id . '" title="Eliminar agenda">'
+                        . '<i class="fas fa-trash-alt"></i>'
+                        . '</button>'
+                        . '<button type="button" class="btn btn-primary btn-sm btn-acceso-agenda" data-action="edit-agenda" data-id="' . $row->id . '" title="Abrir agenda">'
+                        . '<i class="fas fa-plus"></i>'
+                        . '</button>'
+                        . '</div>';
+                }
+
+                return '<button type="button" class="btn btn-warning btn-sm btn-editar-agenda" data-action="edit-agenda" data-id="' . $row->id . '">Editar</button>';
             })
             ->rawColumns(['acciones'])
             ->make(true);

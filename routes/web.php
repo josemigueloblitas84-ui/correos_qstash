@@ -32,7 +32,7 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    Route::view('/dashboard', 'dashboard')->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/control-horas/preview', [DashboardController::class, 'controlHorasPreview'])
         ->name('dashboard.control-horas.preview');
     Route::view('/formulario', 'formulario')->name('formulario');

@@ -2,10 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Dashboard\ControlHorasService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
+    public function __construct(
+        protected ControlHorasService $controlHorasService
+    ) {
+    }
+
+    public function index(): View
+    {
+        return view('dashboard', [
+            'controlHorasRows' => $this->controlHorasService->getRowsForUser((int) auth()->id()),
+        ]);
+    }
+
     public function controlHorasPreview()
     {
         $previewData = [
