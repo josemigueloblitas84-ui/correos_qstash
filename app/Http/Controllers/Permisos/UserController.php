@@ -18,7 +18,6 @@ use App\Services\Agenda\TipoPersonalService;
 
 class UserController extends Controller
 {
-
     protected UserService $userService;
     protected DepartamentoService $departamentoService;
     protected TipoPersonalService $tipoPersonalService;
@@ -68,7 +67,6 @@ class UserController extends Controller
      */
     public function create()
     {
-        // $roles = Role::orderBy('name', 'asc')->get();
         $departamentos = $this->departamentoService->getActiveForSelect();
         $tiposPersonal = $this->tipoPersonalService->getForSelect();
 
@@ -83,7 +81,6 @@ class UserController extends Controller
      */
     public function store(UserRequest $request)
     {
-        // Almacenar el usuario utilizando el servicio
         $this->userService->userStore($request);
 
         return redirect()->route('usuarios.index')->with('success', 'Usuario creado exitosamente');
@@ -125,10 +122,7 @@ class UserController extends Controller
         $usuario = User::findOrFail($id);
         $permisos = Permission::orderBy('name', 'asc')->get();
 
-        // Permisos directos (especiales)
         $directPermissions = $usuario->getDirectPermissions()->pluck('name')->toArray();
-
-        // Permisos heredados por rol (solo para mostrar en pantalla)
         $rolePermissions = $usuario->getPermissionsViaRoles()->pluck('name')->toArray();
 
         return view('usuarios.permisos_especiales', [
@@ -149,7 +143,6 @@ class UserController extends Controller
             'permisos.*' => ['string', Rule::exists('permissions', 'name')],
         ]);
 
-        // Solo sincroniza permisos directos del usuario (NO roles)
         $usuario->syncPermissions($request->input('permisos', []));
         $usuario->load('permissions');
 
@@ -253,12 +246,12 @@ class UserController extends Controller
 
         $this->userService->syncAssignedPersonal(
             $usuario,
-            $request->validated('usuarios_asignados') ?? []
+            $request->validated('usuarios_asignados') ?? [],
+            $request->boolean('validador')
         );
 
         return redirect()
             ->route('usuarios.index')
             ->with('success', 'Personal asignado correctamente.');
     }
-
 }

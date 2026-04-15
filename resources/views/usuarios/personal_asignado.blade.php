@@ -1,4 +1,4 @@
-@extends('plantilla.app')
+﻿@extends('plantilla.app')
 
 @section('title', 'Asignar Personal')
 
@@ -18,10 +18,30 @@
 
             <div class="card shadow-sm">
                 <div class="card-header">
-                    <h5 class="mb-1">
-                        Usuario responsable: <strong>{{ $usuario->name }}</strong>
-                    </h5>
-                    <small class="text-muted">{{ $usuario->email }}</small>
+                    <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                        <div>
+                            <h5 class="mb-1">
+                                Usuario responsable: <strong>{{ $usuario->name }}</strong>
+                            </h5>
+                            <small class="text-muted d-block">{{ $usuario->email }}</small>
+                        </div>
+
+                        <div class="form-check form-switch mb-0 mt-1">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                role="switch"
+                                id="validador"
+                                name="validador"
+                                value="1"
+                                form="formAsignarPersonal"
+                                {{ old('validador', $usuario->validador) ? 'checked' : '' }}
+                            >
+                            <label class="form-check-label fw-semibold" for="validador">
+                                Apto para validar
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="card-body">

@@ -1,4 +1,4 @@
-@extends('plantilla.app')
+﻿@extends('plantilla.app')
 
 @section('title', 'Reporte Agenda Informe')
 
@@ -126,7 +126,9 @@
                                             <th>Nombre y apellido</th>
                                             <th>Equipo</th>
                                             <th>Visualizar</th>
-                                            <th>Validar</th>
+                                            @if ($canValidateInforme)
+                                                <th>Validar</th>
+                                            @endif
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
@@ -170,7 +172,10 @@
             dataUrl: '{{ route('reporte-agenda-informe.data') }}',
             dataInformeUrl: '{{ route('reporte-agenda-informe.data-informe') }}',
             agendaPreviewUrlTemplate: '{{ url('reporte-agenda-informe/agenda') }}/__ID__/preview',
-            informePreviewUrl: '{{ route('reporte-agenda-informe.informe.preview') }}'
+            informePreviewUrl: '{{ route('reporte-agenda-informe.informe.preview') }}',
+            validarInformeUrl: '{{ route('reporte-agenda-informe.informe.validar') }}',
+            csrfToken: '{{ csrf_token() }}',
+            canValidateInforme: @json($canValidateInforme)
         };
     </script>
 

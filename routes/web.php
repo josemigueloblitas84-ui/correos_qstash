@@ -144,6 +144,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/data-informe', 'dataInforme')->name('data-informe');
         Route::get('/agenda/{id}/preview', 'previewAgenda')->whereNumber('id')->name('agenda.preview');
         Route::get('/informe/preview', 'previewInforme')->name('informe.preview');
+        Route::post('/informe/validar', 'validarInforme')->name('informe.validar');
     });
 });
 

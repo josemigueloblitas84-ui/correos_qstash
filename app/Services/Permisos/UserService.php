@@ -11,12 +11,10 @@ use Illuminate\Support\Facades\DB;
 
 class UserService
 {
-
     /**
      * @param UserRequest $request
      * @return User
      */
-
     public function userStore(UserRequest $request)
     {
         $usuario = new User();
@@ -27,7 +25,6 @@ class UserService
         $usuario->tipo_personal_id = $request->tipo_personal_id;
         $usuario->save();
 
-        // $usuario->syncRoles([]);
         $usuario->load('roles');
 
         ActivityLogger::log(
@@ -64,7 +61,6 @@ class UserService
         $usuario->tipo_personal_id = $request->tipo_personal_id;
         $usuario->save();
 
-        // $usuario->syncRoles($request->role ?? []);
         $usuario->load('roles');
 
         ActivityLogger::log(
@@ -92,7 +88,6 @@ class UserService
         return User::query()
             ->leftJoin('departamentos', 'users.departamento_id', '=', 'departamentos.id')
             ->leftJoin('tipos_personal', 'users.tipo_personal_id', '=', 'tipos_personal.id')
-            //->where('users.id', '!=', $userId) en caso de querer excluir al usuario jefe de la lista de asignación
             ->select(
                 'users.id',
                 'users.name',
@@ -113,30 +108,33 @@ class UserService
             ->all();
     }
 
-    public function syncAssignedPersonal(User $usuario, array $assignedUserIds): void
+    public function syncAssignedPersonal(User $usuario, array $assignedUserIds, bool $isValidator = false): void
     {
-        DB::transaction(function () use ($usuario, $assignedUserIds) {
+        $assignedUserIds = array_values(array_unique(array_map('intval', $assignedUserIds)));
+
+        DB::transaction(function () use ($usuario, $assignedUserIds, $isValidator) {
             DB::table('agenda_personal_asignado')
                 ->where('cod_usuario', $usuario->id)
                 ->delete();
 
-            if (empty($assignedUserIds)) {
-                return;
+            if (!empty($assignedUserIds)) {
+                $now = now();
+                $rows = [];
+
+                foreach ($assignedUserIds as $assignedUserId) {
+                    $rows[] = [
+                        'cod_usuario' => $usuario->id,
+                        'cod_usuario_asignado' => $assignedUserId,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
+
+                DB::table('agenda_personal_asignado')->insert($rows);
             }
 
-            $now = now();
-            $rows = [];
-
-            foreach ($assignedUserIds as $assignedUserId) {
-                $rows[] = [
-                    'cod_usuario' => $usuario->id,
-                    'cod_usuario_asignado' => $assignedUserId,
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ];
-            }
-
-            DB::table('agenda_personal_asignado')->insert($rows);
+            $usuario->validador = $isValidator;
+            $usuario->save();
         });
 
         ActivityLogger::log(
@@ -148,6 +146,7 @@ class UserService
                     'email' => $usuario->email,
                 ],
                 'usuarios_asignados' => array_values($assignedUserIds),
+                'validador' => (int) $usuario->validador,
             ],
             $usuario,
             logName: 'usuarios',

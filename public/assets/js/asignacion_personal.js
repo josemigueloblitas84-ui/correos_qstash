@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
+﻿document.addEventListener('DOMContentLoaded', function () {
     const select = $('#usuarios_asignados_select');
     const container = document.getElementById('usuariosSeleccionadosContainer');
     const form = document.getElementById('formAsignarPersonal');
@@ -47,8 +47,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         class="personal-card__remove"
                         data-remove-id="${option.value}"
                         title="Quitar"
+                        aria-label="Quitar"
                     >
-                        ×
+                        &times;
                     </button>
 
                     <div class="personal-card__name">
