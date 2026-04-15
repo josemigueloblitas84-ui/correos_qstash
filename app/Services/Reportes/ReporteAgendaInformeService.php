@@ -233,10 +233,12 @@ class ReporteAgendaInformeService
             $horaInicio = Carbon::createFromFormat('H:i', substr($agenda->hora_desde, 0, 5));
             $horaFin = Carbon::createFromFormat('H:i', substr($agenda->hora_hasta, 0, 5));
             $totalHoras = $horaInicio->diffInMinutes($horaFin) / 60;
+            $fechaClickValidacion = now()->toDateString();
+            $fechaInformeTimestamp = $fechaActividad . ' 00:00:00';
 
             $registroHora = DB::table('registro_horas_validadas')
                 ->where('cod_usuario', $agenda->cod_solicitante)
-                ->where('fecha', $fechaActividad)
+                ->where('fecha_reg', $fechaInformeTimestamp)
                 ->first();
 
             if ($registroHora) {
@@ -244,12 +246,13 @@ class ReporteAgendaInformeService
                     ->where('id', $registroHora->id)
                     ->update([
                         'cod_usuario_validador' => $validadorId,
+                        'fecha' => $fechaClickValidacion,
                         'hora_inicio' => $horaInicio->format('H:i:s'),
                         'hora_fin' => $horaFin->format('H:i:s'),
                         'total_hora' => $totalHoras,
                         'actividad_masivo' => '',
                         'actividad_pasivo' => '',
-                        'fecha_reg' => now(),
+                        'fecha_reg' => $fechaInformeTimestamp,
                     ]);
 
                 $registroHoraId = (int) $registroHora->id;
@@ -257,13 +260,13 @@ class ReporteAgendaInformeService
                 $registroHoraId = DB::table('registro_horas_validadas')->insertGetId([
                     'cod_usuario' => $agenda->cod_solicitante,
                     'cod_usuario_validador' => $validadorId,
-                    'fecha' => $fechaActividad,
+                    'fecha' => $fechaClickValidacion,
                     'hora_inicio' => $horaInicio->format('H:i:s'),
                     'hora_fin' => $horaFin->format('H:i:s'),
                     'total_hora' => $totalHoras,
                     'actividad_masivo' => '',
                     'actividad_pasivo' => '',
-                    'fecha_reg' => now(),
+                    'fecha_reg' => $fechaInformeTimestamp,
                 ]);
             }
 
