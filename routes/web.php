@@ -78,14 +78,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::prefix('formMultiPasos')->name('articulos.')->controller(FormMultiPasosController::class)->group(function () {
         Route::get('/usuarios-por-departamento/{id}', 'usuariosPorDepartamento')->name('usuarios.departamento');
+        Route::get('/agenda-actividades/autocomplete', 'actividadAutocomplete')->name('actividades.autocomplete');
+        Route::get('/agenda-actividades/data', 'agendaActividadesData')->name('actividades.data');
+        Route::get('/agenda-actividades/{id}', 'showActividad')->whereNumber('id')->name('actividades.show');
+        Route::get('/agenda-registrada/data', 'agendaData')->name('agenda.data');
+        Route::get('/agenda-registrada/{id}', 'showAgenda')->whereNumber('id')->name('agenda.show');
+        Route::get('/agenda-registrada/{id}/preview', 'previewAgenda')->whereNumber('id')->name('agenda.preview');
+        Route::patch('/agenda-registrada/{id}/send', 'sendAgenda')->whereNumber('id')->name('agenda.send');
+        Route::delete('/agenda-registrada/{id}', 'destroyAgenda')->whereNumber('id')->name('agenda.destroy');
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
         Route::post('/', 'store')->name('store');
         Route::post('/agenda-actividades', 'storeActividad')->name('actividades.store');
+        Route::put('/agenda-actividades/{id}', 'updateActividad')->whereNumber('id')->name('actividades.update');
+        Route::delete('/agenda-actividades/{id}', 'destroyActividad')->whereNumber('id')->name('actividades.destroy');
         Route::get('/{articulo}/edit', 'edit')->name('edit');
         Route::put('/{articulo}', 'update')->name('update');
         Route::delete('/{articulo}', 'destroy')->name('destroy');
-        Route::get('/agenda-registrada/data', 'agendaData')->name('agenda.data');
     });
 
     Route::prefix('departamentos')->name('departamentos.')->controller(DepartamentoController::class)->group(function () {

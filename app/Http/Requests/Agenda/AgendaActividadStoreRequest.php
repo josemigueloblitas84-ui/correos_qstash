@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Agenda;
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -35,6 +36,15 @@ class AgendaActividadStoreRequest extends FormRequest
 
                 if ($fechaDel && $fechaHasta && $fechaHasta < $fechaDel) {
                     $validator->errors()->add('fecha_hasta', 'La fecha hasta debe ser mayor o igual a la fecha desde.');
+                }
+
+                if ($fechaDel && $fechaHasta) {
+                    $desde = Carbon::parse($fechaDel);
+                    $hasta = Carbon::parse($fechaHasta);
+
+                    if (! $desde->isSameMonth($hasta)) {
+                        $validator->errors()->add('fecha_hasta', 'La fecha hasta debe pertenecer al mismo mes que la fecha desde.');
+                    }
                 }
             }
 

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 //use App\Models\Articulo;
 use App\Http\Requests\Agenda\AgendaActividadStoreRequest;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -14,6 +16,7 @@ use App\Services\Agenda\AgendaActividadService;
 use App\Services\Agenda\AgendaService;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Throwable;
 
 class formMultiPasosController extends Controller
 {
@@ -85,7 +88,25 @@ class formMultiPasosController extends Controller
             'cod_unidad' => ['required', 'exists:departamentos,id'],
             'cod_solicitante' => ['required', 'exists:users,id'],
             'fecha_desde' => ['required', 'date'],
-            'fecha_hasta' => ['required', 'date', 'after_or_equal:fecha_desde'],
+            'fecha_hasta' => [
+                'required',
+                'date',
+                'after_or_equal:fecha_desde',
+                function (string $attribute, mixed $value, \Closure $fail) use ($request) {
+                    $fechaDesde = $request->input('fecha_desde');
+
+                    if (! $fechaDesde || ! $value) {
+                        return;
+                    }
+
+                    $desde = Carbon::parse($fechaDesde);
+                    $hasta = Carbon::parse($value);
+
+                    if (! $desde->isSameMonth($hasta)) {
+                        $fail('La fecha final debe pertenecer al mismo mes que la fecha inicial.');
+                    }
+                },
+            ],
             'hora_inicio_hora' => ['required'],
             'hora_inicio_minuto' => ['required'],
             'hora_fin_hora' => ['required'],
@@ -223,10 +244,149 @@ class formMultiPasosController extends Controller
                 return $row->hora_desde . ' al ' . $row->hora_hasta;
             })
             ->addColumn('acciones', function ($row) {
-                return '<button type="button" class="btn btn-warning btn-sm btn-editar-agenda" data-action="edit-agenda" data-id="' . $row->id . '">Editar</button>';
+                return '<div class="d-flex flex-column align-items-start">'
+                    . '<div class="d-flex align-items-center mb-2" style="gap: 0.4rem;">'
+                    . '<button type="button" class="btn btn-danger btn-sm btn-eliminar-agenda" data-action="delete-agenda" data-id="' . $row->id . '" title="Eliminar agenda">'
+                    . '<i class="fas fa-trash-alt"></i>'
+                    . '</button>'
+                    . '<button type="button" class="btn btn-primary btn-sm btn-acceso-agenda" data-action="edit-agenda" data-id="' . $row->id . '" title="Abrir agenda">'
+                    . '<i class="fas fa-plus"></i>'
+                    . '</button>'
+                    . '</div>'
+                    . '<button type="button" class="btn btn-warning btn-sm btn-editar-agenda" data-action="edit-agenda" data-id="' . $row->id . '">Editar</button>'
+                    . '</div>';
             })
             ->rawColumns(['acciones'])
             ->make(true);
+    }
+
+    public function showAgenda(int $id): JsonResponse
+    {
+        $agenda = $this->agendaService->findById($id);
+
+        if (! $agenda) {
+            return response()->json([
+                'message' => 'La agenda no existe.',
+            ], 404);
+        }
+
+        return response()->json($agenda);
+    }
+
+    public function previewAgenda(int $id)
+    {
+        $previewData = $this->agendaService->getPreviewData($id);
+
+        if (! $previewData) {
+            abort(404, 'La agenda no existe.');
+        }
+
+        $logoPath = public_path('assets/img/logoFundacionTrans.png');
+        $previewData['logoDataUri'] = file_exists($logoPath)
+            ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
+            : null;
+
+        return Pdf::loadView('articulos.partials.agenda-preview-document', $previewData)
+            ->setPaper('a4', 'portrait')
+            ->stream('agenda-' . $id . '.pdf');
+    }
+
+    public function destroyAgenda(int $id): JsonResponse
+    {
+        $agenda = $this->agendaService->findById($id);
+
+        if (! $agenda) {
+            return response()->json([
+                'message' => 'La agenda no existe.',
+            ], 404);
+        }
+
+        try {
+            $this->agendaService->destroy($id);
+
+            return response()->json([
+                'message' => 'La agenda se elimino correctamente.',
+            ]);
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return response()->json([
+                'message' => 'No se pudo eliminar la agenda.',
+            ], 500);
+        }
+    }
+
+    public function sendAgenda(int $id): JsonResponse
+    {
+        $agenda = $this->agendaService->findById($id);
+
+        if (! $agenda) {
+            return response()->json([
+                'message' => 'La agenda no existe.',
+            ], 404);
+        }
+
+        try {
+            $this->agendaService->send($id);
+
+            return response()->json([
+                'message' => 'La agenda se envio correctamente.',
+            ]);
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return response()->json([
+                'message' => 'No se pudo enviar la agenda.',
+            ], 500);
+        }
+    }
+
+    public function agendaActividadesData(Request $request): JsonResponse
+    {
+        $agendaId = $request->integer('agenda_id');
+        $tipo = strtoupper((string) $request->query('tipo', 'D'));
+        $data = $this->agendaActividadService->getAllForDataTable($agendaId, $tipo);
+
+        return DataTables::of($data)
+            ->addIndexColumn()
+            ->addColumn('ejecucion', function ($row) use ($tipo) {
+                if ($tipo === 'D') {
+                    $desde = $row->hora_desde_actividad ?? '';
+                    $hasta = $row->hora_hasta_actividad ?? '';
+
+                    return $desde && $hasta
+                        ? $desde . ' al ' . $hasta
+                        : ($desde ?: $hasta);
+                }
+
+                $desde = $row->fecha_del ? date('d/m/Y', strtotime($row->fecha_del)) : '';
+                $hasta = $row->fecha_hasta ? date('d/m/Y', strtotime($row->fecha_hasta)) : '';
+
+                return $desde && $hasta
+                    ? $desde . ' al ' . $hasta
+                    : ($desde ?: $hasta);
+            })
+            ->addColumn('acciones', function ($row) {
+                return '<div class="d-flex gap-2">'
+                    . '<button type="button" class="btn btn-warning btn-sm btn-editar-actividad" data-action="edit-activity" data-id="' . $row->id . '">Editar</button>'
+                    . '<button type="button" class="btn btn-danger btn-sm btn-eliminar-actividad" data-action="delete-activity" data-id="' . $row->id . '">Eliminar</button>'
+                    . '</div>';
+            })
+            ->rawColumns(['acciones'])
+            ->make(true);
+    }
+
+    public function showActividad(int $id): JsonResponse
+    {
+        $actividad = $this->agendaActividadService->findById($id);
+
+        if (! $actividad) {
+            return response()->json([
+                'message' => 'La actividad no existe.',
+            ], 404);
+        }
+
+        return response()->json($actividad);
     }
 
     public function storeActividad(AgendaActividadStoreRequest $request): JsonResponse
@@ -240,6 +400,38 @@ class formMultiPasosController extends Controller
             'message' => 'Actividad registrada correctamente.',
             'actividad_id' => $actividadId,
         ], 201);
+    }
+
+    public function updateActividad(AgendaActividadStoreRequest $request, int $id): JsonResponse
+    {
+        $this->agendaActividadService->update($id, $request->validated());
+
+        return response()->json([
+            'message' => 'Actividad actualizada correctamente.',
+            'actividad_id' => $id,
+        ]);
+    }
+
+    public function destroyActividad(int $id): JsonResponse
+    {
+        $this->agendaActividadService->destroy($id);
+
+        return response()->json([
+            'message' => 'Actividad eliminada correctamente.',
+        ]);
+    }
+
+    public function actividadAutocomplete(Request $request): JsonResponse
+    {
+        $term = trim((string) $request->query('q', ''));
+
+        if (mb_strlen($term) < 2) {
+            return response()->json([]);
+        }
+
+        return response()->json(
+            $this->agendaActividadService->autocomplete($term)->values()
+        );
     }
 
     public function usuariosPorDepartamento($id): JsonResponse
