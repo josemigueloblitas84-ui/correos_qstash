@@ -10,6 +10,7 @@ use Spatie\Permission\Models\Permission;
 use Illuminate\Validation\Rule;
 use App\Http\Requests\Permisos\UserRequest;
 use App\Http\Requests\Permisos\UserUpdateRequest;
+use App\Http\Requests\Permisos\AsignarPersonalRequest;
 use App\Services\Permisos\UserService;
 use App\Services\Support\ActivityLogger;
 use App\Services\Agenda\DepartamentoService;
@@ -29,7 +30,7 @@ class UserController extends Controller
     ) {
         $this->middleware('permission:ver usuarios')->only('index');
         $this->middleware('permission:crear usuarios')->only(['create', 'store']);
-        $this->middleware('permission:editar usuarios')->only(['edit', 'update']);
+        $this->middleware('permission:editar usuarios')->only(['edit', 'update', 'editPersonalAsignado', 'updatePersonalAsignado']);
         $this->middleware('permission:asignar permiso especial')->only([
             'editPermisosEspeciales',
             'updatePermisosEspeciales',
@@ -231,4 +232,33 @@ class UserController extends Controller
             ->route('usuarios.index')
             ->with('success', 'Rol asignado correctamente.');
     }
+
+    public function editPersonalAsignado(string $id)
+    {
+        $usuario = User::findOrFail($id);
+
+        $usuariosDisponibles = $this->userService->getAssignableUsers($usuario->id);
+        $usuariosAsignados = $this->userService->getAssignedUserIds($usuario->id);
+
+        return view('usuarios.personal_asignado', [
+            'usuario' => $usuario,
+            'usuariosDisponibles' => $usuariosDisponibles,
+            'usuariosAsignados' => $usuariosAsignados,
+        ]);
+    }
+
+    public function updatePersonalAsignado(AsignarPersonalRequest $request, string $id)
+    {
+        $usuario = User::findOrFail($id);
+
+        $this->userService->syncAssignedPersonal(
+            $usuario,
+            $request->validated('usuarios_asignados') ?? []
+        );
+
+        return redirect()
+            ->route('usuarios.index')
+            ->with('success', 'Personal asignado correctamente.');
+    }
+
 }

@@ -64,6 +64,8 @@
   <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.2/css/responsive.bootstrap5.css">
   <!--Estilo de SweetAlert2-->
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.24/dist/sweetalert2.min.css" rel="stylesheet">
+  <!--Estilos de Select2-->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
   <!--Estilos de FormPMultiPasos-->
   @stack('styles')
 </head>
@@ -158,6 +160,7 @@
   <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.colVis.js"></script>
   <!-- SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.24/dist/sweetalert2.all.min.js"></script>
+  <!---->
   <script>
   document.addEventListener('DOMContentLoaded', function () {
     const table1 = document.querySelector('#example1');

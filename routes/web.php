@@ -10,6 +10,8 @@ use App\Http\Controllers\FormMultiPasosController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\Agenda\DepartamentoController;
 use App\Http\Controllers\Agenda\TipoPersonalController;
+use App\Http\Controllers\Agenda\InformeController;
+use App\Http\Controllers\Reportes\ReporteAgendaInformeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,6 +61,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/{id}/edit', 'edit')->name('edit');
         Route::post('/{id}', 'update')->name('update');
         Route::delete('/', 'destroy')->name('destroy');
+        Route::delete('/', 'destroy')->name('destroy');
     });
 
     Route::prefix('usuarios')->name('usuarios.')->controller(UserController::class)->group(function () {
@@ -74,6 +77,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('/{id}/permisos-especiales', 'editPermisosEspeciales')->name('permisos.edit');
         Route::post('/{id}/permisos-especiales', 'updatePermisosEspeciales')->name('permisos.update');
+
+        Route::get('/{id}/personal-asignado', 'editPersonalAsignado')->name('personal.edit');
+        Route::post('/{id}/personal-asignado', 'updatePersonalAsignado')->name('personal.update');
+
     });
 
     Route::prefix('formMultiPasos')->name('articulos.')->controller(FormMultiPasosController::class)->group(function () {
@@ -120,6 +127,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('logs')->name('logs.')->controller(ActivityLogController::class)->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/data', 'data')->name('data');
+    });
+
+    Route::prefix('informe-agenda')->name('informe-agenda.')->controller(InformeController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('/', 'store')->name('store');
+        Route::post('/no-programada', 'storeNoProgramada')->name('no-programada.store');
+    });
+
+    Route::prefix('reporte-agenda-informe')->name('reporte-agenda-informe.')->controller(ReporteAgendaInformeController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/data', 'data')->name('data');
+        Route::get('/data-informe', 'dataInforme')->name('data-informe');
+        Route::get('/agenda/{id}/preview', 'previewAgenda')->whereNumber('id')->name('agenda.preview');
+        Route::get('/informe/preview', 'previewInforme')->name('informe.preview');
     });
 });
 

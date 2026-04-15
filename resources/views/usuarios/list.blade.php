@@ -89,6 +89,12 @@
                                                                 Roles
                                                             </a>
                                                         </li>
+                                                        <li>
+                                                            <a class="dropdown-item"
+                                                                href="{{ route('usuarios.personal.edit', $usuario->id) }}">
+                                                                Asignar personal
+                                                            </a>
+                                                        </li>
 
                                                         @can('asignar permiso especial')
                                                             <li>

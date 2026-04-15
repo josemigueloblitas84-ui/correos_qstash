@@ -1,5 +1,18 @@
 {{-- resources/views/mensajes.blade.php --}}
 
+@if ($errors->any())
+    <div class="alert alert-danger alert-dismissible fade show auto-dismiss-alert position-relative overflow-hidden" role="alert">
+        <strong>Error:</strong>
+        <ul class="mb-0 mt-2 ps-3">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="alert-timer-bar bg-danger"></div>
+    </div>
+@endif
+
 @if (session('success'))
     <div class="alert alert-success alert-dismissible fade show auto-dismiss-alert position-relative overflow-hidden" role="alert">
         <strong>Éxito:</strong> {{ session('success') }}

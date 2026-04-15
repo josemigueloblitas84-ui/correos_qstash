@@ -1,0 +1,177 @@
+.reporte-card {
+    border: 1px solid #2b7eb2;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+.reporte-card__header {
+    background: linear-gradient(180deg, #2f84ba 0%, #286d99 100%);
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    padding: 0.75rem 1.2rem;
+    text-transform: uppercase;
+}
+
+.reporte-label {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #28323d;
+    margin-bottom: 0.45rem;
+}
+
+.reporte-input {
+    height: 42px;
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+    box-shadow: none;
+    font-size: 1rem;
+}
+
+.reporte-input:focus {
+    border-color: #7cb7de;
+    box-shadow: 0 0 0 0.15rem rgba(43, 126, 178, 0.15);
+}
+
+.reporte-radio-label {
+    font-size: 1rem;
+    color: #2e2e2e;
+}
+
+.reporte-btn-buscar {
+    background: linear-gradient(180deg, #2f84ba 0%, #286d99 100%);
+    border: 1px solid #25678f;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: 6px;
+    min-height: 42px;
+}
+
+.reporte-btn-buscar:hover {
+    background: linear-gradient(180deg, #2a78a8 0%, #225f86 100%);
+    color: #fff;
+}
+
+.reporte-subcard {
+    border: 1px solid #d9eaf5;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+}
+
+#tablaReporteAgenda thead th,
+#tablaReporteInformeAgenda thead th {
+    background: #f5f9fc;
+    color: #2f3d4a;
+    border-color: #dde8ef;
+    font-weight: 700;
+}
+
+.badge-fecha {
+    display: inline-block;
+    padding: 0.38rem 0.72rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+}
+
+.badge-fecha-desde {
+    background: #1f8acb;
+}
+
+.badge-fecha-hasta {
+    background: #28b463;
+}
+
+.badge-fecha-separador {
+    display: inline-block;
+    margin: 0 0.45rem;
+    font-weight: 700;
+    color: #4e5b68;
+}
+
+.btn-accion-imprimir {
+    border: 1px solid #d8dde3;
+    background: #fff;
+    color: #d81b60;
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-accion-imprimir:hover {
+    background: #fff2f7;
+    border-color: #e9b4c8;
+    color: #ad1457;
+}
+
+.estado-validada {
+    color: #28a745;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.btn-validar {
+    border: 0;
+    background: linear-gradient(180deg, #f15b4f 0%, #dc3f34 100%);
+    color: #fff;
+    width: 46px;
+    height: 46px;
+    border-radius: 8px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-validar:hover {
+    background: linear-gradient(180deg, #e94c40 0%, #c93127 100%);
+}
+
+.agenda-preview-modal {
+    min-height: 82vh;
+}
+
+.agenda-preview-modal-header {
+    background: #dff0d8;
+    color: #4a7c59;
+    border-bottom: 1px solid #cfe7c7;
+}
+
+.agenda-preview-modal-header .modal-title {
+    width: 100%;
+    text-align: center;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+}
+
+.agenda-preview-modal-body {
+    background: #f9fbf7;
+    padding: 0.75rem;
+}
+
+.agenda-preview-frame {
+    width: 100%;
+    min-height: 78vh;
+    border: 3px solid #2b2b2b;
+    border-radius: 4px;
+    background: #fff;
+}
+
+@media (max-width: 991.98px) {
+    .reporte-btn-buscar {
+        margin-top: 0.5rem;
+    }
+
+    .agenda-preview-frame {
+        min-height: 65vh;
+    }
+}
