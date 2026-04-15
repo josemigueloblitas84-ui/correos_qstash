@@ -260,6 +260,28 @@ document.addEventListener('DOMContentLoaded', function () {
         return `${year}-${month}-${day}`;
     };
 
+    const formatIsoDateForDisplay = (dateString) => {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString || '')) {
+            return '';
+        }
+
+        const [year, month, day] = dateString.split('-');
+
+        return `${day}/${month}/${year}`;
+    };
+
+    const syncStaticDateDisplay = (field, isoDate) => {
+        if (!field || field.id !== 'fecha') {
+            return;
+        }
+
+        const displayField = document.getElementById('fecha_visual');
+
+        if (displayField) {
+            displayField.value = formatIsoDateForDisplay(isoDate);
+        }
+    };
+
     const getIsoValue = (field) => {
         if (!field) {
             return '';
@@ -531,12 +553,14 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        if (typeof $ !== 'undefined' && $.datepicker) {
+        if (typeof $ !== 'undefined' && $.datepicker && $(field).data('datepicker')) {
             $(field).datepicker('setDate', parseIsoDate(isoDate));
+            syncStaticDateDisplay(field, isoDate);
             return;
         }
 
         field.value = isoDate || '';
+        syncStaticDateDisplay(field, isoDate);
     };
 
     const syncProgrammaticFieldUpdate = (field) => {
@@ -743,6 +767,7 @@ document.addEventListener('DOMContentLoaded', function () {
         agendarDataTable = table.DataTable({
             processing: true,
             serverSide: true,
+            deferLoading: 0,
             ajax: {
                 url: config.agendaDataUrl,
                 beforeSend: function () {
@@ -775,6 +800,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 { data: 'horario_trabajo', name: 'hora_desde', orderable: false, searchable: false },
                 { data: 'acciones', name: 'acciones', orderable: false, searchable: false },
             ],
+            language: {
+                url: '/assets/datatables/i18n/es-ES.json',
+            },
         });
     };
 
@@ -817,6 +845,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
             },
             language: {
+                url: '/assets/datatables/i18n/es-ES.json',
                 emptyTable: tipo === 'D'
                     ? 'No hay actividades diarias registradas.'
                     : 'No hay actividades semanales registradas.',
@@ -1379,8 +1408,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const clearAgendaHeaderForm = () => {
         form.reset();
 
-        setDatepickerValue(fechaField, '');
-        setDatepickerValue(periodoDelField, '');
+        setDatepickerValue(fechaField, config.todayString || '');
+        setDatepickerValue(periodoDelField, config.todayString || '');
         setDatepickerValue(periodoAlField, '');
         setDatepickerValue(agendaWeekStartField, '');
         setDatepickerValue(agendaWeekEndField, '');
@@ -1445,6 +1474,8 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
+        syncPeriodoAlRange();
+
         agendaHeaderFields.forEach((field) => {
             if (window.WizardValidationUtils?.clearFieldError) {
                 window.WizardValidationUtils.clearFieldError(field);
@@ -1490,7 +1521,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    initializeDatepicker(document.getElementById('fecha'));
     initializeDatepicker(periodoDelField, {
         minDate: parseIsoDate(config.todayString || getIsoValue(periodoDelField) || ''),
     });

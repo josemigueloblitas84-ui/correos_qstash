@@ -16,15 +16,19 @@
                         <div class="agenda-step-body">
                             <div class="agenda-grid">
                                 <div class="agenda-field">
-                                    <label for="fecha" class="form-label fw-semibold">Fecha:</label>
+                                    <label for="fecha_visual" class="form-label fw-semibold">Fecha:</label>
                                     <input
                                         type="text"
-                                        id="fecha"
-                                        name="fecha"
-                                        value="{{ old('fecha', data_get($articulo ?? null, 'fecha', now()->format('Y-m-d'))) }}"
+                                        id="fecha_visual"
+                                        value="{{ now()->format('d/m/Y') }}"
                                         class="form-control @error('fecha') is-invalid @enderror"
                                         autocomplete="off"
-                                        readonly
+                                        readonly>
+                                    <input
+                                        type="hidden"
+                                        id="fecha"
+                                        name="fecha"
+                                        value="{{ now()->format('Y-m-d') }}"
                                         required>
                                     @error('fecha')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>

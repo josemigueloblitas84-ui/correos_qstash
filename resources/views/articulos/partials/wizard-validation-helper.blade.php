@@ -46,7 +46,7 @@
 
                 const clearFieldError = (field) => {
                     field.setCustomValidity('');
-                    field.classList.remove('is-invalid');
+                    field.classList.remove('is-invalid', 'is-valid');
 
                     const errorElement = getErrorElement(field);
 

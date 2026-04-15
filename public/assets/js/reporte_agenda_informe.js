@@ -157,6 +157,8 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
+    let searchWasSubmitted = false;
+
     function getFilters() {
         return {
             fecha_desde: document.getElementById('fecha_desde')?.value || '',
@@ -166,16 +168,40 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
+    function emptyDataTableResponse(draw) {
+        return {
+            draw: draw || 0,
+            recordsTotal: 0,
+            recordsFiltered: 0,
+            data: []
+        };
+    }
+
+    function buildSearchOnlyAjax(url) {
+        return function (data, callback) {
+            if (!searchWasSubmitted) {
+                callback(emptyDataTableResponse(data.draw));
+                return;
+            }
+
+            $.ajax({
+                url: url,
+                data: Object.assign({}, data, getFilters()),
+                dataType: 'json',
+                success: callback,
+                error: function () {
+                    callback(emptyDataTableResponse(data.draw));
+                }
+            });
+        };
+    }
+
     const tableAgenda = $('#tablaReporteAgenda').DataTable({
         processing: true,
         serverSide: true,
+        deferLoading: 0,
         searching: false,
-        ajax: {
-            url: config.dataUrl,
-            data: function (d) {
-                Object.assign(d, getFilters());
-            }
-        },
+        ajax: buildSearchOnlyAjax(config.dataUrl),
         columns: [
             { data: 'fecha_mostrar', name: 'a.fecha' },
             { data: 'nombre_mostrar', name: 'u.name' },
@@ -192,13 +218,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const tableInforme = $('#tablaReporteInformeAgenda').DataTable({
         processing: true,
         serverSide: true,
+        deferLoading: 0,
         searching: false,
-        ajax: {
-            url: config.dataInformeUrl,
-            data: function (d) {
-                Object.assign(d, getFilters());
-            }
-        },
+        ajax: buildSearchOnlyAjax(config.dataInformeUrl),
         columns: [
             { data: 'fecha_mostrar', name: 'fecha_actividad' },
             { data: 'nombre_mostrar', name: 'usuario_nombre' },
@@ -229,6 +251,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const tipoBusqueda = document.querySelector('input[name="tipo_busqueda"]:checked')?.value || 'agenda';
 
+        searchWasSubmitted = true;
         syncModeView();
 
         if (tipoBusqueda === 'agenda') {
@@ -324,4 +347,3 @@ document.addEventListener('DOMContentLoaded', function () {
 
     syncModeView();
 });
-

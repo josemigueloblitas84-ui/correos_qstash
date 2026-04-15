@@ -1,4 +1,4 @@
-@php
+{{--  --}}@php
     use Illuminate\Support\Carbon;
 
     $formatDate = static fn ($value) => $value ? Carbon::parse($value)->format('d-m-Y') : '';
