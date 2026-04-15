@@ -30,35 +30,12 @@
                         </p>
                     </div>
                 </li>
-                {{-- <li class="nav-item menu-open">
-                    <a href="#" class="nav-link active">
+                <li class="nav-item">
+                    <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                         <i class="nav-icon bi bi-speedometer"></i>
-                        <p>
-                            Dashboard
-                            <i class="nav-arrow bi bi-chevron-right"></i>
-                        </p>
+                        <p>Panel de control</p>
                     </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="{{ route('dashboard') }}" class="nav-link">
-                                <i class="nav-icon bi bi-circle"></i>
-                                <p>Dashboard Principal</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="./index2.html" class="nav-link">
-                                <i class="nav-icon bi bi-circle"></i>
-                                <p>Dashboard v2</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="./index3.html" class="nav-link">
-                                <i class="nav-icon bi bi-circle"></i>
-                                <p>Dashboard v3</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li> --}}
+                </li>
                 <li class="nav-header">Roles y Permisos</li>
                 <li class="nav-item">
                     @can('ver usuarios')

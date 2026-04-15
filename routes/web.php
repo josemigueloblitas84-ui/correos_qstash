@@ -7,6 +7,7 @@ use App\Http\Controllers\Permisos\PermisosController;
 use App\Http\Controllers\Permisos\RolController;
 use App\Http\Controllers\Permisos\UserController;
 use App\Http\Controllers\FormMultiPasosController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\Agenda\DepartamentoController;
 use App\Http\Controllers\Agenda\TipoPersonalController;
@@ -32,6 +33,8 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::view('/dashboard', 'dashboard')->name('dashboard');
+    Route::get('/dashboard/control-horas/preview', [DashboardController::class, 'controlHorasPreview'])
+        ->name('dashboard.control-horas.preview');
     Route::view('/formulario', 'formulario')->name('formulario');
 
     Route::middleware('password.confirm')->group(function () {
