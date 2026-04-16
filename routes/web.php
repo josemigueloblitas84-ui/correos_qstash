@@ -26,7 +26,7 @@ Route::get('/prueba', function () {
 
 Route::get('/', function () {
     return auth()->check()
-        ? redirect('/formMultiPasos/create')
+        ? redirect('/dashboard')
         : redirect('/login');
 });
 
@@ -74,6 +74,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/{id}/edit', 'edit')->name('edit');
         Route::post('/{id}', 'update')->name('update');
         Route::delete('/', 'destroy')->name('destroy');
+        Route::patch('/{id}/estado', 'toggleStatus')->name('toggle-status');
 
         Route::get('/{id}/roles', 'editRoles')->name('roles.edit');
         Route::post('/{id}/roles', 'updateRoles')->name('roles.update');

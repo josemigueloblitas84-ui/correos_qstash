@@ -37,18 +37,31 @@
 
                                 <div class="agenda-field">
                                     <label for="cod_unidad" class="form-label fw-semibold">Departamento o Unidad:</label>
-                                    <select
-                                        id="cod_unidad"
-                                        name="cod_unidad"
-                                        class="form-select @error('cod_unidad') is-invalid @enderror"
-                                        required>
-                                        <option value="">Seleccione</option>
-                                        @foreach ($departamentos as $departamento)
-                                            <option value="{{ $departamento->id }}" @selected(old('cod_unidad') == $departamento->id)>
-                                                {{ $departamento->nombre_depa }}
+                                    @if ($isSuperAdmin)
+                                        <select
+                                            id="cod_unidad"
+                                            name="cod_unidad"
+                                            class="form-select @error('cod_unidad') is-invalid @enderror"
+                                            required>
+                                            <option value="">Seleccione</option>
+                                            @foreach ($departamentos as $departamento)
+                                                <option value="{{ $departamento->id }}" @selected(old('cod_unidad') == $departamento->id)>
+                                                    {{ $departamento->nombre_depa }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    @else
+                                        <select
+                                            id="cod_unidad"
+                                            class="form-select"
+                                            disabled>
+                                            <option value="{{ $currentUser->departamento_id }}" selected>
+                                                {{ $currentUser->departamento_nombre ?? 'Sin departamento' }}
                                             </option>
-                                        @endforeach
-                                    </select>
+                                        </select>
+                                        <input type="hidden" name="cod_unidad" value="{{ $currentUser->departamento_id }}">
+                                    @endif
+
                                     @error('cod_unidad')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
@@ -56,11 +69,25 @@
 
                                 <div class="agenda-field agenda-field-wide">
                                     <label for="cod_solicitante" class="form-label fw-semibold">Nombre y Apellido:</label>
-                                    <select name="cod_solicitante" id="cod_solicitante"
-                                        class="form-select @error('cod_solicitante') is-invalid @enderror"
-                                        required>
-                                        <option value="">Seleccione un departartamento primero</option>
-                                    </select>
+
+                                    @if($isSuperAdmin)
+                                        <select name="cod_solicitante" id="cod_solicitante"
+                                            class="form-select @error('cod_solicitante') is-invalid @enderror"
+                                            required>
+                                            <option value="">Seleccione un departartamento primero</option>
+                                        </select>
+                                    @else
+                                        <select
+                                            id="cod_solicitante"
+                                            class="form-select"
+                                            disabled>
+                                            <option value="{{ $currentUser->id }}" selected>
+                                                {{ $currentUser->name }}
+                                            </option>
+                                        </select>
+                                        <input type="hidden" name="cod_solicitante" value="{{ $currentUser->id }}">
+                                    @endif
+
                                     @error('cod_solicitante')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
@@ -72,7 +99,7 @@
                                         type="text"
                                         id="cargo_visual"
                                         class="form-control"
-                                        value=""
+                                        value="{{ $currentUser->cargo_nombre ?? 'Sin cargo' }}"
                                         placeholder="Se completara automaticamente"
                                         readonly>
                                 </div>
@@ -683,6 +710,8 @@
         activityDestroyUrl: '{{ url('formMultiPasos/agenda-actividades') }}/__ID__',
         activityAutocompleteUrl: '{{ route('articulos.actividades.autocomplete') }}',
         usuariosPorDepartamentoUrl: '{{ url('formMultiPasos/usuarios-por-departamento') }}/__ID__',
+        isSuperAdmin: @json($isSuperAdmin),
+        currentUserHeader: @json($currentUser),
     };
 </script>
 <script src="{{ asset('assets/plugins/jquery-ui/jquery-ui.min.js') }}"></script>

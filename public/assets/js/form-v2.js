@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     const config = window.formV2Config || {};
+    const isSuperAdmin = Boolean(config.isSuperAdmin);
+    const currentUserHeader = config.currentUserHeader || null;
     const agendaValidateButton = form.querySelector('[data-action="validate-agenda"]');
     const agendaPreviewWrapper = document.getElementById('agendaPreviewWrapper');
     const agendaWeeklyWrapper = document.getElementById('agendaWeeklyWrapper');
@@ -16,8 +18,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const fechaField = form.querySelector('[name="fecha"]');
     const periodoDelField = form.querySelector('[name="fecha_desde"]');
     const periodoAlField = form.querySelector('[name="fecha_hasta"]');
-    const departamentoField = form.querySelector('[name="cod_unidad"]');
-    const solicitanteField = form.querySelector('[name="cod_solicitante"]');
+    const departamentoField = document.getElementById('cod_unidad');
+    const solicitanteField = document.getElementById('cod_solicitante');
     const agendaWeekStartField = document.getElementById('agendaWeekStart');
     const agendaWeekEndField = document.getElementById('agendaWeekEnd');
     const agendaDailyFromHourField = document.getElementById('agendaDailyFromHour');
@@ -587,6 +589,10 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     const syncCargoVisualWithSelectedUser = () => {
+        if (!solicitanteField || solicitanteField.tagName !== 'SELECT') {
+            return;
+        }
+        
         const selectedOption = solicitanteField?.options[solicitanteField.selectedIndex];
         const tipoPersonal = selectedOption?.dataset?.tipoPersonal || '';
 
@@ -2098,6 +2104,19 @@ document.addEventListener('DOMContentLoaded', function () {
             return [];
         }
 
+        if (!isSuperAdmin && currentUserHeader) {
+            solicitanteField.innerHTML = `
+                <option value="${currentUserHeader.id}" selected>${currentUserHeader.name}</option>
+            `;
+            solicitanteField.value = String(currentUserHeader.id);
+
+            if (cargoVisualField) {
+                cargoVisualField.value = currentUserHeader.cargo_nombre || '';
+            }
+
+            return [currentUserHeader];
+        }
+
         solicitanteField.innerHTML = '<option value="">Cargando usuarios...</option>';
 
         if (!departamentoId) {
@@ -2131,21 +2150,28 @@ document.addEventListener('DOMContentLoaded', function () {
             return [];
         }
     };
-    if (departamentoField) {
-        departamentoField.addEventListener('change', function () {
-            cargarUsuariosPorDepartamento(this.value);
-            if(cargoVisualField) {
-                cargoVisualField.value = '';
-            }
+    if(isSuperAdmin) {
+        if (departamentoField) {
+            departamentoField.addEventListener('change', function () {
+                cargarUsuariosPorDepartamento(this.value);
+                if(cargoVisualField) {
+                    cargoVisualField.value = '';
+                }
 
-            resetAgendaState();
-        });
+                resetAgendaState();
+            });
+        }
+        if (solicitanteField) {
+            solicitanteField.addEventListener('change', function () {
+                syncCargoVisualWithSelectedUser();
+                resetAgendaState();
+            });
+        }
+    }else if(currentUserHeader){
+        if(cargoVisualField) {
+            cargoVisualField.value = currentUserHeader.cargo_nombre || '';
+        }
+        cargarUsuariosPorDepartamento(currentUserHeader.departamento_id, currentUserHeader.id);
     }
-    if (solicitanteField) {
-        solicitanteField.addEventListener('change', function () {
-            syncCargoVisualWithSelectedUser();
 
-            resetAgendaState();
-        });
-    }
 });

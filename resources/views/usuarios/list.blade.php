@@ -35,7 +35,7 @@
                                 <th>Rol</th>
                                 <th width="320">Permisos Directos</th>
                                 <th width="200">Creación</th>
-                                <th width="200">Acciones</th>
+                                <th width="240">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -108,10 +108,16 @@
                                                 </div>
 
                                                 @can('eliminar usuarios')
-                                                    <button onclick="eliminarUsuario({{ $usuario->id }})"
-                                                        class="btn btn-sm btn-danger">
-                                                        Eliminar
-                                                    </button>
+                                                    <div class="form-check form-switch m-0 d-flex align-items-center gap-2">
+                                                        <input
+                                                            type="checkbox"
+                                                            class="form-check-input js-toggle-estado-usuario"
+                                                            data-id="{{ $usuario->id }}"
+                                                            {{ (int) $usuario->estado === 1 ? 'checked' : '' }}>
+                                                        <label class="form-check-label small {{(int) $usuario->estado === 1? 'text-success' : 'text-danger'}}">
+                                                            {{ (int) $usuario->estado === 1 ? 'Activo' : 'Inactivo' }}
+                                                        </label>
+                                                    </div>
                                                 @endcan
                                             </div>
                                         </td>
@@ -134,26 +140,80 @@
     </div>
 
 @endsection
+@push('styles')
+    <style>
+        .js-toggle-estado-usuario {
+            cursor: pointer;
+        }
+
+        .js-toggle-estado-usuario:not(:checked) {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .js-toggle-estado-usuario:checked {
+            background-color: #198754;
+            border-color: #198754;
+        }
+
+        .js-toggle-estado-usuario:focus {
+            box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+        }
+
+        .js-toggle-estado-usuario:not(:checked):focus {
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+    </style>
+@endpush
 
 @push('scripts')
     <script>
-        function eliminarUsuario(id) {
-            if (confirm('¿Desea eliminar el usuario?')) {
-                $.ajax({
-                    url: '{{ route('usuarios.destroy') }}',
-                    type: 'DELETE',
-                    data: {
-                        id: id
-                    },
-                    dataType: 'json',
-                    headers: {
-                        'X-CSRF-TOKEN': "{{ csrf_token() }}"
-                    },
-                    success: function() {
-                        location.reload();
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.js-toggle-estado-usuario').forEach(function (input) {
+                input.addEventListener('change', function () {
+                    const id = this.getAttribute('data-id');
+                    const checked = this.checked;
+                    const self = this;
+                    const label = self.closest('.form-check')?.querySelector('.form-check-label');
+
+                    if (!id) {
+                        return;
                     }
+
+                    $.ajax({
+                        url: '{{ url('usuarios') }}/' + id + '/estado',
+                        type: 'POST',
+                        data: {
+                            _method: 'PATCH',
+                            _token: '{{ csrf_token() }}'
+                        },
+                        beforeSend: function () {
+                            self.disabled = true;
+                        },
+                        success: function (response) {
+                            if (label) {
+                                label.textContent = checked ? 'Activo' : 'Inactivo';
+                                label.classList.remove('text-success', 'text-danger');
+                                label.classList.add(checked ? 'text-success' : 'text-danger')
+                            }
+                        },
+                        error: function () {
+                            self.checked = !checked;
+
+                            if (label) {
+                                label.textContent = self.checked ? 'Activo' : 'Inactivo';
+                                label.classList.remove('text-success', 'text-danger');
+                                label.classList.add(self.checked ? 'text-success' : 'text-danger');
+                            }
+
+                            alert('No se pudo actualizar el estado del usuario.');
+                        },
+                        complete: function () {
+                            self.disabled = false;
+                        }
+                    });
                 });
-            }
-        }
+            });
+        });
     </script>
 @endpush

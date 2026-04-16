@@ -23,6 +23,11 @@ class UserService
         $usuario->password = Hash::make($request->contrasenaUsuario);
         $usuario->departamento_id = $request->departamento_id;
         $usuario->tipo_personal_id = $request->tipo_personal_id;
+        $usuario->cod_estudiante = $request->cod_estudiante;
+        $usuario->cantidad_horas_totales = $request->cantidad_horas_totales;
+        $usuario->celular = $request->celular;
+        $usuario->telefono_contacto = $request->telefono_contacto;
+        $usuario->estado = 1;
         $usuario->save();
 
         $usuario->load('roles');
@@ -34,6 +39,11 @@ class UserService
                     'id' => $usuario->id,
                     'name' => $usuario->name,
                     'email' => $usuario->email,
+                    'cod_estudiante' => $usuario->cod_estudiante,
+                    'cantidad_horas_totales' => $usuario->cantidad_horas_totales,
+                    'celular' => $usuario->celular,
+                    'telefono_contacto' => $usuario->telefono_contacto,
+                    'estado' => (int) $usuario->estado,
                 ],
                 'roles' => $usuario->roles->pluck('name')->values()->all(),
             ],
@@ -52,6 +62,10 @@ class UserService
             'email' => $usuario->email,
             'departamentos_id' => $usuario->departamento_id,
             'tipo_personal_id' => $usuario->tipo_personal_id,
+            'cod_estudiante' => $usuario->cod_estudiante,
+            'cantidad_horas_totales' => $usuario->cantidad_horas_totales,
+            'celular' => $usuario->celular,
+            'telefono_contacto' => $usuario->telefono_contacto,
             'roles' => $usuario->roles()->pluck('name')->values()->all(),
         ];
 
@@ -59,6 +73,10 @@ class UserService
         $usuario->email = $request->email;
         $usuario->departamento_id = $request->departamento_id;
         $usuario->tipo_personal_id = $request->tipo_personal_id;
+        $usuario->cod_estudiante = $request->cod_estudiante;
+        $usuario->cantidad_horas_totales = $request->cantidad_horas_totales;
+        $usuario->celular = $request->celular;
+        $usuario->telefono_contacto = $request->telefono_contacto;
         $usuario->save();
 
         $usuario->load('roles');
@@ -72,6 +90,10 @@ class UserService
                     'email' => $usuario->email,
                     'departamento_id' => $usuario->departamento_id,
                     'tipo_personal_id' => $usuario->tipo_personal_id,
+                    'cod_estudiante' => $usuario->cod_estudiante,
+                    'cantidad_horas_totales' => $usuario->cantidad_horas_totales,
+                    'celular' => $usuario->celular,
+                    'telefono_contacto' => $usuario->telefono_contacto,
                     'roles' => $usuario->roles->pluck('name')->values()->all(),
                 ],
             ],
@@ -81,6 +103,55 @@ class UserService
         );
 
         return $usuario;
+    }
+
+    public function deactivateUser(User $usuario): void
+    {
+        $estadoAnterior = (int) $usuario->estado;
+
+        $usuario->estado = 0;
+        $usuario->save();
+
+        ActivityLogger::log(
+            'Usuario desactivado',
+            [
+                'old' => [
+                    'estado' => $estadoAnterior,
+                ],
+                'attributes' => [
+                    'estado' => 0,
+                ],
+            ],
+            $usuario,
+            logName: 'usuarios',
+            event: 'deactivated'
+        );
+    }
+
+    public function toggleStatus(User $usuario): int
+    {
+        $estadoAnterior = (int) $usuario->estado;
+        $nuevoEstado = $estadoAnterior === 1 ? 0 : 1;
+
+        $usuario->estado = $nuevoEstado;
+        $usuario->save();
+
+        ActivityLogger::log(
+            'Estado de usuario actualizado',
+            [
+                'old' => [
+                    'estado' => $estadoAnterior,
+                ],
+                'attributes' => [
+                    'estado' => $nuevoEstado,
+                ],
+            ],
+            $usuario,
+            logName: 'usuarios',
+            event: 'status_updated'
+        );
+
+        return $nuevoEstado;
     }
 
     public function getAssignableUsers(int $userId)

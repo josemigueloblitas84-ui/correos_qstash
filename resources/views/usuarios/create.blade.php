@@ -8,9 +8,6 @@
         <div class="container-fluid">
             <div class="d-flex justify-content-between">
                 <h1>Usuarios / Crear</h1>
-                {{--<a href="{{ route('usuarios.index') }}" class="btn btn-primary">
-                    Volver
-                </a>--}}
             </div>
         </div>
     </div>
@@ -18,15 +15,12 @@
     <div class="app-content">
         <div class="container-fluid">
             <div class="row">
-                <!-- left column -->
                 <div class="col-md-12">
-                    <!-- general form elements -->
                     <div class="card card-primary">
                         <div class="card-header">
                             <h3 class="card-title">Crear Usuario</h3>
                         </div>
-                        <!-- /.card-header -->
-                        <!-- form start -->
+
                         <form action="{{ route('usuarios.store') }}" method="POST" autocomplete="off">
                             @csrf
                             <div class="card-body">
@@ -50,7 +44,7 @@
 
                                 <div class="mb-3">
                                     <label for="contrasenaUsuario" class="form-label fw-bold">Contraseña:</label>
-                                    <input value="{{ old('contrasenaUsuario') }}" type="password" class="form-control"
+                                    <input type="password" class="form-control"
                                         id="contrasenaUsuario" placeholder="Ingrese la contraseña del usuario"
                                         name="contrasenaUsuario">
                                     @error('contrasenaUsuario')
@@ -60,7 +54,7 @@
 
                                 <div class="mb-3">
                                     <label for="confirmar_contrasenaUsuario" class="form-label fw-bold">Confirmar Contraseña:</label>
-                                    <input value="{{ old('confirmar_contrasenaUsuario') }}" type="password" class="form-control"
+                                    <input type="password" class="form-control"
                                         id="confirmar_contrasenaUsuario" placeholder="Confirme la contraseña del usuario"
                                         name="confirmar_contrasenaUsuario">
                                     @error('confirmar_contrasenaUsuario')
@@ -104,94 +98,62 @@
                                     </div>
                                 </div>
 
-                                {{-- <div class="mb-3">
-                                    <label class="d-block form-label fw-bold">Roles</label>
-
-                                    @if ($roles->isNotEmpty())
-                                        <div class="row">
-                                            @foreach ($roles as $role)
-                                                <div class="col-12 col-md-6 mb-2">
-                                                    <div class="form-check form-switch">
-                                                        <input type="checkbox" class="form-check-input"
-                                                            id="role-{{ $role->id }}" name="role[]"
-                                                            value="{{ $role->name }}"
-                                                            style="transform: scale(1.2);">
-                                                        <label class="form-check-label fw-bold" for="role-{{ $role->id }}">
-                                                            {{ $role->name }}
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            @endforeach
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="cod_estudiante" class="form-label fw-bold">Código de Estudiante:</label>
+                                            <input value="{{ old('cod_estudiante') }}" type="text" class="form-control"
+                                                id="cod_estudiante" name="cod_estudiante" placeholder="Ingrese el código de estudiante">
+                                            @error('cod_estudiante')
+                                                <small class="text-danger">{{ $message }}</small>
+                                            @enderror
                                         </div>
-                                    @endif
-                                </div> --}}
+                                    </div>
 
-                                {{--
-                                <div class="mb-3">
-                                    <label for="exampleInputPassword1" class="form-label">Password</label>
-                                    <input type="password" class="form-control" id="exampleInputPassword1"
-                                        placeholder="Password">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="exampleInputFile" class="form-label">File input</label>
-                                    <div class="input-group">
-                                        <input type="file" class="form-control" id="exampleInputFile">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="cantidad_horas_totales" class="form-label fw-bold">Cantidad de Horas Totales:</label>
+                                            <input value="{{ old('cantidad_horas_totales') }}" type="number" step="0.01" min="0" class="form-control"
+                                                id="cantidad_horas_totales" name="cantidad_horas_totales" placeholder="Ingrese la cantidad de horas">
+                                            @error('cantidad_horas_totales')
+                                                <small class="text-danger">{{ $message }}</small>
+                                            @enderror
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                                    <label class="form-check-label" for="exampleCheck1">Check me out</label>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="celular" class="form-label fw-bold">Celular:</label>
+                                            <input value="{{ old('celular') }}" type="number" class="form-control"
+                                                id="celular" name="celular" placeholder="Ingrese el celular">
+                                            @error('celular')
+                                                <small class="text-danger">{{ $message }}</small>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="telefono_contacto" class="form-label fw-bold">Teléfono de Contacto:</label>
+                                            <input value="{{ old('telefono_contacto') }}" type="number" class="form-control"
+                                                id="telefono_contacto" name="telefono_contacto" placeholder="Ingrese el teléfono de contacto">
+                                            @error('telefono_contacto')
+                                                <small class="text-danger">{{ $message }}</small>
+                                            @enderror
+                                        </div>
+                                    </div>
                                 </div>
-                                --}}
                             </div>
-                            <!-- /.card-body -->
 
                             <div class="card-footer">
                                 <button type="submit" class="btn btn-primary my-2">Crear Usuario</button>
                             </div>
                         </form>
                     </div>
-                    <!-- /.card -->
                 </div>
             </div>
         </div>
     </div>
-
 @endsection
-
-{{-- <!-- general form elements -->
-<div class="card card-primary">
-    <div class="card-header">
-        <h3 class="card-title">Quick Example</h3>
-    </div>
-    <!-- /.card-header -->
-    <!-- form start -->
-    <form>
-        <div class="card-body">
-            <div class="mb-3">
-                <label for="exampleInputEmail1" class="form-label">Email address</label>
-                <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email">
-            </div>
-            <div class="mb-3">
-                <label for="exampleInputPassword1" class="form-label">Password</label>
-                <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
-            </div>
-            <div class="mb-3">
-                <label for="exampleInputFile" class="form-label">File input</label>
-                <div class="input-group">
-                    <input type="file" class="form-control" id="exampleInputFile">
-                </div>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                <label class="form-check-label" for="exampleCheck1">Check me out</label>
-            </div>
-        </div>
-        <!-- /.card-body -->
-
-        <div class="card-footer">
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </div>
-    </form>
-</div>
-<!-- /.card --> --}}

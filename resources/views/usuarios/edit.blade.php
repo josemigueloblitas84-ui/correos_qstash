@@ -10,13 +10,6 @@
                 <div class="col-sm-6">
                     <h1>Usuarios / Editar</h1>
                 </div>
-                {{--
-                <div class="col-sm-6 text-end">
-                    <a href="{{ route('usuarios.index') }}" class="btn btn-primary">
-                        Volver
-                    </a>
-                </div>
-                --}}
             </div>
         </div>
     </div>
@@ -114,32 +107,87 @@
                             </div>
                         </div>
 
-                        {{-- <div class="mb-3">
-                            <label class="form-label">Roles:</label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="cod_estudiante" class="form-label">Código de Estudiante:</label>
+                                    <input
+                                        value="{{ old('cod_estudiante', $usuario->cod_estudiante) }}"
+                                        name="cod_estudiante"
+                                        id="cod_estudiante"
+                                        type="text"
+                                        placeholder="Ingrese el código de estudiante"
+                                        class="form-control @error('cod_estudiante') is-invalid @enderror">
 
-                            <div class="row">
-                                @if ($roles->isNotEmpty())
-                                    @foreach ($roles as $role)
-                                        <div class="col-md-3">
-                                            <div class="form-check">
-                                                <input
-                                                    {{ $hasRoles->contains($role->id) ? 'checked' : '' }}
-                                                    type="checkbox"
-                                                    id="role-{{ $role->id }}"
-                                                    name="role[]"
-                                                    value="{{ $role->name }}"
-                                                    class="form-check-input">
-                                                <label
-                                                    for="role-{{ $role->id }}"
-                                                    class="form-check-label">
-                                                    {{ $role->name }}
-                                                </label>
-                                            </div>
+                                    @error('cod_estudiante')
+                                        <div class="invalid-feedback d-block">
+                                            {{ $message }}
                                         </div>
-                                    @endforeach
-                                @endif
+                                    @enderror
+                                </div>
                             </div>
-                        </div> --}}
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="cantidad_horas_totales" class="form-label">Cantidad de Horas Totales:</label>
+                                    <input
+                                        value="{{ old('cantidad_horas_totales', $usuario->cantidad_horas_totales) }}"
+                                        name="cantidad_horas_totales"
+                                        id="cantidad_horas_totales"
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        placeholder="Ingrese la cantidad de horas"
+                                        class="form-control @error('cantidad_horas_totales') is-invalid @enderror">
+
+                                    @error('cantidad_horas_totales')
+                                        <div class="invalid-feedback d-block">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="celular" class="form-label">Celular:</label>
+                                    <input
+                                        value="{{ old('celular', $usuario->celular) }}"
+                                        name="celular"
+                                        id="celular"
+                                        type="number"
+                                        placeholder="Ingrese el celular"
+                                        class="form-control @error('celular') is-invalid @enderror">
+
+                                    @error('celular')
+                                        <div class="invalid-feedback d-block">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="telefono_contacto" class="form-label">Teléfono de Contacto:</label>
+                                    <input
+                                        value="{{ old('telefono_contacto', $usuario->telefono_contacto) }}"
+                                        name="telefono_contacto"
+                                        id="telefono_contacto"
+                                        type="number"
+                                        placeholder="Ingrese el teléfono de contacto"
+                                        class="form-control @error('telefono_contacto') is-invalid @enderror">
+
+                                    @error('telefono_contacto')
+                                        <div class="invalid-feedback d-block">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
 
                         <button type="submit" class="btn btn-warning">
                             Actualizar

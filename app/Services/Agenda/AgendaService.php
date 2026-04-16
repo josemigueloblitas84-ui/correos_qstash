@@ -15,6 +15,25 @@ class AgendaService
             ->first();
     }
 
+    public function findAccessibleById(int $id, $user)
+    {
+        $query = DB::table('agendas')
+            ->where('id', $id);
+
+        if (! $user->hasRole('SuperAdministrador')) {
+            $query->where(function ($subQuery) use ($user) {
+                $subQuery->where('agendas.cod_solicitante', $user->id)
+                    ->orWhereIn('agendas.cod_solicitante', function ($assignedQuery) use ($user) {
+                        $assignedQuery->select('cod_usuario_asignado')
+                            ->from('agenda_personal_asignado')
+                            ->where('cod_usuario', $user->id);
+                    });
+            });
+        }
+
+        return $query->first();
+    }
+
     public function store(array $data, int $userId): int
     {
         $horaDesde = $data['hora_inicio_hora'] . ':' . $data['hora_inicio_minuto'];
@@ -76,9 +95,9 @@ class AgendaService
         });
     }
 
-    public function getAllForDataTable()
+    public function getAllForDataTable($user)
     {
-        return DB::table('agendas')
+        $query = DB::table('agendas')
             ->join('departamentos', 'agendas.cod_unidad', '=', 'departamentos.id')
             ->join('users', 'agendas.cod_solicitante', '=', 'users.id')
             ->select([
@@ -91,8 +110,20 @@ class AgendaService
                 'departamentos.nombre_depa as departamento',
                 'users.name as nombre_apellido',
             ])
-            ->where('agendas.estado_agenda', 'A')
-            ->orderByDesc('agendas.id');
+            ->where('agendas.estado_agenda', 'A');
+
+        if (! $user->hasRole('SuperAdministrador')) {
+            $query->where(function ($subQuery) use ($user) {
+                $subQuery->where('agendas.cod_solicitante', $user->id)
+                    ->orWhereIn('agendas.cod_solicitante', function ($assignedQuery) use ($user) {
+                        $assignedQuery->select('cod_usuario_asignado')
+                            ->from('agenda_personal_asignado')
+                            ->where('cod_usuario', $user->id);
+                    });
+            });
+        }
+
+        return $query->orderByDesc('agendas.id');
     }
 
     public function getPreviewData(int $id): ?array
@@ -213,5 +244,4 @@ class AgendaService
             );
         });
     }
-
 }

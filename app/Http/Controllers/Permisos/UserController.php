@@ -34,15 +34,12 @@ class UserController extends Controller
             'editPermisosEspeciales',
             'updatePermisosEspeciales',
         ]);
-        $this->middleware('permission:eliminar usuarios')->only('destroy');
+        $this->middleware('permission:eliminar usuarios')->only(['destroy', 'toggleStatus']);
         $this->userService = $userService;
         $this->departamentoService = $departamentoService;
         $this->tipoPersonalService = $tipoPersonalService;
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $usuarios = User::query()
@@ -62,9 +59,6 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $departamentos = $this->departamentoService->getActiveForSelect();
@@ -76,9 +70,6 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(UserRequest $request)
     {
         $this->userService->userStore($request);
@@ -86,9 +77,6 @@ class UserController extends Controller
         return redirect()->route('usuarios.index')->with('success', 'Usuario creado exitosamente');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         $usuario = User::findOrFail($id);
@@ -106,9 +94,6 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UserUpdateRequest $request, string $id)
     {
         $usuario = User::findOrFail($id);
@@ -166,33 +151,29 @@ class UserController extends Controller
             ->with('success', 'Permisos especiales actualizados correctamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Request $request)
     {
         $usuario = User::findOrFail($request->id);
-        $properties = [
-            'user' => [
-                'id' => $usuario->id,
-                'name' => $usuario->name,
-                'email' => $usuario->email,
-            ],
-            'roles' => $usuario->roles()->pluck('name')->values()->all(),
-        ];
 
-        $usuario->delete();
+        $this->userService->deactivateUser($usuario);
 
-        ActivityLogger::log(
-            'Usuario eliminado',
-            $properties,
-            null,
-            logName: 'usuarios',
-            event: 'deleted'
-        );
-
-        session()->flash('success', 'Usuario eliminado exitosamente');
+        session()->flash('success', 'Usuario desactivado exitosamente');
         return response()->json(['status' => true]);
+    }
+
+    public function toggleStatus(string $id)
+    {
+        $usuario = User::findOrFail($id);
+
+        $nuevoEstado = $this->userService->toggleStatus($usuario);
+
+        return response()->json([
+            'status' => true,
+            'message' => $nuevoEstado === 1
+                ? 'Usuario activado correctamente.'
+                : 'Usuario desactivado correctamente.',
+            'estado' => $nuevoEstado,
+        ]);
     }
 
     public function editRoles(string $id)

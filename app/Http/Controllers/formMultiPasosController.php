@@ -74,15 +74,38 @@ class formMultiPasosController extends Controller
     public function create(): View
     {
        $departamentos = $this->departamentoService->getActiveForSelect();
+       $isSuperAdmin = auth()->user()?->hasRole('SuperAdministrador') ?? false;
+
+       $currentUser = User::query()
+            ->leftJoin('departamentos', 'users.departamento_id', '=', 'departamentos.id')
+            ->leftJoin('tipos_personal', 'users.tipo_personal_id', '=', 'tipos_personal.id')
+            ->where('users.id', auth()->id())
+            ->select([
+                'users.id',
+                'users.name',
+                'users.departamento_id',
+                'users.tipo_personal_id',
+                'departamentos.nombre_depa as departamento_nombre',
+                'tipos_personal.tipo as cargo_nombre',
+            ])
+            ->first();
 
        return view('articulos.create', [
             'departamentos' => $departamentos,
             'articulo' => null,
+            'isSuperAdmin' => $isSuperAdmin,
+            'currentUser' => $currentUser,
        ]);
     }
 
     public function store(Request $request): RedirectResponse|JsonResponse
     {
+        if(!auth()->user()?->hasRole('SuperAdministrador')){
+            $request->merge([
+                'cod_unidad' => auth()->user()->departamento_id,
+                'cod_solicitante' => auth()->id(),
+            ]);
+        }
         $validated = $request->validate([
             'fecha' => ['required', 'date'],
             'cod_unidad' => ['required', 'exists:departamentos,id'],
@@ -226,7 +249,7 @@ class formMultiPasosController extends Controller
 
     public function agendaData(): JsonResponse
     {
-        $data = $this->agendaService->getAllForDataTable();
+        $data = $this->agendaService->getAllForDataTable(auth()->user());
 
         return DataTables::of($data)
             ->addColumn('fecha_registro', function ($row) {
@@ -267,11 +290,11 @@ class formMultiPasosController extends Controller
 
     public function showAgenda(int $id): JsonResponse
     {
-        $agenda = $this->agendaService->findById($id);
+        $agenda = $this->agendaService->findAccessibleById($id, auth()->user());
 
         if (! $agenda) {
             return response()->json([
-                'message' => 'La agenda no existe.',
+                'message' => 'La agenda no existe o no tienes permiso para verla.',
             ], 404);
         }
 
@@ -298,11 +321,11 @@ class formMultiPasosController extends Controller
 
     public function destroyAgenda(int $id): JsonResponse
     {
-        $agenda = $this->agendaService->findById($id);
+        $agenda = $this->agendaService->findAccessibleById($id, auth()->user());
 
         if (! $agenda) {
             return response()->json([
-                'message' => 'La agenda no existe.',
+                'message' => 'La agenda no existe o no tienes permiso para eliminarla.',
             ], 404);
         }
 
@@ -323,11 +346,11 @@ class formMultiPasosController extends Controller
 
     public function sendAgenda(int $id): JsonResponse
     {
-        $agenda = $this->agendaService->findById($id);
+        $agenda = $this->agendaService->findAccessibleById($id, auth()->user());
 
         if (! $agenda) {
             return response()->json([
-                'message' => 'La agenda no existe.',
+                'message' => 'La agenda no existe o no tienes permiso para enviarla.',
             ], 404);
         }
 
@@ -444,6 +467,7 @@ class formMultiPasosController extends Controller
         $usuarios = User::query()
             ->leftJoin('tipos_personal', 'users.tipo_personal_id', '=', 'tipos_personal.id')
             ->where('users.departamento_id', $id)
+            ->where('users.estado', 1)
             ->orderBy('users.name', 'asc')
             ->get(['users.id', 'users.name', 'tipos_personal.tipo as tipo_personal_nombre']);
 

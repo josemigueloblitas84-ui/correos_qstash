@@ -11,11 +11,33 @@
         <div class="container-fluid">
             <div class="row g-3">
                 <div class="col-lg-4 col-md-6">
+                    <div class="small-box text-bg-success">
+                        <div class="inner">
+                            <h3>{{ $controlHorasSummary['horas_totales'] }}</h3>
+                            <p>Total horas a cumplir</p>
+                            <small>Horas planificadas</small>
+                        </div>
+                        <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path
+                                d="M5.625 3.75A2.625 2.625 0 003 6.375v11.25a2.625 2.625 0 002.625 2.625h12.75A2.625 2.625 0 0021 17.625V6.375a2.625 2.625 0 00-2.625-2.625H5.625zM12.53 14.78a.75.75 0 01-1.06 0l-2.25-2.25a.75.75 0 111.06-1.06L12 13.19l3.72-3.72a.75.75 0 111.06 1.06l-4.25 4.25z">
+                            </path>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
                     <div class="small-box text-bg-primary">
                         <div class="inner">
-                            <h3>08:00</h3>
+                            <h3>{{ $controlHorasSummary['horas_validadas'] }}</h3>
                             <p>Total horas realizadas</p>
-                            <small>Del {{ now()->format('d-m-Y') }} al {{ now()->format('d-m-Y') }}</small>
+                            <small>
+                                @if ($controlHorasSummary['fecha_desde'] && $controlHorasSummary['fecha_hasta'])
+                                    Del {{ $controlHorasSummary['fecha_desde'] }} al {{ $controlHorasSummary['fecha_hasta'] }}
+                                @else
+                                    Sin horas validadas registradas
+                                @endif
+                            </small>
                         </div>
                         <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -37,25 +59,9 @@
                 </div>
 
                 <div class="col-lg-4 col-md-6">
-                    <div class="small-box text-bg-success">
-                        <div class="inner">
-                            <h3>00:00</h3>
-                            <p>Total horas a cumplir</p>
-                            <small>Horas planificadas</small>
-                        </div>
-                        <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <path
-                                d="M5.625 3.75A2.625 2.625 0 003 6.375v11.25a2.625 2.625 0 002.625 2.625h12.75A2.625 2.625 0 0021 17.625V6.375a2.625 2.625 0 00-2.625-2.625H5.625zM12.53 14.78a.75.75 0 01-1.06 0l-2.25-2.25a.75.75 0 111.06-1.06L12 13.19l3.72-3.72a.75.75 0 111.06 1.06l-4.25 4.25z">
-                            </path>
-                        </svg>
-                    </div>
-                </div>
-
-                <div class="col-lg-4 col-md-6">
                     <div class="small-box text-bg-warning">
                         <div class="inner">
-                            <h3>08:00</h3>
+                            <h3>{{ $controlHorasSummary['horas_pendientes'] }}</h3>
                             <p>Total horas a ser realizadas</p>
                             <small>Horas pendientes</small>
                         </div>

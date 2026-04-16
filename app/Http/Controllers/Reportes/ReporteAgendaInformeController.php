@@ -35,6 +35,7 @@ class ReporteAgendaInformeController extends Controller
             'fecha_desde' => $request->fecha_desde,
             'fecha_hasta' => $request->fecha_hasta,
             'equipo' => $request->equipo,
+            'auth_user_id' => auth()->id(),
         ]);
 
         return DataTables::of($query)
@@ -78,6 +79,7 @@ class ReporteAgendaInformeController extends Controller
             'fecha_desde' => $request->fecha_desde,
             'fecha_hasta' => $request->fecha_hasta,
             'equipo' => $request->equipo,
+            'auth_user_id' => auth()->id(),
         ]);
 
         return DataTables::of($query)
@@ -103,7 +105,7 @@ class ReporteAgendaInformeController extends Controller
                         </button>';
             })
             ->addColumn('validar', function ($row) use ($canValidateInforme) {
-                if (! $canValidateInforme) {
+                if (!$canValidateInforme) {
                     return '';
                 }
 
@@ -126,7 +128,7 @@ class ReporteAgendaInformeController extends Controller
     {
         $previewData = $this->agendaService->getPreviewData($id);
 
-        if (! $previewData) {
+        if (!$previewData) {
             abort(404, 'La agenda no existe.');
         }
 
@@ -152,7 +154,7 @@ class ReporteAgendaInformeController extends Controller
             (int) $request->usuario_id
         );
 
-        if (! $previewData) {
+        if (!$previewData) {
             abort(404, 'El informe no existe.');
         }
 
