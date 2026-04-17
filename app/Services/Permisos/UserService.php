@@ -77,6 +77,11 @@ class UserService
         $usuario->cantidad_horas_totales = $request->cantidad_horas_totales;
         $usuario->celular = $request->celular;
         $usuario->telefono_contacto = $request->telefono_contacto;
+
+        if ($request->filled('contrasenaUsuario')) {
+            $usuario->password = Hash::make($request->contrasenaUsuario);
+        }
+
         $usuario->save();
 
         $usuario->load('roles');

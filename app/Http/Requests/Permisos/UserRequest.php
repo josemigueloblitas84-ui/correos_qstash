@@ -31,7 +31,7 @@ class UserRequest extends FormRequest
             'departamento_id' => 'required|exists:departamentos,id',
             'tipo_personal_id' => 'required|exists:tipos_personal,id',
             'cod_estudiante' => 'required|string|max:30',
-            'cantidad_horas_totales' => 'required|numeric|min:0',
+            'cantidad_horas_totales' => 'nullable|numeric|min:0',
             'celular' => 'nullable|numeric',
             'telefono_contacto' => 'nullable|numeric',
         ];

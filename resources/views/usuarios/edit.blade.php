@@ -60,6 +60,44 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
+                                    <label for="contrasenaUsuario" class="form-label">Nueva contrasena:</label>
+                                    <input
+                                        name="contrasenaUsuario"
+                                        id="contrasenaUsuario"
+                                        type="password"
+                                        placeholder="Deje en blanco para mantener la actual"
+                                        class="form-control @error('contrasenaUsuario') is-invalid @enderror">
+
+                                    @error('contrasenaUsuario')
+                                        <div class="invalid-feedback d-block">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="confirmar_contrasenaUsuario" class="form-label">Confirmar nueva contrasena:</label>
+                                    <input
+                                        name="confirmar_contrasenaUsuario"
+                                        id="confirmar_contrasenaUsuario"
+                                        type="password"
+                                        placeholder="Repita la nueva contrasena"
+                                        class="form-control @error('confirmar_contrasenaUsuario') is-invalid @enderror">
+
+                                    @error('confirmar_contrasenaUsuario')
+                                        <div class="invalid-feedback d-block">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
                                     <label for="departamento_id" class="form-label">Departamento:</label>
                                     <select
                                         name="departamento_id"
@@ -110,13 +148,13 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="cod_estudiante" class="form-label">Código de Estudiante:</label>
+                                    <label for="cod_estudiante" class="form-label">Codigo / documento de identidad:</label>
                                     <input
                                         value="{{ old('cod_estudiante', $usuario->cod_estudiante) }}"
                                         name="cod_estudiante"
                                         id="cod_estudiante"
                                         type="text"
-                                        placeholder="Ingrese el código de estudiante"
+                                        placeholder="Ingrese el codigo o documento de identidad"
                                         class="form-control @error('cod_estudiante') is-invalid @enderror">
 
                                     @error('cod_estudiante')

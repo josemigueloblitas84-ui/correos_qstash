@@ -133,7 +133,7 @@
             <td colspan="5"><span class="label">Nombre de la empresa:</span> {{ $institucion['nombre'] }}</td>
         </tr>
         <tr>
-            <td colspan="3"><span class="label">Codigo:</span> {{ $estudiante['codigo'] }}</td>
+            <td colspan="3"><span class="label">Codigo / documento de identidad:</span> {{ $estudiante['codigo'] }}</td>
             <td colspan="2"><span class="label">Telefono:</span> {{ $estudiante['telefono'] }}</td>
             <td colspan="5"><span class="label">Nombre del responsable:</span></td>
             <td colspan="5"><span class="label">Telefono de contacto:</span> {{ $institucion['telefono'] }}</td>

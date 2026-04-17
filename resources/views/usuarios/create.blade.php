@@ -101,9 +101,9 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label for="cod_estudiante" class="form-label fw-bold">Código de Estudiante:</label>
+                                            <label for="cod_estudiante" class="form-label fw-bold">Codigo / documento de identidad:</label>
                                             <input value="{{ old('cod_estudiante') }}" type="text" class="form-control"
-                                                id="cod_estudiante" name="cod_estudiante" placeholder="Ingrese el código de estudiante">
+                                                id="cod_estudiante" name="cod_estudiante" placeholder="Ingrese el codigo o documento de identidad">
                                             @error('cod_estudiante')
                                                 <small class="text-danger">{{ $message }}</small>
                                             @enderror
