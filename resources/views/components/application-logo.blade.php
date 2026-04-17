@@ -1,1 +1,1 @@
-<img src="{{ asset('assets/img/logoFundacion.png') }}" {{ $attributes }} alt="LogoFundacion">
+<img src="{{ $systemConfig['logo_principal_url'] }}" {{ $attributes }} alt="{{ $systemConfig['nombre_institucion'] }}">

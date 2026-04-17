@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Services\ConfiguracionSistemaService;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\View;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        View::composer([
+            'plantilla.menu',
+            'layouts.adminLTE_guest',
+            'layouts.guest',
+            'components.application-logo',
+        ], function ($view) {
+            $view->with(
+                'systemConfig',
+                app(ConfiguracionSistemaService::class)->getPresentationData()
+            );
+        });
     }
 }

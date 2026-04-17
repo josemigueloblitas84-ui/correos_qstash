@@ -14,7 +14,7 @@
 
 <div class="login-box">
     <div class="login-logo">
-        <img src="{{ asset('assets/img/logoFundacionTrans.png') }}" alt="LogoFundacion" >
+        <img src="{{ $systemConfig['logo_principal_url'] }}" alt="{{ $systemConfig['nombre_institucion'] }}" >
     </div>
 
     <div class="card">

@@ -2,6 +2,7 @@
 
 namespace App\Services\Dashboard;
 
+use App\Services\ConfiguracionSistemaService;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -9,8 +10,15 @@ use Illuminate\Support\Facades\DB;
 
 class ControlHorasService
 {
+    public function __construct(
+        protected ConfiguracionSistemaService $configuracionSistemaService
+    ) {
+    }
+
     public function getPreviewDataForUser(int $userId): array
     {
+        $configuracion = $this->configuracionSistemaService->getPresentationData();
+
         $usuario = User::query()
             ->select([
                 'id',
@@ -56,8 +64,9 @@ class ControlHorasService
                 'celular' => $responsable?->validador_celular ?? '',
             ],
             'institucion' => [
-                'nombre' => 'FUNDACION UNIFRANZ',
-                'telefono' => '',
+                'nombre' => $configuracion['nombre_institucion'] ?? '',
+                'telefono' => $configuracion['celular_institucional'] ?? '',
+                'correo' => $configuracion['correo_institucional'] ?? '',
             ],
             'periodos' => $registros->map(function ($registro) {
                 return [

@@ -4,11 +4,11 @@
         <!--begin::Brand Link-->
         <a href="{{route('dashboard')}}" class="brand-link">
             <!--begin::Brand Image-->
-            <img src="{{asset('assets/img/logoFundacionTrans.png')}}" alt="AdminLTE Logo"
+            <img src="{{ $systemConfig['logo_principal_url'] }}" alt="{{ $systemConfig['nombre_institucion'] }}"
                 class="brand-image opacity-75 shadow" />
             <!--end::Brand Image-->
             <!--begin::Brand Text-->
-            <span class="brand-text fw-light">FU UNIFRANZ</span>
+            <span class="brand-text fw-light" style="white-space: normal; line-height: 1.15;">{{ $systemConfig['nombre_institucion'] }}</span>
             <!--end::Brand Text-->
         </a>
         <!--end::Brand Link-->
@@ -73,6 +73,15 @@
                     </a>
                     @endcan
                 </li>
+                <li class="nav-item">
+                    @can('configurar sistema')
+                    <a href="{{ route('configuracion-sistema.edit') }}"
+                    class="nav-link {{ request()->routeIs('configuracion-sistema.*') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-cogs"></i>
+                    <p>Configuracion del Sistema</p>
+                    </a>
+                    @endcan
+                </li>
                 {{-- <li class="nav-item">
                     @can('qstash')
                     <a href="#" class="nav-link">
@@ -114,7 +123,7 @@
                 </li> --}}
                 <li class="nav-item">
                     @can('ver agenda')
-                    <a href="{{ route('articulos.create') }}" class="nav-link {{ request()->routeIs('articulos.create') ? 'active' : '' }}">
+                    <a href="{{ route('agenda.create') }}" class="nav-link {{ request()->routeIs('agenda.*') ? 'active' : '' }}">
                         <i class="nav-icon far fa-file-alt"></i>
                         <p>Agendar</p>
                     </a>

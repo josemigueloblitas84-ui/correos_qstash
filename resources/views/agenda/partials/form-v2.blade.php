@@ -555,7 +555,7 @@
     </div>
 </div>
 
-@include('articulos.partials.wizard-validation-helper')
+@include('agenda.partials.wizard-validation-helper')
 
 @once
 @push('styles')
@@ -698,18 +698,18 @@
 <script>
     window.formV2Config = {
         todayString: '{{ now()->format('Y-m-d') }}',
-        agendaDataUrl: '{{ route('articulos.agenda.data') }}',
-        agendaShowUrl: '{{ url('formMultiPasos/agenda-registrada') }}/__ID__',
-        agendaPreviewUrl: '{{ url('formMultiPasos/agenda-registrada') }}/__ID__/preview',
-        agendaSendUrl: '{{ url('formMultiPasos/agenda-registrada') }}/__ID__/send',
-        agendaDestroyUrl: '{{ url('formMultiPasos/agenda-registrada') }}/__ID__',
-        activityDataUrl: '{{ route('articulos.actividades.data') }}',
-        activityStoreUrl: '{{ route('articulos.actividades.store') }}',
-        activityShowUrl: '{{ url('formMultiPasos/agenda-actividades') }}/__ID__',
-        activityUpdateUrl: '{{ url('formMultiPasos/agenda-actividades') }}/__ID__',
-        activityDestroyUrl: '{{ url('formMultiPasos/agenda-actividades') }}/__ID__',
-        activityAutocompleteUrl: '{{ route('articulos.actividades.autocomplete') }}',
-        usuariosPorDepartamentoUrl: '{{ url('formMultiPasos/usuarios-por-departamento') }}/__ID__',
+        agendaDataUrl: '{{ route('agenda.registradas.data') }}',
+        agendaShowUrl: '{{ url('agenda/registradas') }}/__ID__',
+        agendaPreviewUrl: '{{ url('agenda/registradas') }}/__ID__/preview',
+        agendaSendUrl: '{{ url('agenda/registradas') }}/__ID__/send',
+        agendaDestroyUrl: '{{ url('agenda/registradas') }}/__ID__',
+        activityDataUrl: '{{ route('agenda.actividades.data') }}',
+        activityStoreUrl: '{{ route('agenda.actividades.store') }}',
+        activityShowUrl: '{{ url('agenda/actividades') }}/__ID__',
+        activityUpdateUrl: '{{ url('agenda/actividades') }}/__ID__',
+        activityDestroyUrl: '{{ url('agenda/actividades') }}/__ID__',
+        activityAutocompleteUrl: '{{ route('agenda.actividades.autocomplete') }}',
+        usuariosPorDepartamentoUrl: '{{ url('agenda/usuarios-por-departamento') }}/__ID__',
         isSuperAdmin: @json($isSuperAdmin),
         currentUserHeader: @json($currentUser),
     };

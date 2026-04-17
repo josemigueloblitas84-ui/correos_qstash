@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Reportes;
 
 use App\Http\Controllers\Controller;
+use App\Services\ConfiguracionSistemaService;
 use App\Services\Agenda\AgendaService;
 use App\Services\Reportes\ReporteAgendaInformeService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -13,7 +14,8 @@ class ReporteAgendaInformeController extends Controller
 {
     public function __construct(
         protected ReporteAgendaInformeService $reporteAgendaInformeService,
-        protected AgendaService $agendaService
+        protected AgendaService $agendaService,
+        protected ConfiguracionSistemaService $configuracionSistemaService
     ) {
         $this->middleware('permission:ver reporte agenda informe')->only([
             'index',
@@ -140,12 +142,9 @@ class ReporteAgendaInformeController extends Controller
             abort(404, 'La agenda no existe.');
         }
 
-        $logoPath = public_path('assets/img/logoFundacionTrans.png');
-        $previewData['logoDataUri'] = file_exists($logoPath)
-            ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
-            : null;
+        $previewData['logoDataUri'] = $this->configuracionSistemaService->getPdfLogoDataUri();
 
-        return Pdf::loadView('articulos.partials.agenda-preview-document', $previewData)
+        return Pdf::loadView('agenda.partials.agenda-preview-document', $previewData)
             ->setPaper('a4', 'portrait')
             ->stream('agenda-' . $id . '.pdf');
     }
@@ -166,10 +165,7 @@ class ReporteAgendaInformeController extends Controller
             abort(404, 'El informe no existe.');
         }
 
-        $logoPath = public_path('assets/img/logoFundacionTrans.png');
-        $previewData['logoDataUri'] = file_exists($logoPath)
-            ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
-            : null;
+        $previewData['logoDataUri'] = $this->configuracionSistemaService->getPdfLogoDataUri();
 
         return Pdf::loadView('reportes.partials.informe-agenda-preview-document', $previewData)
             ->setPaper('a4', 'portrait')

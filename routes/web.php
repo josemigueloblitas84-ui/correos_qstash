@@ -3,10 +3,11 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\ConfiguracionSistemaController;
 use App\Http\Controllers\Permisos\PermisosController;
 use App\Http\Controllers\Permisos\RolController;
 use App\Http\Controllers\Permisos\UserController;
-use App\Http\Controllers\FormMultiPasosController;
+use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\Agenda\DepartamentoController;
@@ -67,6 +68,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/', 'destroy')->name('destroy');
     });
 
+    Route::prefix('configuracion-sistema')->name('configuracion-sistema.')->controller(ConfiguracionSistemaController::class)->group(function () {
+        Route::get('/', 'edit')->name('edit');
+        Route::post('/', 'update')->name('update');
+    });
+
     Route::prefix('usuarios')->name('usuarios.')->controller(UserController::class)->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
@@ -87,25 +93,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     });
 
-    Route::prefix('formMultiPasos')->name('articulos.')->controller(FormMultiPasosController::class)->group(function () {
+    Route::prefix('agenda')->name('agenda.')->controller(AgendaController::class)->group(function () {
         Route::get('/usuarios-por-departamento/{id}', 'usuariosPorDepartamento')->name('usuarios.departamento');
-        Route::get('/agenda-actividades/autocomplete', 'actividadAutocomplete')->name('actividades.autocomplete');
-        Route::get('/agenda-actividades/data', 'agendaActividadesData')->name('actividades.data');
-        Route::get('/agenda-actividades/{id}', 'showActividad')->whereNumber('id')->name('actividades.show');
-        Route::get('/agenda-registrada/data', 'agendaData')->name('agenda.data');
-        Route::get('/agenda-registrada/{id}', 'showAgenda')->whereNumber('id')->name('agenda.show');
-        Route::get('/agenda-registrada/{id}/preview', 'previewAgenda')->whereNumber('id')->name('agenda.preview');
-        Route::patch('/agenda-registrada/{id}/send', 'sendAgenda')->whereNumber('id')->name('agenda.send');
-        Route::delete('/agenda-registrada/{id}', 'destroyAgenda')->whereNumber('id')->name('agenda.destroy');
-        Route::get('/', 'index')->name('index');
+        Route::get('/actividades/autocomplete', 'actividadAutocomplete')->name('actividades.autocomplete');
+        Route::get('/actividades/data', 'agendaActividadesData')->name('actividades.data');
+        Route::get('/actividades/{id}', 'showActividad')->whereNumber('id')->name('actividades.show');
+        Route::get('/registradas/data', 'agendaData')->name('registradas.data');
+        Route::get('/registradas/{id}', 'showAgenda')->whereNumber('id')->name('registradas.show');
+        Route::get('/registradas/{id}/preview', 'previewAgenda')->whereNumber('id')->name('registradas.preview');
+        Route::patch('/registradas/{id}/send', 'sendAgenda')->whereNumber('id')->name('registradas.send');
+        Route::delete('/registradas/{id}', 'destroyAgenda')->whereNumber('id')->name('registradas.destroy');
         Route::get('/create', 'create')->name('create');
         Route::post('/', 'store')->name('store');
-        Route::post('/agenda-actividades', 'storeActividad')->name('actividades.store');
-        Route::put('/agenda-actividades/{id}', 'updateActividad')->whereNumber('id')->name('actividades.update');
-        Route::delete('/agenda-actividades/{id}', 'destroyActividad')->whereNumber('id')->name('actividades.destroy');
-        Route::get('/{articulo}/edit', 'edit')->name('edit');
-        Route::put('/{articulo}', 'update')->name('update');
-        Route::delete('/{articulo}', 'destroy')->name('destroy');
+        Route::post('/actividades', 'storeActividad')->name('actividades.store');
+        Route::put('/actividades/{id}', 'updateActividad')->whereNumber('id')->name('actividades.update');
+        Route::delete('/actividades/{id}', 'destroyActividad')->whereNumber('id')->name('actividades.destroy');
+        Route::get('/{agenda}/edit', 'edit')->name('edit');
+        Route::put('/{agenda}', 'update')->name('update');
+        Route::delete('/{agenda}', 'destroy')->name('destroy');
     });
 
     Route::prefix('departamentos')->name('departamentos.')->controller(DepartamentoController::class)->group(function () {

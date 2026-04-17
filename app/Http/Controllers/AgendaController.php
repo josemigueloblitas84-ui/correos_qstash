@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-//use App\Models\Articulo;
+//use App\Models\Agenda;
 use App\Http\Requests\Agenda\AgendaActividadStoreRequest;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Yajra\DataTables\Facades\DataTables;
+use App\Services\ConfiguracionSistemaService;
 use App\Services\Agenda\DepartamentoService;
 use App\Services\Agenda\AgendaActividadService;
 use App\Services\Agenda\AgendaService;
@@ -18,20 +19,21 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Throwable;
 
-class formMultiPasosController extends Controller
+class AgendaController extends Controller
 {
     protected DepartamentoService $departamentoService;
     protected AgendaService $agendaService;
     protected AgendaActividadService $agendaActividadService;
+    protected ConfiguracionSistemaService $configuracionSistemaService;
 
     public function __construct(
         DepartamentoService $departamentoService,
         AgendaService $agendaService,
-        AgendaActividadService $agendaActividadService
+        AgendaActividadService $agendaActividadService,
+        ConfiguracionSistemaService $configuracionSistemaService
     )
     {
         $this->middleware('permission:ver agenda')->only([
-            'index',
             'create',
             'store',
             'edit',
@@ -54,42 +56,7 @@ class formMultiPasosController extends Controller
         $this->departamentoService = $departamentoService;
         $this->agendaService = $agendaService;
         $this->agendaActividadService = $agendaActividadService;
-    }
-
-    public function index(): View
-    {
-        /*$articulos = Articulo::latest()->get();
-
-        return view('articulos.list', [
-            'articulos' => $articulos,
-        ]);*/
-        $articulos = collect([
-            (object) [
-                'id' => 1,
-                'codigo' => 'ART-001',
-                'nombre' => 'Articulo Demo 1',
-                'descripcion' => 'Descripcion de prueba para el articulo demo 1.',
-                'marca' => 'Marca Demo',
-                'categoria_texto' => 'Categoria Demo',
-                'estado' => 'activo',
-                'precio' => 25.50,
-                'stock' => 10,
-            ],
-            (object)[
-                'id' => 2,
-                'codigo' => 'ART-002',
-                'nombre' => 'Articulo Demo 2',
-                'descripcion' => 'Descripcion de prueba para el articulo demo 2.',
-                'marca' => 'Otra Marca',
-                'categoria_texto' => 'Otra Categoria',
-                'estado' => 'inactivo',
-                'precio' => 40.00,
-                'stock' => 5,
-            ],
-        ]);
-        return view('articulos.list', [
-            'articulos' => $articulos,
-        ]);
+        $this->configuracionSistemaService = $configuracionSistemaService;
     }
 
     public function create(): View
@@ -111,9 +78,9 @@ class formMultiPasosController extends Controller
             ])
             ->first();
 
-       return view('articulos.create', [
+       return view('agenda.create', [
             'departamentos' => $departamentos,
-            'articulo' => null,
+            'agenda' => null,
             'isSuperAdmin' => $isSuperAdmin,
             'currentUser' => $currentUser,
        ]);
@@ -180,17 +147,17 @@ class formMultiPasosController extends Controller
         }
 
         return redirect()
-            ->route('articulos.create')
+            ->route('agenda.create')
             ->with('success', 'Agenda registrada correctamente.');
     }
 
-    public function edit(int $articulo): View
+    public function edit(int $agenda): View
     {
-        $articulo = (object) [ //Temporal
-            'id' => $articulo,
-            'codigo' => 'ART-00' . $articulo,
-            'nombre' => 'Articulo Demo ' . $articulo,
-            'descripcion' => 'Descripcion de prueba para el articulo demo ' . $articulo . '.',
+        $agenda = (object) [ //Temporal
+            'id' => $agenda,
+            'codigo' => 'ART-00' . $agenda,
+            'nombre' => 'Agenda Demo ' . $agenda,
+            'descripcion' => 'Descripcion de prueba para la agenda demo ' . $agenda . '.',
             'marca' => 'Marca Demo',
             'categoria_texto' => 'Categoria Demo',
             'estado' => 'activo',
@@ -198,42 +165,42 @@ class formMultiPasosController extends Controller
             'stock' => 10,
         ];//Temporal
 
-        return view('articulos.edit', [
-            'articulo' => $articulo,
+        return view('agenda.edit', [
+            'agenda' => $agenda,
         ]);
     }
 
-    public function update(Request $request, int $articulo): RedirectResponse
+    public function update(Request $request, int $agenda): RedirectResponse
     {
         $data = $request->validate(
-            $this->rules($articulo), // Temporal mientras se define el modelo real
+            $this->rules($agenda), // Temporal mientras se define el modelo real
             $this->messages()
         );
 
-        //$articulo->update($data);
+        //$agenda->update($data);
 
         return redirect()
-            ->route('articulos.index')
-            ->with('success', 'Articulo actualizado correctamente.');
+            ->route('agenda.create')
+            ->with('success', 'Agenda actualizada correctamente.');
     }
 
-    public function destroy(int $articulo): RedirectResponse
+    public function destroy(int $agenda): RedirectResponse
     {
-        //$articulo->delete();
+        //$agenda->delete();
 
         return redirect()
-            ->route('articulos.index')
-            ->with('success', 'Articulo eliminado correctamente.');
+            ->route('agenda.create')
+            ->with('success', 'Agenda eliminada correctamente.');
     }
 
-    private function rules(?int $articuloId = null): array
+    private function rules(?int $agendaId = null): array
     {
         return [
             'codigo' => [
                 'required',
                 'string',
                 'max:50',
-                //Rule::unique('articulos', 'codigo')->ignore($articuloId),
+                //Rule::unique('agendas', 'codigo')->ignore($agendaId),
             ],
             'nombre' => ['required', 'string', 'min:3', 'max:150'],
             'descripcion' => ['required', 'string', 'min:10', 'max:1000'],
@@ -330,12 +297,9 @@ class formMultiPasosController extends Controller
             abort(404, 'La agenda no existe.');
         }
 
-        $logoPath = public_path('assets/img/logoFundacionTrans.png');
-        $previewData['logoDataUri'] = file_exists($logoPath)
-            ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
-            : null;
+        $previewData['logoDataUri'] = $this->configuracionSistemaService->getPdfLogoDataUri();
 
-        return Pdf::loadView('articulos.partials.agenda-preview-document', $previewData)
+        return Pdf::loadView('agenda.partials.agenda-preview-document', $previewData)
             ->setPaper('a4', 'portrait')
             ->stream('agenda-' . $id . '.pdf');
     }

@@ -233,7 +233,7 @@
     @endpush
 @endonce
 {{--Nota: Para usar esta validacion en cualquier formulario se debe usar:
-@include('articulos.partials.wizard-validation-helper')
+@include('agenda.partials.wizard-validation-helper')
 definir formValidationConfig
 llamar attachFieldEvents(form, formValidationConfig)
 llamar validateFields(..., formValidationConfig)

@@ -8,7 +8,7 @@
             <div>
                 <h2>Crear Agenda</h2>
             </div>
-            {{-- <a href="{{ route('articulos.index') }}" class="btn btn-outline-secondary">
+            {{-- <a href="{{ route('agenda.create') }}" class="btn btn-outline-secondary">
                 Volver al listado
             </a> --}}
         </div>
@@ -18,8 +18,8 @@
         <div class="container-fluid">
             @include('mensajes')
 
-            @include('articulos.partials.form-v2', [
-                'action' => route('articulos.store'),
+            @include('agenda.partials.form-v2', [
+                'action' => route('agenda.store'),
                 'method' => 'POST',
             ])
         </div>

@@ -44,7 +44,6 @@
         }
 
         .document-frame {
-            border: 4px solid #1f1f1f;
             padding: 18px 18px 20px;
         }
 

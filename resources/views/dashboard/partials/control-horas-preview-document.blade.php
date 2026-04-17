@@ -141,7 +141,10 @@
         <tr>
             <td colspan="5"><span class="label">Correo electronico institucional:</span></td>
             <td colspan="5" rowspan="2" class="muted">{{ $responsable['nombre'] }}</td>
-            <td colspan="5" rowspan="3"></td>
+            <td colspan="5" rowspan="3" class="muted" style="vertical-align: top;">
+                <span class="label">Correo institucional:</span>
+                <div style="margin-top: 6px;">{{ $institucion['correo'] }}</div>
+            </td>
         </tr>
         <tr>
             <td colspan="5" class="muted">{{ $estudiante['correo'] }}</td>
