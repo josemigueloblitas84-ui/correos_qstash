@@ -49,24 +49,24 @@
 
             <!-- Remember -->
             <div class="row">
-                <div class="col-6">
+                {{--<div class="col-6">
                     <div class="icheck-primary">
                         <input type="checkbox" id="remember" name="remember">
                         <label for="remember">
                             Recuérdame
                         </label>
                     </div>
-                </div>
+                </div>--}}
 
-                <div class="col-6">
-                    <button type="submit" class="btn btn-primary btn-block">
+                <div class="col-12 d-flex justify-content-center">
+                    <button type="submit" class="btn btn-primary px-4">
                         Iniciar Sesión
                     </button>
                 </div>
             </div>
         </form>
 
-        @if (Route::has('password.request'))
+        {{-- @if (Route::has('password.request'))
             <p class="mt-3 mb-1">
                 <a href="{{ route('password.request') }}">
                     ¿Olvidaste tu contraseña?
@@ -80,7 +80,7 @@
                     Crear una nueva cuenta
                 </a>
             </p>
-        @endif
+        @endif --}}
 
     </div>
 </div>
@@ -99,7 +99,8 @@ VANTA.WAVES({
   minHeight: 200.00,
   minWidth: 200.00,
   scale: 1.00,
-  scaleMobile: 1.00
+  scaleMobile: 1.00,
+  color:0xffffff
 })
 </script>
 @endpush
