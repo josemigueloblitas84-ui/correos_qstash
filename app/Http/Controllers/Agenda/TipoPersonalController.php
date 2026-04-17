@@ -16,6 +16,14 @@ class TipoPersonalController extends Controller
 
     public function __construct(TipoPersonalService $tipoPersonalService)
     {
+        $this->middleware('permission:ver tipos de personal')->only([
+            'index',
+            'data',
+            'show',
+            'store',
+            'update',
+            'destroy',
+        ]);
         $this->tipoPersonalService = $tipoPersonalService;
     }
 

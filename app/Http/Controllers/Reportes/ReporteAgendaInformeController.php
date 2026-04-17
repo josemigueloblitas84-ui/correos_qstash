@@ -15,6 +15,14 @@ class ReporteAgendaInformeController extends Controller
         protected ReporteAgendaInformeService $reporteAgendaInformeService,
         protected AgendaService $agendaService
     ) {
+        $this->middleware('permission:ver reporte agenda informe')->only([
+            'index',
+            'data',
+            'dataInforme',
+            'previewAgenda',
+            'previewInforme',
+            'validarInforme',
+        ]);
     }
 
     public function index()

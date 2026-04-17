@@ -16,6 +16,11 @@ class InformeController extends Controller
     public function __construct(
         protected AgendaInformeService $agendaInformeService
     ) {
+        $this->middleware('permission:ver informe agenda')->only([
+            'index',
+            'store',
+            'storeNoProgramada',
+        ]);
     }
 
     public function index(): View

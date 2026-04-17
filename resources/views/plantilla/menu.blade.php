@@ -137,16 +137,20 @@
                     @endcan
                 </li>
                 <li class="nav-item">
+                    @can('ver informe agenda')
                     <a href=" {{route('informe-agenda.index') }}" class="nav-link {{ request()->routeIs('informe-agenda.*') ? 'active' : ''}}">
                         <i class="nav-icon fas fa-tasks"></i>
                         <p>Informe de Agenda</p>
                     </a>
+                    @endcan
                 </li>
                 <li class="nav-item">
+                    @can('ver reporte agenda informe')
                     <a href="{{route('reporte-agenda-informe.index') }}" class="nav-link {{ request()->routeIs('reporte-agenda-informe.*') ? 'active' : ''}}">
                         <i class="nav-icon fas fa-chart-bar"></i>
                         <p>Reporte de Agenda/Informe</p>
                     </a>
+                    @endcan
                 </li>
                 {{--<li class="nav-item">
                     <a href="./generate/theme.html" class="nav-link">

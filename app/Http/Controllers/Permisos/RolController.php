@@ -21,9 +21,13 @@ class RolController extends Controller
     {
         $this->rolService = $rolService;
 
-        $this->middleware('permission:crear roles')->only(['create', 'store']);
+        /*$this->middleware('permission:crear roles')->only(['create', 'store']);
         $this->middleware('permission:editar roles')->only(['edit', 'update']);
         $this->middleware('permission:editar roles')->only(['edit']);
+        $this->middleware('permission:eliminar roles')->only('destroy');*/
+        $this->middleware('permission:ver roles')->only(['index']);
+        $this->middleware('permission:crear roles')->only(['create', 'store']);
+        $this->middleware('permission:editar roles')->only(['edit', 'update']);
         $this->middleware('permission:eliminar roles')->only('destroy');
     }
 

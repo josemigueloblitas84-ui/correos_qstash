@@ -16,6 +16,15 @@ class DepartamentoController extends Controller
 
     public function __construct(DepartamentoService $departamentoService)
     {
+        $this->middleware('permission:ver departamentos')->only([
+            'index',
+            'data',
+            'show',
+            'store',
+            'update',
+            'toggleStatus',
+            'destroy',
+        ]);
         $this->departamentoService = $departamentoService;
     }
 

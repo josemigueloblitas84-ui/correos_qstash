@@ -29,7 +29,7 @@ class UserController extends Controller
     ) {
         $this->middleware('permission:ver usuarios')->only('index');
         $this->middleware('permission:crear usuarios')->only(['create', 'store']);
-        $this->middleware('permission:editar usuarios')->only(['edit', 'update', 'editPersonalAsignado', 'updatePersonalAsignado']);
+        $this->middleware('permission:editar usuarios')->only(['edit', 'update', 'editRoles','updateRoles', 'editPersonalAsignado', 'updatePersonalAsignado']);
         $this->middleware('permission:asignar permiso especial')->only([
             'editPermisosEspeciales',
             'updatePermisosEspeciales',

@@ -30,6 +30,27 @@ class formMultiPasosController extends Controller
         AgendaActividadService $agendaActividadService
     )
     {
+        $this->middleware('permission:ver agenda')->only([
+            'index',
+            'create',
+            'store',
+            'edit',
+            'update',
+            'destroy',
+            'agendaData',
+            'showAgenda',
+            'previewAgenda',
+            'sendAgenda',
+            'destroyAgenda',
+            'agendaActividadesData',
+            'showActividad',
+            'storeActividad',
+            'updateActividad',
+            'destroyActividad',
+            'actividadAutocomplete',
+            'usuariosPorDepartamento',
+        ]);
+
         $this->departamentoService = $departamentoService;
         $this->agendaService = $agendaService;
         $this->agendaActividadService = $agendaActividadService;
