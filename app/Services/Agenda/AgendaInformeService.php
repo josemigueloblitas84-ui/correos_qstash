@@ -2,9 +2,11 @@
 
 namespace App\Services\Agenda;
 
+use App\Exceptions\AgendaInformeException;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class AgendaInformeService
 {
@@ -100,107 +102,124 @@ class AgendaInformeService
 
     public function store(array $data, int $userId): void
     {
-        DB::transaction(function () use ($data, $userId) {
-            $fecha = $data['fecha'];
-            $hoy = now()->toDateString();
-            $ahora = now();
+        try {
+            DB::transaction(function () use ($data, $userId) {
+                $fecha = $data['fecha'];
+                $hoy = now()->toDateString();
+                $ahora = now();
 
-            foreach ($data['programadas'] ?? [] as $item) {
-                DB::table('agenda_actividad_informe')->updateOrInsert(
-                    [
-                        'agenda_actividad_id' => $item['agenda_actividad_id'],
-                        'fecha_actividad' => $fecha,
-                        'tipo_actividad' => $item['tipo_actividad'],
-                    ],
-                    [
+                foreach ($data['programadas'] ?? [] as $item) {
+                    DB::table('agenda_actividad_informe')->updateOrInsert(
+                        [
+                            'agenda_actividad_id' => $item['agenda_actividad_id'],
+                            'fecha_actividad' => $fecha,
+                            'tipo_actividad' => $item['tipo_actividad'],
+                        ],
+                        [
+                            'agenda_id' => $item['agenda_id'],
+                            'actividad' => trim($item['actividad']),
+                            'departamento_id' => $item['departamento_id'],
+                            'usuario_id' => $userId,
+                            'estado' => !empty($item['estado']) ? 1 : 0,
+                            'detalle_estado' => filled($item['detalle_estado'] ?? null)
+                                ? trim($item['detalle_estado'])
+                                : null,
+                            'reprogramado' => null,
+                            'fecha_actualizacion' => $hoy,
+                            'validada_encargado' => 0,
+                            'usuario_actualizador_id' => $userId,
+                            'updated_at' => $ahora,
+                            'created_at' => $ahora,
+                        ]
+                    );
+                }
+
+                DB::table('agenda_actividad_informe')
+                    ->where('usuario_id', $userId)
+                    ->whereDate('fecha_actividad', $fecha)
+                    ->where('tipo_actividad', 'P')
+                    ->delete();
+
+                $noProgramadas = [];
+
+                foreach ($data['no_programadas'] ?? [] as $item) {
+                    $actividad = trim($item['actividad'] ?? '');
+
+                    if ($actividad === '') {
+                        continue;
+                    }
+
+                    $noProgramadas[] = [
+                        'agenda_actividad_id' => null,
                         'agenda_id' => $item['agenda_id'],
-                        'actividad' => trim($item['actividad']),
+                        'fecha_actividad' => $fecha,
+                        'actividad' => $actividad,
                         'departamento_id' => $item['departamento_id'],
+                        'tipo_actividad' => 'P',
                         'usuario_id' => $userId,
-                        'estado' => !empty($item['estado']) ? 1 : 0,
-                        'detalle_estado' => filled($item['detalle_estado'] ?? null)
-                            ? trim($item['detalle_estado'])
-                            : null,
+                        'estado' => 1,
+                        'detalle_estado' => null,
                         'reprogramado' => null,
                         'fecha_actualizacion' => $hoy,
                         'validada_encargado' => 0,
                         'usuario_actualizador_id' => $userId,
-                        'updated_at' => $ahora,
                         'created_at' => $ahora,
-                    ]
-                );
-            }
-
-            DB::table('agenda_actividad_informe')
-                ->where('usuario_id', $userId)
-                ->whereDate('fecha_actividad', $fecha)
-                ->where('tipo_actividad', 'P')
-                ->delete();
-
-            $noProgramadas = [];
-
-            foreach ($data['no_programadas'] ?? [] as $item) {
-                $actividad = trim($item['actividad'] ?? '');
-
-                if ($actividad === '') {
-                    continue;
+                        'updated_at' => $ahora,
+                    ];
                 }
 
-                $noProgramadas[] = [
-                    'agenda_actividad_id' => null,
-                    'agenda_id' => $item['agenda_id'],
-                    'fecha_actividad' => $fecha,
-                    'actividad' => $actividad,
-                    'departamento_id' => $item['departamento_id'],
-                    'tipo_actividad' => 'P',
-                    'usuario_id' => $userId,
-                    'estado' => 1,
-                    'detalle_estado' => null,
-                    'reprogramado' => null,
-                    'fecha_actualizacion' => $hoy,
-                    'validada_encargado' => 0,
-                    'usuario_actualizador_id' => $userId,
-                    'created_at' => $ahora,
-                    'updated_at' => $ahora,
-                ];
-            }
+                if (!empty($noProgramadas)) {
+                    DB::table('agenda_actividad_informe')->insert($noProgramadas);
+                }
+            });
+        } catch (AgendaInformeException $exception) {
+            throw $exception;
+        } catch (Throwable $exception) {
+            report($exception);
 
-            if (!empty($noProgramadas)) {
-                DB::table('agenda_actividad_informe')->insert($noProgramadas);
-            }
-        });
+            throw new AgendaInformeException('No se pudo guardar el informe.', 500);
+        }
     }
+
     public function storeNoProgramada(array $data, int $userId): array
     {
-        $departamento = DB::table('departamentos')
-            ->where('id', $data['departamento_id'])
-            ->first();
+        try {
+            $departamento = DB::table('departamentos')
+                ->where('id', $data['departamento_id'])
+                ->first();
 
-        $id = DB::table('agenda_actividad_informe')->insertGetId([
-            'agenda_actividad_id' => null,
-            'agenda_id' => $data['agenda_id'],
-            'fecha_actividad' => $data['fecha'],
-            'actividad' => trim($data['actividad']),
-            'departamento_id' => $data['departamento_id'],
-            'tipo_actividad' => 'P',
-            'usuario_id' => $userId,
-            'estado' => 1,
-            'detalle_estado' => 'Realizado',
-            'reprogramado' => null,
-            'fecha_actualizacion' => now()->toDateString(),
-            'validada_encargado' => 0,
-            'usuario_actualizador_id' => $userId,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+            $id = DB::table('agenda_actividad_informe')->insertGetId([
+                'agenda_actividad_id' => null,
+                'agenda_id' => $data['agenda_id'],
+                'fecha_actividad' => $data['fecha'],
+                'actividad' => trim($data['actividad']),
+                'departamento_id' => $data['departamento_id'],
+                'tipo_actividad' => 'P',
+                'usuario_id' => $userId,
+                'estado' => 1,
+                'detalle_estado' => 'Realizado',
+                'reprogramado' => null,
+                'fecha_actualizacion' => now()->toDateString(),
+                'validada_encargado' => 0,
+                'usuario_actualizador_id' => $userId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
 
-        return [
-            'id' => $id,
-            'agenda_id' => (int) $data['agenda_id'],
-            'actividad' => trim($data['actividad']),
-            'departamento_id' => (int) $data['departamento_id'],
-            'equipo' => $departamento?->nombre_depa,
-        ];
+            return [
+                'id' => $id,
+                'agenda_id' => (int) $data['agenda_id'],
+                'actividad' => trim($data['actividad']),
+                'departamento_id' => (int) $data['departamento_id'],
+                'equipo' => $departamento?->nombre_depa,
+            ];
+        } catch (AgendaInformeException $exception) {
+            throw $exception;
+        } catch (Throwable $exception) {
+            report($exception);
+
+            throw new AgendaInformeException('No se pudo registrar la actividad no programada.', 500);
+        }
     }
 
 }
