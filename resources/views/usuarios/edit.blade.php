@@ -20,7 +20,7 @@
             <div class="card card-primary">
                 <div class="card-body">
 
-                    <form action="{{ route('usuarios.update', $usuario->id) }}" method="POST">
+                    <form action="{{ route('usuarios.update', $usuario->id) }}" method="POST" autocomplete="off">
                         @csrf
 
                         <div class="mb-3">
@@ -173,8 +173,9 @@
                                         name="cantidad_horas_totales"
                                         id="cantidad_horas_totales"
                                         type="number"
-                                        step="0.01"
+                                        step="1"
                                         min="0"
+                                        max="2147483647"
                                         placeholder="Ingrese la cantidad de horas"
                                         class="form-control @error('cantidad_horas_totales') is-invalid @enderror">
 
@@ -195,7 +196,10 @@
                                         value="{{ old('celular', $usuario->celular) }}"
                                         name="celular"
                                         id="celular"
-                                        type="number"
+                                        type="text"
+                                        inputmode="numeric"
+                                        maxlength="12"
+                                        pattern="[0-9]*"
                                         placeholder="Ingrese el celular"
                                         class="form-control @error('celular') is-invalid @enderror">
 
@@ -215,6 +219,9 @@
                                         name="telefono_contacto"
                                         id="telefono_contacto"
                                         type="number"
+                                        min="0"
+                                        max="2147483647"
+                                        step="1"
                                         placeholder="Ingrese el teléfono de contacto"
                                         class="form-control @error('telefono_contacto') is-invalid @enderror">
 

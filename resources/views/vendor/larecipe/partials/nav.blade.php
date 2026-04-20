@@ -27,9 +27,11 @@
                 </larecipe-button>
             @endif
 
-            <larecipe-button tag="a" href="https://github.com/saleem-hadad/larecipe" target="__blank" type="black" class="mx-2 px-4">
-                <i class="fab fa-github"></i>
-            </larecipe-button>
+            @if(auth()->check() && method_exists(auth()->user(), 'hasAnyRole') && auth()->user()->hasAnyRole(config('docs_access.super_admin_roles', [])))
+                <larecipe-button tag="a" href="https://github.com/josemigueloblitas84-ui/correos_qstash/tree/AdminLTE4" target="__blank" type="black" class="mx-2 px-4">
+                    <i class="fab fa-github"></i>
+                </larecipe-button>
+            @endif
 
             {{-- versions dropdown --}}
             <larecipe-dropdown>

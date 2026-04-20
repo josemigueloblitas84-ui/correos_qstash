@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\DocsAccessService;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
@@ -23,6 +24,14 @@ class AuthServiceProvider extends ServiceProvider
     {
         Gate::before(function ($user, $ability){
             return $user->hasRole('SuperAdministrador') ? true : null;
+        });
+
+        Gate::define('viewLarecipe', function ($user, $documentation) {
+            return app(DocsAccessService::class)->canViewDocumentation($user, $documentation);
+        });
+
+        Gate::define('viewDocReporteValidation', function ($user) {
+            return (bool) ($user->validador ?? false);
         });
     }
 }

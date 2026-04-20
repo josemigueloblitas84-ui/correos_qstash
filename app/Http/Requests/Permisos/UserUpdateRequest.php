@@ -36,9 +36,19 @@ class UserUpdateRequest extends FormRequest
             'departamento_id' => ['required', Rule::exists('departamentos', 'id')],
             'tipo_personal_id' => ['required', Rule::exists('tipos_personal', 'id')],
             'cod_estudiante' => ['required', 'string', 'max:30'],
-            'cantidad_horas_totales' => ['nullable', 'numeric', 'min:0'],
-            'celular' => ['nullable', 'numeric'],
-            'telefono_contacto' => ['nullable', 'numeric'],
+            'cantidad_horas_totales' => ['nullable', 'integer', 'min:0', 'digits_between:1,10', 'max:2147483647'],
+            'celular' => [
+                'nullable',
+                'integer',
+                'min:0',
+                'digits_between:1,12',
+                function ($attribute, $value, $fail) {
+                    if ($value !== null && (int) $value > 2147483647) {
+                        $fail('El celular no puede superar 12 digitos y debe estar dentro del limite permitido por el sistema.');
+                    }
+                },
+            ],
+            'telefono_contacto' => ['nullable', 'integer', 'min:0', 'digits_between:1,10', 'max:2147483647'],
         ];
     }
 
@@ -60,10 +70,17 @@ class UserUpdateRequest extends FormRequest
             'cod_estudiante.required' => 'El código de estudiante es obligatorio.',
             'cod_estudiante.string' => 'El codigo de estudiante debe ser texto.',
             'cod_estudiante.max' => 'El codigo de estudiante no debe superar :max caracteres.',
-            'cantidad_horas_totales.numeric' => 'La cantidad de horas totales debe ser numerica.',
+            'cantidad_horas_totales.integer' => 'La cantidad de horas totales debe ser un numero entero.',
             'cantidad_horas_totales.min' => 'La cantidad de horas totales no puede ser negativa.',
-            'celular.numeric' => 'El celular debe ser numerico.',
-            'telefono_contacto.numeric' => 'El telefono de contacto debe ser numerico.',
+            'cantidad_horas_totales.digits_between' => 'La cantidad de horas totales no puede superar :max digitos.',
+            'cantidad_horas_totales.max' => 'La cantidad de horas totales no puede exceder el limite permitido.',
+            'celular.integer' => 'El celular debe ser un numero entero.',
+            'celular.min' => 'El celular no puede ser negativo.',
+            'celular.digits_between' => 'El celular no puede superar 12 digitos.',
+            'telefono_contacto.integer' => 'El telefono de contacto debe ser un numero entero.',
+            'telefono_contacto.min' => 'El telefono de contacto no puede ser negativo.',
+            'telefono_contacto.digits_between' => 'El telefono de contacto no puede superar :max digitos.',
+            'telefono_contacto.max' => 'El telefono de contacto no puede exceder el limite permitido.',
         ];
     }
 }

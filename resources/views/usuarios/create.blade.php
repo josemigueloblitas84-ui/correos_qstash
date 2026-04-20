@@ -113,7 +113,7 @@
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label for="cantidad_horas_totales" class="form-label fw-bold">Cantidad de Horas Totales:</label>
-                                            <input value="{{ old('cantidad_horas_totales') }}" type="number" step="0.01" min="0" class="form-control"
+                                            <input value="{{ old('cantidad_horas_totales') }}" type="number" step="1" min="0" max="2147483647" class="form-control"
                                                 id="cantidad_horas_totales" name="cantidad_horas_totales" placeholder="Ingrese la cantidad de horas">
                                             @error('cantidad_horas_totales')
                                                 <small class="text-danger">{{ $message }}</small>
@@ -126,7 +126,7 @@
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label for="celular" class="form-label fw-bold">Celular:</label>
-                                            <input value="{{ old('celular') }}" type="number" class="form-control"
+                                            <input value="{{ old('celular') }}" type="text" inputmode="numeric" maxlength="12" pattern="[0-9]*" class="form-control"
                                                 id="celular" name="celular" placeholder="Ingrese el celular">
                                             @error('celular')
                                                 <small class="text-danger">{{ $message }}</small>
@@ -137,7 +137,7 @@
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label for="telefono_contacto" class="form-label fw-bold">Teléfono de Contacto:</label>
-                                            <input value="{{ old('telefono_contacto') }}" type="number" class="form-control"
+                                            <input value="{{ old('telefono_contacto') }}" type="number" min="0" max="2147483647" step="1" class="form-control"
                                                 id="telefono_contacto" name="telefono_contacto" placeholder="Ingrese el teléfono de contacto">
                                             @error('telefono_contacto')
                                                 <small class="text-danger">{{ $message }}</small>

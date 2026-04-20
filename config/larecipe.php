@@ -14,8 +14,8 @@ return [
     */
 
     'docs'        => [
-        'route'   => '/docsfunda',
-        'path'    => '/resources/docsfunda',
+        'route'   => '/docs',
+        'path'    => '/resources/docs',
         'logout'    => '/logout',
         'landing' => 'overview',
         'middleware' => ['web'],
@@ -96,8 +96,8 @@ return [
     */
 
     'search'            => [
-        'enabled'       => false,
-        'default'       => 'algolia',
+        'enabled'       => true,
+        'default'       => 'internal',
         'engines'       => [
             'internal'  => [
                 'index' => ['h2', 'h3']
@@ -127,8 +127,8 @@ return [
         'fa_v4_shims'    => true, // Add FontAwesome v4 shims prevent BC break
         'show_side_bar'  => true,
         'colors'         => [
-            'primary'    => '#787AF6',
-            'secondary'  => '#2b9cf2'
+            'primary'    => '#1f78ad',
+            'secondary'  => '#0f4c75'
         ],
 
         'theme_order'    => null // ['LaRecipeDarkTheme', 'customTheme']
