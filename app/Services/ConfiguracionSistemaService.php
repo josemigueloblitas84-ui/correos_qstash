@@ -6,13 +6,16 @@ use App\Models\ConfiguracionSistema;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ConfiguracionSistemaService
 {
     private const DEFAULT_NAME = 'Fundacion UNIFRANZ';
     private const DEFAULT_LOGO = 'assets/img/logoFundacionTrans.png';
-    private const MANAGED_DIRECTORY = 'assets/img/configuracion-sistema';
+    private const DISK = 'public';
+    private const MANAGED_DIRECTORY = 'configuracion-sistema';
+    private const LEGACY_MANAGED_DIRECTORY = 'assets/img/configuracion-sistema';
 
     public function getOrCreate(): ConfiguracionSistema
     {
@@ -79,15 +82,28 @@ class ConfiguracionSistemaService
     public function getPdfLogoDataUri(): ?string
     {
         $configuracion = $this->getPresentationData();
-        $logoPath = public_path($configuracion['logo_pdf_path']);
 
-        if (! File::exists($logoPath)) {
+        if ($this->isPublicAssetPath($configuracion['logo_pdf_path'])) {
+            $logoPath = public_path($configuracion['logo_pdf_path']);
+
+            if (! File::exists($logoPath)) {
+                return null;
+            }
+
+            $mime = File::mimeType($logoPath) ?: 'image/png';
+
+            return 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($logoPath));
+        }
+
+        if (! Storage::disk(self::DISK)->exists($configuracion['logo_pdf_path'])) {
             return null;
         }
 
-        $mime = File::mimeType($logoPath) ?: 'image/png';
+        $mime = Storage::disk(self::DISK)->mimeType($configuracion['logo_pdf_path']) ?: 'image/png';
 
-        return 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($logoPath));
+        return 'data:' . $mime . ';base64,' . base64_encode(
+            Storage::disk(self::DISK)->get($configuracion['logo_pdf_path'])
+        );
     }
 
     private function mapForPresentation(array $data): array
@@ -98,9 +114,9 @@ class ConfiguracionSistemaService
         return [
             'nombre_institucion' => $data['nombre_institucion'] ?: self::DEFAULT_NAME,
             'logo_principal_path' => $logoPrincipalPath,
-            'logo_principal_url' => asset($logoPrincipalPath),
+            'logo_principal_url' => $this->buildImageUrl($logoPrincipalPath),
             'logo_pdf_path' => $logoPdfPath,
-            'logo_pdf_url' => asset($logoPdfPath),
+            'logo_pdf_url' => $this->buildImageUrl($logoPdfPath),
             'correo_institucional' => $data['correo_institucional'] ?? null,
             'celular_institucional' => $data['celular_institucional'] ?? null,
         ];
@@ -108,16 +124,18 @@ class ConfiguracionSistemaService
 
     private function storeImage(UploadedFile $file, string $prefix, ?string $currentPath): string
     {
-        $directory = public_path(self::MANAGED_DIRECTORY);
-        File::ensureDirectoryExists($directory);
-
         $extension = strtolower($file->getClientOriginalExtension());
         $filename = $prefix . '_' . now()->format('YmdHis') . '_' . Str::random(6) . '.' . $extension;
 
-        $file->move($directory, $filename);
+        $storedPath = $file->storeAs(self::MANAGED_DIRECTORY, $filename, self::DISK);
+
+        if ($storedPath === false) {
+            throw new \RuntimeException('No se pudo guardar la imagen en storage.');
+        }
+
         $this->deleteManagedFile($currentPath);
 
-        return self::MANAGED_DIRECTORY . '/' . $filename;
+        return $storedPath;
     }
 
     private function deleteManagedFile(?string $path): void
@@ -129,14 +147,36 @@ class ConfiguracionSistemaService
         $normalizedPath = str_replace('\\', '/', $path);
 
         if (! str_starts_with($normalizedPath, self::MANAGED_DIRECTORY . '/')) {
+            if (! str_starts_with($normalizedPath, self::LEGACY_MANAGED_DIRECTORY . '/')) {
+                return;
+            }
+
+            $absolutePath = public_path($normalizedPath);
+
+            if (File::exists($absolutePath)) {
+                File::delete($absolutePath);
+            }
+
             return;
         }
 
-        $absolutePath = public_path($normalizedPath);
-
-        if (File::exists($absolutePath)) {
-            File::delete($absolutePath);
+        if (Storage::disk(self::DISK)->exists($normalizedPath)) {
+            Storage::disk(self::DISK)->delete($normalizedPath);
         }
+    }
+
+    private function buildImageUrl(string $path): string
+    {
+        if ($this->isPublicAssetPath($path)) {
+            return asset($path);
+        }
+
+        return Storage::disk(self::DISK)->url($path);
+    }
+
+    private function isPublicAssetPath(string $path): bool
+    {
+        return str_starts_with($path, 'assets/');
     }
 
     private function getDefaultAttributes(): array

@@ -86,7 +86,7 @@
                                             name="logo_principal"
                                             accept=".jpg,.jpeg,.png,.webp"
                                             class="form-control @error('logo_principal') is-invalid @enderror">
-                                        <div class="form-text">Se usa en el menu lateral y en el login. Dejalo vacio si no deseas cambiarlo.</div>
+                                        <div class="form-text">Se usa en el menu lateral. Dejalo vacio si no deseas cambiarlo.</div>
                                         @error('logo_principal')
                                             <div class="invalid-feedback d-block">{{ $message }}</div>
                                         @enderror

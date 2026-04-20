@@ -23,7 +23,6 @@ class AppServiceProvider extends ServiceProvider
     {
         View::composer([
             'plantilla.menu',
-            'layouts.adminLTE_guest',
             'layouts.guest',
             'components.application-logo',
         ], function ($view) {
