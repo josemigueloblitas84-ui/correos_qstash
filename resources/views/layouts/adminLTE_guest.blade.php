@@ -8,21 +8,20 @@
     <title>{{ config('app.name') }}</title>
     <link rel="stylesheet" href="{{ asset('assets/plugins/fontawesome-free/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/adminlte.min.css') }}">
+    @stack('styles')
 </head>
 
-<body class="hold-transition login-page">
+<body class="@yield('body_class', 'hold-transition login-page')">
 
-<div class="login-box">
-    <div class="login-logo">
-        <img src="{{ $systemConfig['logo_principal_url'] }}" alt="{{ $systemConfig['nombre_institucion'] }}" >
-    </div>
-
-    <div class="card">
-        {{-- <div class="card-body login-card-body"> --}}
+@hasSection('full_width_auth')
+    @yield('content')
+@else
+    <div class="login-box">
+        <div class="card">
             @yield('content')
-        {{-- </div> --}}
+        </div>
     </div>
-</div>
+@endif
 
 <script src="{{ asset('assets/plugins/jquery/jquery.min.js') }}"></script>
 <script src="{{ asset('assets/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
