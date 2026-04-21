@@ -35,7 +35,7 @@ class UserService
         ActivityLogger::log(
             'Usuario creado',
             [
-                'user' => [
+                'attributes' => [
                     'id' => $usuario->id,
                     'name' => $usuario->name,
                     'email' => $usuario->email,
@@ -44,8 +44,8 @@ class UserService
                     'celular' => $usuario->celular,
                     'telefono_contacto' => $usuario->telefono_contacto,
                     'estado' => (int) $usuario->estado,
+                    'roles' => $usuario->roles->pluck('name')->values()->all(),
                 ],
-                'roles' => $usuario->roles->pluck('name')->values()->all(),
             ],
             $usuario,
             logName: 'usuarios',
@@ -187,6 +187,8 @@ class UserService
     public function syncAssignedPersonal(User $usuario, array $assignedUserIds, bool $isValidator = false): void
     {
         $assignedUserIds = array_values(array_unique(array_map('intval', $assignedUserIds)));
+        $previousAssignedUserIds = $this->getAssignedUserIds($usuario->id);
+        $previousValidator = (int) $usuario->validador;
 
         DB::transaction(function () use ($usuario, $assignedUserIds, $isValidator) {
             DB::table('agenda_personal_asignado')
@@ -216,17 +218,64 @@ class UserService
         ActivityLogger::log(
             'Personal asignado actualizado',
             [
-                'usuario_jefe' => [
-                    'id' => $usuario->id,
-                    'name' => $usuario->name,
-                    'email' => $usuario->email,
+                'old' => [
+                    'usuarios_asignados' => $previousAssignedUserIds,
+                    'validador' => $previousValidator,
                 ],
-                'usuarios_asignados' => array_values($assignedUserIds),
-                'validador' => (int) $usuario->validador,
+                'attributes' => [
+                    'usuarios_asignados' => array_values($assignedUserIds),
+                    'validador' => (int) $usuario->validador,
+                ],
             ],
             $usuario,
             logName: 'usuarios',
             event: 'personal_assigned'
+        );
+    }
+
+    public function syncSpecialPermissions(User $usuario, array $permissions = []): void
+    {
+        $previousPermissions = $usuario->getDirectPermissions()->pluck('name')->values()->all();
+
+        $usuario->syncPermissions($permissions);
+        $usuario->load('permissions');
+
+        ActivityLogger::log(
+            'Permisos especiales de usuario actualizados',
+            [
+                'old' => [
+                    'direct_permissions' => $previousPermissions,
+                ],
+                'attributes' => [
+                    'direct_permissions' => $usuario->getDirectPermissions()->pluck('name')->values()->all(),
+                ],
+            ],
+            $usuario,
+            logName: 'usuarios',
+            event: 'permissions_updated'
+        );
+    }
+
+    public function syncUserRole(User $usuario, string $role): void
+    {
+        $previousRoles = $usuario->roles()->pluck('name')->values()->all();
+
+        $usuario->syncRoles([$role]);
+        $usuario->load('roles');
+
+        ActivityLogger::log(
+            'Rol de usuario actualizado',
+            [
+                'old' => [
+                    'roles' => $previousRoles,
+                ],
+                'attributes' => [
+                    'roles' => $usuario->roles->pluck('name')->values()->all(),
+                ],
+            ],
+            $usuario,
+            logName: 'usuarios',
+            event: 'role_updated'
         );
     }
 }

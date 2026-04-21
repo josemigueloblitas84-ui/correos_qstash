@@ -12,10 +12,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
-use App\Services\Support\ActivityLogger;
+use App\Services\Auth\AuthActivityService;
 
 class RegisteredUserController extends Controller
 {
+    public function __construct(
+        protected AuthActivityService $authActivityService
+    ) {
+    }
     /**
      * Display the registration view.
      */
@@ -47,21 +51,9 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        ActivityLogger::log(
-            'Usuario registrado desde formulario web',
-            [
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                ],
-            ],
-            $user,
-            $user,
-            'auth',
-            'registered'
-        );
+        $this->authActivityService->logRegistered($user);
 
         return redirect(RouteServiceProvider::HOME);
     }
 }
+

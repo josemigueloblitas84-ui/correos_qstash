@@ -8,10 +8,27 @@
             margin: 18px 20px;
         }
 
+        @font-face {
+            font-family: 'Montserrat';
+            font-style: normal;
+            font-weight: 100 900;
+            src: url('{{ public_path('assets/fonts/montserrat/Montserrat-VariableFont_wght.ttf') }}') format('truetype');
+        }
+
+        @font-face {
+            font-family: 'Montserrat';
+            font-style: italic;
+            font-weight: 100 900;
+            src: url('{{ public_path('assets/fonts/montserrat/Montserrat-Italic-VariableFont_wght.ttf') }}') format('truetype');
+        }
+
         body {
             margin: 0;
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300;
             color: #111111;
+            margin: 0;
+            font-style: normal;
             font-size: 9px;
         }
 

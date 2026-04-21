@@ -6,10 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Services\Support\ActivityLogger;
+use App\Services\Auth\AuthActivityService;
 
 class EmailVerificationNotificationController extends Controller
 {
+    public function __construct(
+        protected AuthActivityService $authActivityService
+    ) {
+    }
     /**
      * Send a new email verification notification.
      */
@@ -21,15 +25,9 @@ class EmailVerificationNotificationController extends Controller
 
         $request->user()->sendEmailVerificationNotification();
 
-        ActivityLogger::log(
-            'Enlace de verificacion reenviado',
-            [],
-            $request->user(),
-            $request->user(),
-            'auth',
-            'verification_link_sent'
-        );
+        $this->authActivityService->logVerificationLinkSent($request->user());
 
         return back()->with('status', 'verification-link-sent');
     }
 }
+

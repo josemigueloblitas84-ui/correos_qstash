@@ -1,0 +1,41 @@
+@font-face {
+    font-family: 'Montserrat';
+    src: url('../fonts/montserrat/Montserrat-VariableFont_wght.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Montserrat';
+    src: url('../fonts/montserrat/Montserrat-Italic-VariableFont_wght.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: italic;
+    font-display: swap;
+}
+
+:root {
+    --bs-body-font-family: 'Montserrat', sans-serif;
+    --bs-font-sans-serif: 'Montserrat', sans-serif;
+}
+
+body,
+.main-header,
+.main-sidebar,
+.content-wrapper,
+.app-footer,
+.card,
+.table,
+.btn,
+.form-control,
+.form-select,
+.dropdown-menu,
+.modal,
+.swal2-popup,
+.select2-container--default .select2-selection--single,
+.select2-container--default .select2-selection--multiple {
+    font-family: 'Montserrat', sans-serif !important;
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-style: normal;
+}

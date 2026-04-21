@@ -9,7 +9,6 @@ use Spatie\Permission\Models\Permission;
 use App\Http\Requests\Permisos\PermisoStoreRequest;
 use App\Http\Requests\Permisos\PermisoUpdateRequest;
 use App\Services\Permisos\PermisoService;
-use App\Services\Support\ActivityLogger;
 
 
 class PermisosController extends Controller
@@ -82,22 +81,7 @@ class PermisosController extends Controller
             return response()->json(['status' => false]);
         }
 
-        $properties = [
-            'permission' => [
-                'id' => $permiso->id,
-                'name' => $permiso->name,
-            ],
-        ];
-
-        $permiso->delete();
-
-        ActivityLogger::log(
-            'Permiso eliminado',
-            $properties,
-            null,
-            logName: 'permisos',
-            event: 'deleted'
-        );
+        $this->permisoService->destroyPermiso($permiso);
 
         session()->flash('success', 'Permiso eliminado exitosamente');
         return response()->json(['status' => true]);

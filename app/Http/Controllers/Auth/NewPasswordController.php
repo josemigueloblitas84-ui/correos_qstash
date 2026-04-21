@@ -11,10 +11,14 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
-use App\Services\Support\ActivityLogger;
+use App\Services\Auth\AuthActivityService;
 
 class NewPasswordController extends Controller
 {
+    public function __construct(
+        protected AuthActivityService $authActivityService
+    ) {
+    }
     /**
      * Display the password reset view.
      */
@@ -47,14 +51,7 @@ class NewPasswordController extends Controller
                     'remember_token' => Str::random(60),
                 ])->save();
 
-                ActivityLogger::log(
-                    'Contrasena restablecida desde recovery',
-                    [],
-                    $user,
-                    $user,
-                    'auth',
-                    'password_reset'
-                );
+                $this->authActivityService->logPasswordReset($user);
 
                 event(new PasswordReset($user));
             }
@@ -69,3 +66,4 @@ class NewPasswordController extends Controller
                             ->withErrors(['email' => __($status)]);
     }
 }
+

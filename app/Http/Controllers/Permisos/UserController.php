@@ -12,7 +12,6 @@ use App\Http\Requests\Permisos\UserRequest;
 use App\Http\Requests\Permisos\UserUpdateRequest;
 use App\Http\Requests\Permisos\AsignarPersonalRequest;
 use App\Services\Permisos\UserService;
-use App\Services\Support\ActivityLogger;
 use App\Services\Agenda\DepartamentoService;
 use App\Services\Agenda\TipoPersonalService;
 
@@ -121,29 +120,15 @@ class UserController extends Controller
     public function updatePermisosEspeciales(Request $request, string $id)
     {
         $usuario = User::findOrFail($id);
-        $previousPermissions = $usuario->getDirectPermissions()->pluck('name')->values()->all();
 
         $request->validate([
             'permisos' => ['nullable', 'array'],
             'permisos.*' => ['string', Rule::exists('permissions', 'name')],
         ]);
 
-        $usuario->syncPermissions($request->input('permisos', []));
-        $usuario->load('permissions');
-
-        ActivityLogger::log(
-            'Permisos especiales de usuario actualizados',
-            [
-                'old' => [
-                    'direct_permissions' => $previousPermissions,
-                ],
-                'attributes' => [
-                    'direct_permissions' => $usuario->getDirectPermissions()->pluck('name')->values()->all(),
-                ],
-            ],
+        $this->userService->syncSpecialPermissions(
             $usuario,
-            logName: 'usuarios',
-            event: 'permissions_updated'
+            $request->input('permisos', [])
         );
 
         return redirect()
@@ -200,7 +185,7 @@ class UserController extends Controller
             'role.exists' => 'El rol seleccionado no es valido.',
         ]);
 
-        $usuario->syncRoles([$request->role]);
+        $this->userService->syncUserRole($usuario, $request->role);
 
         return redirect()
             ->route('usuarios.index')

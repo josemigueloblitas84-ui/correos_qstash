@@ -73,8 +73,8 @@ class AgendaService
             ActivityLogger::log(
                 'Agenda creada',
                 [
-                    'agenda' => [
-                        'id' => $agendaId,
+                    'attributes' => [
+                        'agenda_id' => $agendaId,
                         'fecha' => $data['fecha'],
                         'cod_unidad' => $data['cod_unidad'],
                         'cod_solicitante' => $data['cod_solicitante'],
@@ -197,6 +197,20 @@ class AgendaService
                 return;
             }
 
+            $old = [
+                'agenda_id' => $agenda->id,
+                'fecha' => $agenda->fecha,
+                'cod_unidad' => $agenda->cod_unidad,
+                'cod_solicitante' => $agenda->cod_solicitante,
+                'fecha_desde' => $agenda->fecha_desde,
+                'fecha_hasta' => $agenda->fecha_hasta,
+                'hora_desde' => $agenda->hora_desde,
+                'hora_hasta' => $agenda->hora_hasta,
+                'cod_usuario' => $agenda->cod_usuario,
+                'cerrado' => $agenda->cerrado,
+                'estado_agenda' => $agenda->estado_agenda,
+            ];
+
             DB::table('agendas')
                 ->where('id', $agenda->id)
                 ->delete();
@@ -204,9 +218,8 @@ class AgendaService
             ActivityLogger::log(
                 'Agenda eliminada',
                 [
-                    'agenda' => (array) $agenda,
+                    'old' => $old,
                 ],
-                null,
                 logName: 'agendas',
                 event: 'deleted'
             );
@@ -224,6 +237,8 @@ class AgendaService
                 return;
             }
 
+            $oldStatus = $agenda->estado_agenda;
+
             DB::table('agendas')
                 ->where('id', $agenda->id)
                 ->update([
@@ -234,11 +249,15 @@ class AgendaService
             ActivityLogger::log(
                 'Agenda enviada',
                 [
-                    'agenda' => array_merge((array) $agenda, [
-                        'estado_agenda_nuevo' => 'C',
-                    ]),
+                    'old' => [
+                        'agenda_id' => $agenda->id,
+                        'estado_agenda' => $oldStatus,
+                    ],
+                    'attributes' => [
+                        'agenda_id' => $agenda->id,
+                        'estado_agenda' => 'C',
+                    ],
                 ],
-                null,
                 logName: 'agendas',
                 event: 'updated'
             );

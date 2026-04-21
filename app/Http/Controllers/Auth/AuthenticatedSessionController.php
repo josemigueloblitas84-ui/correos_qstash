@@ -9,10 +9,15 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
-use App\Services\Support\ActivityLogger;
+use App\Services\Auth\AuthActivityService;
 
 class AuthenticatedSessionController extends Controller
 {
+    public function __construct(
+        protected AuthActivityService $authActivityService
+    ) {
+    }
+
     /**
      * Display the login view.
      */
@@ -30,15 +35,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        ActivityLogger::log(
-            'Inicio de sesión web',
-            [
-                'guard' => 'web',
-            ],
-            $request->user(),
-            logName: 'auth',
-            event: 'login'
-        );
+        $this->authActivityService->logWebLogin($request->user());
 
         return redirect()->intended(RouteServiceProvider::HOME);
     }
@@ -51,16 +48,7 @@ class AuthenticatedSessionController extends Controller
         $user = $request->user();
 
         if ($user !== null) {
-            ActivityLogger::log(
-                'Cierre de sesión web',
-                [
-                    'guard' => 'web',
-                ],
-                $user,
-                $user,
-                'auth',
-                'logout'
-            );
+            $this->authActivityService->logWebLogout($user);
         }
 
         Auth::guard('web')->logout();
@@ -72,3 +60,4 @@ class AuthenticatedSessionController extends Controller
         return redirect('/');
     }
 }
+

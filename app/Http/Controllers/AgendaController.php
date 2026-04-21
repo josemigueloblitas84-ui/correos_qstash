@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-//use App\Models\Agenda;
 use App\Http\Requests\Agenda\AgendaActividadStoreRequest;
+use App\Http\Requests\Agenda\AgendaStoreRequest;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -86,58 +86,9 @@ class AgendaController extends Controller
        ]);
     }
 
-    public function store(Request $request): RedirectResponse|JsonResponse
+    public function store(AgendaStoreRequest $request): RedirectResponse|JsonResponse
     {
-        if(!auth()->user()?->hasRole('SuperAdministrador')){
-            $request->merge([
-                'cod_unidad' => auth()->user()->departamento_id,
-                'cod_solicitante' => auth()->id(),
-            ]);
-        }
-        $validated = $request->validate([
-            'fecha' => ['required', 'date'],
-            'cod_unidad' => ['required', 'exists:departamentos,id'],
-            'cod_solicitante' => ['required', 'exists:users,id'],
-            'fecha_desde' => ['required', 'date'],
-            'fecha_hasta' => [
-                'required',
-                'date',
-                'after_or_equal:fecha_desde',
-                function (string $attribute, mixed $value, \Closure $fail) use ($request) {
-                    $fechaDesde = $request->input('fecha_desde');
-
-                    if (! $fechaDesde || ! $value) {
-                        return;
-                    }
-
-                    $desde = Carbon::parse($fechaDesde);
-                    $hasta = Carbon::parse($value);
-
-                    if (! $desde->isSameMonth($hasta)) {
-                        $fail('La fecha final debe pertenecer al mismo mes que la fecha inicial.');
-                    }
-                },
-            ],
-            'hora_inicio_hora' => ['required'],
-            'hora_inicio_minuto' => ['required'],
-            'hora_fin_hora' => ['required'],
-            'hora_fin_minuto' => ['required'],
-        ], [
-            'fecha.required' => 'La fecha es obligatoria.',
-            'cod_unidad.required' => 'Debe seleccionar un departamento o unidad.',
-            'cod_unidad.exists' => 'El departamento seleccionado no es válido.',
-            'cod_solicitante.required' => 'Debe seleccionar un solicitante.',
-            'cod_solicitante.exists' => 'El solicitante seleccionado no es válido.',
-            'fecha_desde.required' => 'La fecha inicial es obligatoria.',
-            'fecha_hasta.required' => 'La fecha final es obligatoria.',
-            'fecha_hasta.after_or_equal' => 'La fecha final debe ser mayor o igual a la fecha inicial.',
-            'hora_inicio_hora.required' => 'Debe seleccionar la hora de inicio.',
-            'hora_inicio_minuto.required' => 'Debe seleccionar los minutos de inicio.',
-            'hora_fin_hora.required' => 'Debe seleccionar la hora final.',
-            'hora_fin_minuto.required' => 'Debe seleccionar los minutos finales.',
-        ]);
-
-        $agendaId = $this->agendaService->store($validated, auth()->id());
+        $agendaId = $this->agendaService->store($request->validated(), auth()->id());
 
         if ($request->expectsJson()) {
             return response()->json([

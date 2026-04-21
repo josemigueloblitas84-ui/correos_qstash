@@ -7,6 +7,7 @@
 
     <title>{{ config('app.name') }}</title>
     <link rel="stylesheet" href="{{ asset('assets/plugins/fontawesome-free/css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/gloBal-font.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/adminlte.min.css') }}">
     @stack('styles')
 </head>

@@ -7,10 +7,14 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\RedirectResponse;
-use App\Services\Support\ActivityLogger;
+use App\Services\Auth\AuthActivityService;
 
 class VerifyEmailController extends Controller
 {
+    public function __construct(
+        protected AuthActivityService $authActivityService
+    ) {
+    }
     /**
      * Mark the authenticated user's email address as verified.
      */
@@ -23,16 +27,10 @@ class VerifyEmailController extends Controller
         if ($request->user()->markEmailAsVerified()) {
             event(new Verified($request->user()));
 
-            ActivityLogger::log(
-                'Correo electronico verificado',
-                [],
-                $request->user(),
-                $request->user(),
-                'auth',
-                'email_verified'
-            );
+            $this->authActivityService->logEmailVerified($request->user());
         }
 
         return redirect()->intended(RouteServiceProvider::HOME.'?verified=1');
     }
 }
+

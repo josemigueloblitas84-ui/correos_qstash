@@ -18,7 +18,7 @@ class PermisoService
         ActivityLogger::log(
             'Permiso creado',
             [
-                'permission' => [
+                'attributes' => [
                     'id' => $permiso->id,
                     'name' => $permiso->name,
                 ],
@@ -54,5 +54,25 @@ class PermisoService
         );
 
         return $permiso;
+    }
+
+    public function destroyPermiso(Permission $permiso): void
+    {
+        $properties = [
+            'old' => [
+                'id' => $permiso->id,
+                'name' => $permiso->name,
+            ],
+        ];
+
+        $permiso->delete();
+
+        ActivityLogger::log(
+            'Permiso eliminado',
+            $properties,
+            $permiso,
+            logName: 'permisos',
+            event: 'deleted'
+        );
     }
 }

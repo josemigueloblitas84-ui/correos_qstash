@@ -8,8 +8,6 @@ Bienvenido al manual de usuario del sistema de gestión de permisos, roles, usua
 
 Este manual esta dirigido a usuarios operativos, administrativos y responsables de control que utilizan el sistema para registrar informacion, administrar accesos y consultar reportes de trabajo.
 
-> Oblitas usar la imagen personalizada:
-
 ## Presentación del sistema
 
 El sistema fue desarrollado para centralizar procesos importantes de la organizacion, permitiendo controlar el acceso de usuarios y registrar actividades operativas de manera ordenada.

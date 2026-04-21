@@ -3,16 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\FormularioMail;
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
-use Illuminate\Support\Facades\Log;
-use App\Services\Support\ActivityLogger;
+use App\Services\Formulario\FormularioService;
 
 class FormularioController extends Controller
 {
+ public function __construct(
+     protected FormularioService $formularioService
+ ) {
+ }
+
  public function index()
  {
      return view('formulario');
@@ -30,55 +29,14 @@ public function store(Request $request)
         'adjuntos.*' => ['file', 'mimes:pdf,jpg,jpeg,png,doc,docx,xls,xlsx,txt', 'max:5120'],
     ]);
 
-    // Array para ir guardando los adjuntos y devolver la informacion
-    $adjuntos = [];
-
-    if ($request->hasFile('adjuntos')) {
-        foreach ($request->file('adjuntos') as $file) {
-            $path = $file->store('correo_adjuntos', 'local');
-
-            $adjuntos[] = [
-                'path' => $path,
-                'name' => $file->getClientOriginalName(),
-                'mime' => $file->getMimeType(),
-            ];
-        }
-    }
-
-    $endpoint = env('QSTASH_BASE_URL')
-        . '/v2/publish/'
-        . env('QSTASH_ENDPOINT');
-
-    $response = Http::withHeaders([
-        'Authorization' => 'Bearer ' . env('QSTASH_TOKEN'),
-        'Upstash-Delay' => '300s',
-    ])->post($endpoint, [
-        'nombre' => $validated['nombre'],
-        'email' => $validated['email'],
-        'mensaje' => $validated['mensaje'],
-        'adjuntos' => $adjuntos,
-    ]);
-
-    ActivityLogger::log(
-        'Formulario enviado a QStash',
-        [
-            'formulario' => [
-                'nombre' => $validated['nombre'],
-                'email' => $validated['email'],
-                'adjuntos_count' => count($adjuntos),
-            ],
-            'qstash' => [
-                'status' => $response->status(),
-            ],
-        ],
-        logName: 'formularios',
-        event: 'submitted'
+    $result = $this->formularioService->submit(
+        $validated,
+        $request->file('adjuntos', [])
     );
 
-
     return response()->json([
-        'status' => $response->status(),
-        'body' => $response->body(),
+        'status' => $result['status'],
+        'body' => $result['body'],
     ]);
 }
 
@@ -90,21 +48,7 @@ public function enviarEmail(Request $request)
     
         $datos = $request->json()->all();
 
-        Mail::to('oblitasjosemiguel4@gmail.com')
-            ->send(new FormularioMail($datos));
-
-        ActivityLogger::log(
-            'Correo del formulario procesado por QStash',
-            [
-                'formulario' => [
-                    'nombre' => $datos['nombre'] ?? null,
-                    'email' => $datos['email'] ?? null,
-                    'adjuntos_count' => count($datos['adjuntos'] ?? []),
-                ],
-            ],
-            logName: 'formularios',
-            event: 'processed'
-        );
+        $this->formularioService->processEmailPayload($datos);
 
         return response()->json([
             'status' => 'Correo enviado correctamente'

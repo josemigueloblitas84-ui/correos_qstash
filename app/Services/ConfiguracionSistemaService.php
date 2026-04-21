@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Services\Support\ActivityLogger;
 
 class ConfiguracionSistemaService
 {
@@ -30,6 +31,14 @@ class ConfiguracionSistemaService
     public function update(array $data): ConfiguracionSistema
     {
         $configuracion = $this->getOrCreate();
+        $old = [
+            'id' => $configuracion->id,
+            'nombre_institucion' => $configuracion->nombre_institucion,
+            'correo_institucional' => $configuracion->correo_institucional,
+            'celular_institucional' => $configuracion->celular_institucional,
+            'logo_principal' => $configuracion->logo_principal,
+            'logo_pdf' => $configuracion->logo_pdf,
+        ];
 
         $configuracion->nombre_institucion = $data['nombre_institucion'];
         $configuracion->correo_institucional = $data['correo_institucional'] ?: null;
@@ -60,6 +69,25 @@ class ConfiguracionSistemaService
         }
 
         $configuracion->save();
+
+        ActivityLogger::log(
+            'Configuracion del sistema actualizada',
+            [
+                'old' => $old,
+                'attributes' => [
+                    'id' => $configuracion->id,
+                    'nombre_institucion' => $configuracion->nombre_institucion,
+                    'correo_institucional' => $configuracion->correo_institucional,
+                    'celular_institucional' => $configuracion->celular_institucional,
+                    'logo_principal' => $configuracion->logo_principal,
+                    'logo_pdf' => $configuracion->logo_pdf,
+                ],
+            ],
+            $configuracion,
+            null,
+            'configuracion_sistema',
+            'updated'
+        );
 
         return $configuracion->fresh();
     }

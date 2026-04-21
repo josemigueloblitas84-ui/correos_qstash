@@ -27,11 +27,11 @@ class RolService
         ActivityLogger::log(
             'Rol creado',
             [
-                'role' => [
+                'attributes' => [
                     'id' => $role->id,
                     'name' => $role->name,
+                    'permissions' => $role->permissions->pluck('name')->values()->all(),
                 ],
-                'permissions' => $role->permissions->pluck('name')->values()->all(),
             ],
             $role,
             logName: 'roles',
@@ -69,5 +69,26 @@ class RolService
         );
 
         return $role;
+    }
+
+    public function destroyRol(Role $role): void
+    {
+        $properties = [
+            'old' => [
+                'id' => $role->id,
+                'name' => $role->name,
+                'permissions' => $role->permissions()->pluck('name')->values()->all(),
+            ],
+        ];
+
+        $role->delete();
+
+        ActivityLogger::log(
+            'Rol eliminado',
+            $properties,
+            $role,
+            logName: 'roles',
+            event: 'deleted'
+        );
     }
 }

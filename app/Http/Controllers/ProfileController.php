@@ -8,10 +8,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
-use App\Services\Support\ActivityLogger;
+use App\Services\Profile\ProfileService;
 
 class ProfileController extends Controller
 {
+    public function __construct(
+        protected ProfileService $profileService
+    ) {
+    }
+
     /**
      * Display the user's profile.
      */
@@ -37,33 +42,7 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $user = $request->user();
-        $before = [
-            'name' => $user->name,
-            'email' => $user->email,
-        ];
-
-        $user->fill($request->validated());
-
-        if ($user->isDirty('email')) {
-            $user->email_verified_at = null;
-        }
-
-        $user->save();
-
-        ActivityLogger::log(
-            'Perfil actualizado',
-            [
-                'old' => $before,
-                'attributes' => [
-                    'name' => $user->name,
-                    'email' => $user->email,
-                ],
-            ],
-            $user,
-            logName: 'perfil',
-            event: 'updated'
-        );
+        $this->profileService->updateProfile($request->user(), $request->validated());
 
         return Redirect::route('profile.show')->with('status', 'profile-updated');
     }
@@ -78,26 +57,10 @@ class ProfileController extends Controller
         ]);
 
         $user = $request->user();
-        $properties = [
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-            ],
-        ];
 
         Auth::logout();
 
-        $user->delete();
-
-        ActivityLogger::log(
-            'Cuenta eliminada',
-            $properties,
-            null,
-            $user,
-            'perfil',
-            'deleted'
-        );
+        $this->profileService->deleteAccount($user);
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

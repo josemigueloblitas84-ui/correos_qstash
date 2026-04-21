@@ -47,6 +47,8 @@
   <!--begin::Required Plugin(AdminLTE)-->
   <link rel="stylesheet" href="{{ asset('adminlte/dist/css/adminlte.css') }}" />
   <!--end::Required Plugin(AdminLTE)-->
+  <!--Letrita del sistema-->
+  <link rel="stylesheet" href="{{ asset('assets/css/gloBal-font.css') }}">
 
   <!-- apexcharts -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.css"

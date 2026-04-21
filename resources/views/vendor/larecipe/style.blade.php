@@ -1,7 +1,40 @@
 <style>
+    @font-face {
+        font-family: 'Montserrat';
+        src: url('{{ asset('assets/fonts/montserrat/Montserrat-VariableFont_wght.ttf') }}') format('truetype');
+        font-weight: 100 900;
+        font-style: normal;
+        font-display: swap;
+    }
+
+    @font-face {
+        font-family: 'Montserrat';
+        src: url('{{ asset('assets/fonts/montserrat/Montserrat-Italic-VariableFont_wght.ttf') }}') format('truetype');
+        font-weight: 100 900;
+        font-style: italic;
+        font-display: swap;
+    }
+
     :root {
         --primary: {{ config('larecipe.ui.colors.primary') }};
         --secondary: {{ config('larecipe.ui.colors.secondary') }};
+    }
+
+    body,
+    .documentation,
+    .documentation p,
+    .documentation li,
+    .documentation a,
+    .documentation h1,
+    .documentation h2,
+    .documentation h3,
+    .documentation h4,
+    .documentation h5,
+    .documentation h6,
+    .sidebar,
+    .navbar {
+        font-family: 'Montserrat', sans-serif !important;
+        font-optical-sizing: auto;
     }
 
     :not(pre)>code[class*=language-], pre[class*=language-] {

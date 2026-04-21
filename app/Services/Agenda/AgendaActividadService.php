@@ -4,6 +4,7 @@ namespace App\Services\Agenda;
 
 use App\Exceptions\AgendaActividadException;
 use Illuminate\Support\Facades\DB;
+use App\Services\Support\ActivityLogger;
 use Throwable;
 
 class AgendaActividadService
