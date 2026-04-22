@@ -117,8 +117,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/data', 'data')->name('data');
         Route::post('/', 'store')->name('store');
-        Route::get('/{id}', 'show')->name('show');
         Route::put('/{id}', 'update')->name('update');
+        Route::get('/{id}', 'show')->name('show');
         Route::patch('/{id}/toggle-status', 'toggleStatus')->name('toggle-status');
         Route::delete('/{id}', 'destroy')->name('destroy');
     });

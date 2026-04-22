@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function buildUrl(template, id) {
-        return template.replace('__ID__', id);
+        return template.replace('__ID__', encodeURIComponent(String(id)));
     }
 
     function clearValidation(form, prefix) {

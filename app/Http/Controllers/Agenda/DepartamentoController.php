@@ -42,12 +42,13 @@ class DepartamentoController extends Controller
                 $estado = strtolower((string) $row->estado_depa);
                 $toggleClass = $estado === 'activo' ? 'btn-danger' : 'btn-success';
                 $toggleLabel = $estado === 'activo' ? 'Desactivar' : 'Activar';
+                $encryptedId = e(encrypt_id((int) $row->id));
 
                 return '
-                    <button type="button" class="btn btn-warning btn-sm btn-editar" data-id="' . $row->id . '">
+                    <button type="button" class="btn btn-warning btn-sm btn-editar" data-id="' . $encryptedId . '">
                         Editar
                     </button>
-                    <button type="button" class="btn ' . $toggleClass . ' btn-sm btn-toggle-estado" data-id="' . $row->id . '" data-estado="' . e($row->estado_depa) . '">
+                    <button type="button" class="btn ' . $toggleClass . ' btn-sm btn-toggle-estado" data-id="' . $encryptedId . '" data-estado="' . e($row->estado_depa) . '">
                         ' . $toggleLabel . '
                     </button>
                 ';
@@ -68,13 +69,14 @@ class DepartamentoController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Departamento creado correctamente.',
-            'id' => $id,
+            'id' => encrypt_id($id),
         ]);
     }
 
-    public function show($id): JsonResponse
+    public function show(string $id): JsonResponse
     {
-        $departamento = $this->departamentoService->findById((int) $id);
+        $idDepartamento = decrypt_id($id);
+        $departamento = $this->departamentoService->findById((int) $idDepartamento);
 
         if (!$departamento) {
             return response()->json([
@@ -85,13 +87,19 @@ class DepartamentoController extends Controller
 
         return response()->json([
             'status' => true,
-            'data' => $departamento,
+            'data' => [
+                'id' => encrypt_id((int) $departamento->id),
+                'nombre_depa' => $departamento->nombre_depa,
+                'estado_depa' => $departamento->estado_depa,
+                'created_at' => $departamento->created_at,
+            ],
         ]);
     }
 
-    public function update(DepartamentoUpdateRequest $request, $id): JsonResponse
+    public function update(DepartamentoUpdateRequest $request, string $id): JsonResponse
     {
-        $departamento = $this->departamentoService->findById((int) $id);
+        $idDepartamento = decrypt_id($id);
+        $departamento = $this->departamentoService->findById($idDepartamento);
 
         if (!$departamento) {
             return response()->json([
@@ -100,7 +108,7 @@ class DepartamentoController extends Controller
             ], 404);
         }
 
-        $this->departamentoService->update((int) $id, $request->validated());
+        $this->departamentoService->update($idDepartamento, $request->validated());
 
         return response()->json([
             'status' => true,
@@ -108,9 +116,10 @@ class DepartamentoController extends Controller
         ]);
     }
 
-    public function toggleStatus($id): JsonResponse
+    public function toggleStatus(string $id): JsonResponse
     {
-        $departamento = $this->departamentoService->findById((int) $id);
+        $idDepartamento = decrypt_id($id);
+        $departamento = $this->departamentoService->findById($idDepartamento);
 
         if (!$departamento) {
             return response()->json([
@@ -119,7 +128,7 @@ class DepartamentoController extends Controller
             ], 404);
         }
 
-        $nuevoEstado = $this->departamentoService->toggleStatus((int) $id, (string) $departamento->estado_depa);
+        $nuevoEstado = $this->departamentoService->toggleStatus($idDepartamento, (string) $departamento->estado_depa);
 
         return response()->json([
             'status' => true,
@@ -130,9 +139,10 @@ class DepartamentoController extends Controller
         ]);
     }
 
-    public function destroy($id): JsonResponse
+    public function destroy(string $id): JsonResponse
     {
-        $departamento = $this->departamentoService->findById((int) $id);
+        $idDepartamento = decrypt_id($id);
+        $departamento = $this->departamentoService->findById($idDepartamento);
 
         if (!$departamento) {
             return response()->json([
@@ -141,7 +151,7 @@ class DepartamentoController extends Controller
             ], 404);
         }
 
-        $this->departamentoService->deactivate((int) $id);
+        $this->departamentoService->deactivate($idDepartamento);
 
         return response()->json([
             'status' => true,
