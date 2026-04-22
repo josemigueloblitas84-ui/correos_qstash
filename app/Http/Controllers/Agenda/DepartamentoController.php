@@ -42,7 +42,7 @@ class DepartamentoController extends Controller
                 $estado = strtolower((string) $row->estado_depa);
                 $toggleClass = $estado === 'activo' ? 'btn-danger' : 'btn-success';
                 $toggleLabel = $estado === 'activo' ? 'Desactivar' : 'Activar';
-                $encryptedId = e(encrypt_id((int) $row->id));
+                $encryptedId = encrypt_id((int) $row->id);
 
                 return '
                     <button type="button" class="btn btn-warning btn-sm btn-editar" data-id="' . $encryptedId . '">
