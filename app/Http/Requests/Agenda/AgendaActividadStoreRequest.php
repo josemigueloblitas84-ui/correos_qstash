@@ -13,6 +13,17 @@ class AgendaActividadStoreRequest extends FormRequest
         return auth()->check();
     }
 
+    protected function prepareForValidation(): void
+    {
+        $agendaId = $this->input('agenda_id');
+
+        if (is_string($agendaId) && $agendaId !== '') {
+            $this->merge([
+                'agenda_id' => decrypt_id($agendaId),
+            ]);
+        }
+    }
+
     public function rules(): array
     {
         return [

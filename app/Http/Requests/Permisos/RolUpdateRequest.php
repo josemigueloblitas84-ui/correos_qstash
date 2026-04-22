@@ -22,15 +22,16 @@ class RolUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-        $roleId = $this->route('id');
+        $id = $this->resolveRolId();
+
         return [
             'name' => [
                 'required',
                 'min:3',
-                Rule::unique('roles', 'name')->ignore($roleId, 'id'),
+                Rule::unique('roles', 'name')->ignore($id, 'id'),
             ],
-            'permisos' => 'nullable|array',
-            'permisos.*' => 'exists:permissions,name',
+            'permisos' => ['nullable', 'array'],
+            'permisos.*' => ['string', 'exists:permissions,name'],
         ];
     }
 
@@ -40,8 +41,19 @@ class RolUpdateRequest extends FormRequest
             'name.required' => 'El nombre del rol es obligatorio.',
             'name.min' => 'El nombre del rol debe tener al menos :min caracteres.',
             'name.unique' => 'El nombre del rol ya existe.',
-            'permisos.array' => 'Los permisos deben enviarse como lista.',
+            'permisos.array' => 'Los permisos enviados no son válidos.',
             'permisos.*.exists' => 'Uno de los permisos seleccionados no existe.',
         ];
+    }
+
+    private function resolveRolId(): ?int
+    {
+        $encryptedId = $this->route('id');
+
+        if (! is_string($encryptedId) || $encryptedId === '') {
+            return null;
+        }
+
+        return decrypt_id($encryptedId);
     }
 }

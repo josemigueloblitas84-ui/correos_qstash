@@ -40,13 +40,13 @@
                             <td>{{ $permiso->created_at->format('d / M / Y H:i:s') }}</td>
                             <td>
                                 @can('editar permisos')
-                                <a href="{{ route('permisos.edit', $permiso->id) }}" class="btn btn-warning btn-sm">
+                                <a href="{{ route('permisos.edit', encrypt_id($permiso->id)) }}" class="btn btn-warning btn-sm">
                                     Editar
                                 </a>
                                 @endcan
 
                                 @can('eliminar permisos')
-                                <button onclick="eliminarPermiso({{ $permiso->id }})" class="btn btn-danger btn-sm">
+                                <button onclick="eliminarPermiso('{{ encrypt_id($permiso->id) }}')" class="btn btn-danger btn-sm">
                                     Eliminar
                                 </button>
                                 @endcan
@@ -63,7 +63,6 @@
 </div>
 
 @endsection
-
 
 @push('scripts')
 <script>

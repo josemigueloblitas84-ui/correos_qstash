@@ -60,14 +60,14 @@
 
                                         <td>
                                             @can('editar roles')
-                                                <a href="{{ route('roles.edit', $role->id) }}"
+                                                <a href="{{ route('roles.edit', encrypt_id($role->id)) }}"
                                                     class="btn btn-sm btn-warning">
                                                     Editar
                                                 </a>
                                             @endcan
 
                                             @can('eliminar roles')
-                                                <a href="javascript:void(0)" onclick="eliminarRol({{ $role->id }})"
+                                                <a href="javascript:void(0)" onclick="eliminarRol('{{ encrypt_id($role->id) }}')"
                                                     class="btn btn-sm btn-danger">
                                                     Eliminar
                                                 </a>
@@ -90,7 +90,6 @@
     </div>
 
 @endsection
-
 
 @push('scripts')
 <script>

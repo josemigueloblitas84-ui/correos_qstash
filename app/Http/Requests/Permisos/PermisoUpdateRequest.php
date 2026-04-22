@@ -22,7 +22,7 @@ class PermisoUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-        $id = $this->route('id');
+        $id = $this->resolvePermisoId();
 
         return [
             'name' => [
@@ -40,5 +40,16 @@ class PermisoUpdateRequest extends FormRequest
             'name.min' => 'El nombre del permiso debe tener al menos :min caracteres.',
             'name.unique' => 'El nombre del permiso ya existe.',
         ];
+    }
+
+    private function resolvePermisoId(): ?int
+    {
+        $encryptedId = $this->route('id');
+
+        if (! is_string($encryptedId) || $encryptedId === '') {
+            return null;
+        }
+
+        return decrypt_id($encryptedId);
     }
 }

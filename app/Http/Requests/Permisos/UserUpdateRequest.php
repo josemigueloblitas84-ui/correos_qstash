@@ -7,22 +7,14 @@ use Illuminate\Validation\Rule;
 
 class UserUpdateRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
-        $id = $this->route('id');
+        $id = $this->resolveUserId();
 
         return [
             'name' => ['required', 'min:3'],
@@ -82,5 +74,16 @@ class UserUpdateRequest extends FormRequest
             'telefono_contacto.digits_between' => 'El telefono de contacto no puede superar :max digitos.',
             'telefono_contacto.max' => 'El telefono de contacto no puede exceder el limite permitido.',
         ];
+    }
+
+    private function resolveUserId(): ?int
+    {
+        $encryptedId = $this->route('id');
+
+        if (! is_string($encryptedId) || $encryptedId === '') {
+            return null;
+        }
+
+        return decrypt_id($encryptedId);
     }
 }

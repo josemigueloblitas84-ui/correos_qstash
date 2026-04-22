@@ -16,7 +16,7 @@
 
             <div class="card">
                 <div class="card-body">
-                    <form action="{{ route('usuarios.permisos.update', $usuario->id) }}" method="POST">
+                    <form action="{{ route('usuarios.permisos.update', $encryptedId) }}" method="POST">
                         @csrf
 
                         <p class="text-body-secondary">

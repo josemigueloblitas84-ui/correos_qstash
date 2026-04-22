@@ -16,6 +16,48 @@
 
     let searchWasSubmitted = false;
     const canValidateInforme = Boolean(config.canValidateInforme);
+    const fechaDesdeField = document.getElementById('fecha_desde');
+const fechaHastaField = document.getElementById('fecha_hasta');
+
+    if (typeof $ !== 'undefined' && $.datepicker) {
+        $.datepicker.setDefaults({
+            closeText: 'Cerrar',
+            prevText: 'Anterior',
+            nextText: 'Siguiente',
+            currentText: 'Hoy',
+            monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+            monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+            dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+            dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+            dayNamesMin: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa'],
+            weekHeader: 'Sm',
+            firstDay: 1
+        });
+
+        $(fechaDesdeField).datepicker({
+            dateFormat: 'yy-mm-dd',
+            changeMonth: true,
+            changeYear: true,
+            onSelect: function (selectedDate) {
+                $(fechaHastaField).datepicker('option', 'minDate', selectedDate);
+            }
+        });
+
+        $(fechaHastaField).datepicker({
+            dateFormat: 'yy-mm-dd',
+            changeMonth: true,
+            changeYear: true
+        });
+
+        if (fechaDesdeField?.value) {
+            $(fechaDesdeField).datepicker('setDate', fechaDesdeField.value);
+            $(fechaHastaField).datepicker('option', 'minDate', fechaDesdeField.value);
+        }
+
+        if (fechaHastaField?.value) {
+            $(fechaHastaField).datepicker('setDate', fechaHastaField.value);
+        }
+    }
 
     function getFilters() {
         return {

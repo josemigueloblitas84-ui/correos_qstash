@@ -22,11 +22,13 @@
                             <div class="col-lg-3 col-md-6">
                                 <label for="fecha_desde" class="form-label reporte-label">Fecha Desde:</label>
                                 <input
-                                    type="date"
+                                    type="text"
                                     id="fecha_desde"
                                     name="fecha_desde"
                                     class="form-control reporte-input"
                                     value="{{ now()->format('Y-m-d') }}"
+                                    autocomplete="off"
+                                    readonly
                                 >
                                 <small class="text-muted">Ingrese la fecha de inicio.</small>
 
@@ -47,11 +49,13 @@
                             <div class="col-lg-3 col-md-6">
                                 <label for="fecha_hasta" class="form-label reporte-label">Fecha Hasta:</label>
                                 <input
-                                    type="date"
+                                    type="text"
                                     id="fecha_hasta"
                                     name="fecha_hasta"
                                     class="form-control reporte-input"
                                     value="{{ now()->format('Y-m-d') }}"
+                                    autocomplete="off"
+                                    readonly
                                 >
                                 <small class="text-muted">Ingrese la fecha final.</small>
                             </div>
@@ -164,6 +168,7 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/reporte_agenda_informe.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/plugins/jquery-ui/jquery-ui.min.css') }}">
 @endpush
 
 @push('scripts')
@@ -178,6 +183,6 @@
             canValidateInforme: @json($canValidateInforme)
         };
     </script>
-
+    <script src="{{ asset('assets/plugins/jquery-ui/jquery-ui.min.js') }}"></script>
     <script src="{{ asset('assets/js/reporte_agenda_informe.js') }}"></script>
 @endpush

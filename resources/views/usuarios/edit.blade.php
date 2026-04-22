@@ -20,7 +20,7 @@
             <div class="card card-primary">
                 <div class="card-body">
 
-                    <form action="{{ route('usuarios.update', $usuario->id) }}" method="POST" autocomplete="off">
+                    <form action="{{ route('usuarios.update', $encryptedId) }}" method="POST" autocomplete="off">
                         @csrf
 
                         <div class="mb-3">

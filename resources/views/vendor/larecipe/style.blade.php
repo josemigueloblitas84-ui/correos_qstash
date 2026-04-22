@@ -37,7 +37,8 @@
         font-optical-sizing: auto;
     }
 
-    :not(pre)>code[class*=language-], pre[class*=language-] {
+    :not(pre)>code[class*=language-],
+    pre[class*=language-] {
         border-top: 3px solid {{ config('larecipe.ui.colors.primary') }};
     }
 
@@ -307,6 +308,61 @@
         color: #25435f;
     }
 
+    .sidebar {
+        background: linear-gradient(180deg, #f7fbff 0%, #eef5fb 100%);
+        border-right: 1px solid #d8e5f0;
+        padding: 1.25rem 1rem;
+        min-width: 320px;
+    }
+
+    .sidebar h1 {
+        font-size: 1.1rem;
+        font-weight: 800;
+        line-height: 1.3;
+        color: #143d67;
+        margin: 0 0 1rem 0;
+        word-break: break-word;
+    }
+
+    .sidebar ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .sidebar li {
+        margin-bottom: 0.45rem;
+        list-style: none;
+    }
+
+    .sidebar li::before {
+        content: none !important;
+        display: none !important;
+    }
+
+    .sidebar a {
+        display: block;
+        padding: 0.6rem 0.8rem;
+        border-radius: 10px;
+        text-decoration: none;
+        color: #36536d;
+        font-weight: 600;
+        line-height: 1.45;
+        transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+    }
+
+    .sidebar a:hover {
+        background: rgba(31, 120, 173, 0.10);
+        color: #0f4c75;
+        transform: translateX(2px);
+    }
+
+    .sidebar a.active,
+    .sidebar a.router-link-active {
+        background: linear-gradient(135deg, #1f78ad 0%, #0f4c75 100%);
+        color: #ffffff;
+    }
+
     @media (max-width: 1280px) {
         .documentation > ul.page-toc {
             width: 18rem;
@@ -321,11 +377,21 @@
             max-width: none;
             margin: 0 0 1.5rem 0;
         }
+
+        .sidebar {
+            min-width: 100%;
+            padding: 1rem;
+        }
+
+        .sidebar h1 {
+            font-size: 1rem;
+        }
     }
+
     .documentation .page-toc a.is-current {
-    color: #1f78ad;
-    font-weight: 700;
-    position: relative;
+        color: #1f78ad;
+        font-weight: 700;
+        position: relative;
     }
 
     .documentation .page-toc a.is-current::before {
@@ -354,5 +420,4 @@
             transform: translateY(-50%) scale(0.92);
         }
     }
-
 </style>

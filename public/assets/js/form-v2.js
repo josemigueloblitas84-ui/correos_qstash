@@ -592,7 +592,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!solicitanteField || solicitanteField.tagName !== 'SELECT') {
             return;
         }
-        
+
         const selectedOption = solicitanteField?.options[solicitanteField.selectedIndex];
         const tipoPersonal = selectedOption?.dataset?.tipoPersonal || '';
 
@@ -1074,7 +1074,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const horaHasta = `${editActivityDailyToHourField?.value || ''}:${editActivityDailyToMinuteField?.value || ''}`;
 
         return {
-            agenda_id: Number(editActivityAgendaIdField?.value || currentAgendaId || 0),
+            agenda_id: String(editActivityAgendaIdField?.value || currentAgendaId || ''),
             actividad: editActivityNameField?.value?.trim() || '',
             departamento_id: editActivityDepartmentField?.value || '',
             tipo_actividad: tipo,

@@ -93,7 +93,7 @@ class AgendaController extends Controller
         if ($request->expectsJson()) {
             return response()->json([
                 'message' => 'Agenda registrada correctamente.',
-                'agenda_id' => $agendaId,
+                'agenda_id' => encrypt_id($agendaId),
             ]);
         }
 
@@ -102,13 +102,15 @@ class AgendaController extends Controller
             ->with('success', 'Agenda registrada correctamente.');
     }
 
-    public function edit(int $agenda): View
+    public function edit(string $agenda): View
     {
+        $agendaId = $this->resolveEncryptedOrNumericId($agenda);
+
         $agenda = (object) [ //Temporal
-            'id' => $agenda,
-            'codigo' => 'ART-00' . $agenda,
-            'nombre' => 'Agenda Demo ' . $agenda,
-            'descripcion' => 'Descripcion de prueba para la agenda demo ' . $agenda . '.',
+            'id' => $agendaId,
+            'codigo' => 'ART-00' . $agendaId,
+            'nombre' => 'Agenda Demo ' . $agendaId,
+            'descripcion' => 'Descripcion de prueba para la agenda demo ' . $agendaId . '.',
             'marca' => 'Marca Demo',
             'categoria_texto' => 'Categoria Demo',
             'estado' => 'activo',
@@ -121,10 +123,12 @@ class AgendaController extends Controller
         ]);
     }
 
-    public function update(Request $request, int $agenda): RedirectResponse
+    public function update(Request $request, string $agenda): RedirectResponse
     {
+        $agendaId = $this->resolveEncryptedOrNumericId($agenda);
+
         $data = $request->validate(
-            $this->rules($agenda), // Temporal mientras se define el modelo real
+            $this->rules($agendaId), // Temporal mientras se define el modelo real
             $this->messages()
         );
 
@@ -135,8 +139,10 @@ class AgendaController extends Controller
             ->with('success', 'Agenda actualizada correctamente.');
     }
 
-    public function destroy(int $agenda): RedirectResponse
+    public function destroy(string $agenda): RedirectResponse
     {
+        $agendaId = $this->resolveEncryptedOrNumericId($agenda);
+
         //$agenda->delete();
 
         return redirect()
@@ -210,26 +216,29 @@ class AgendaController extends Controller
                     ? Carbon::parse($row->fecha)
                     : null;
 
+                $encryptedId = e(encrypt_id((int) $row->id));
+
                 if ($fechaRegistro?->isSameDay(Carbon::today())) {
                     return '<div class="d-flex align-items-center" style="gap: 0.4rem;">'
-                        . '<button type="button" class="btn btn-danger btn-sm btn-eliminar-agenda" data-action="delete-agenda" data-id="' . $row->id . '" title="Eliminar agenda">'
+                        . '<button type="button" class="btn btn-danger btn-sm btn-eliminar-agenda" data-action="delete-agenda" data-id="' . $encryptedId . '" title="Eliminar agenda">'
                         . '<i class="fas fa-trash-alt"></i>'
                         . '</button>'
-                        . '<button type="button" class="btn btn-primary btn-sm btn-acceso-agenda" data-action="edit-agenda" data-id="' . $row->id . '" title="Abrir agenda">'
+                        . '<button type="button" class="btn btn-primary btn-sm btn-acceso-agenda" data-action="edit-agenda" data-id="' . $encryptedId . '" title="Abrir agenda">'
                         . '<i class="fas fa-plus"></i>'
                         . '</button>'
                         . '</div>';
                 }
 
-                return '<button type="button" class="btn btn-warning btn-sm btn-editar-agenda" data-action="edit-agenda" data-id="' . $row->id . '">Editar</button>';
+                return '<button type="button" class="btn btn-warning btn-sm btn-editar-agenda" data-action="edit-agenda" data-id="' . $encryptedId . '">Editar</button>';
             })
             ->rawColumns(['acciones'])
             ->make(true);
     }
 
-    public function showAgenda(int $id): JsonResponse
+    public function showAgenda(string $id): JsonResponse
     {
-        $agenda = $this->agendaService->findAccessibleById($id, auth()->user());
+        $agendaId = decrypt_id($id);
+        $agenda = $this->agendaService->findAccessibleById($agendaId, auth()->user());
 
         if (! $agenda) {
             return response()->json([
@@ -237,12 +246,16 @@ class AgendaController extends Controller
             ], 404);
         }
 
-        return response()->json($agenda);
+        $data = (array) $agenda;
+        $data['id'] = encrypt_id((int) $agenda->id);
+
+        return response()->json($data);
     }
 
-    public function previewAgenda(int $id)
+    public function previewAgenda(string $id)
     {
-        $previewData = $this->agendaService->getPreviewData($id);
+        $agendaId = decrypt_id($id);
+        $previewData = $this->agendaService->getPreviewData($agendaId);
 
         if (! $previewData) {
             abort(404, 'La agenda no existe.');
@@ -252,12 +265,13 @@ class AgendaController extends Controller
 
         return Pdf::loadView('agenda.partials.agenda-preview-document', $previewData)
             ->setPaper('a4', 'portrait')
-            ->stream('agenda-' . $id . '.pdf');
+            ->stream('agenda-' . $agendaId . '.pdf');
     }
 
-    public function destroyAgenda(int $id): JsonResponse
+    public function destroyAgenda(string $id): JsonResponse
     {
-        $agenda = $this->agendaService->findAccessibleById($id, auth()->user());
+        $agendaId = decrypt_id($id);
+        $agenda = $this->agendaService->findAccessibleById($agendaId, auth()->user());
 
         if (! $agenda) {
             return response()->json([
@@ -266,7 +280,7 @@ class AgendaController extends Controller
         }
 
         try {
-            $this->agendaService->destroy($id);
+            $this->agendaService->destroy($agendaId);
 
             return response()->json([
                 'message' => 'La agenda se elimino correctamente.',
@@ -280,9 +294,10 @@ class AgendaController extends Controller
         }
     }
 
-    public function sendAgenda(int $id): JsonResponse
+    public function sendAgenda(string $id): JsonResponse
     {
-        $agenda = $this->agendaService->findAccessibleById($id, auth()->user());
+        $agendaId = decrypt_id($id);
+        $agenda = $this->agendaService->findAccessibleById($agendaId, auth()->user());
 
         if (! $agenda) {
             return response()->json([
@@ -291,7 +306,7 @@ class AgendaController extends Controller
         }
 
         try {
-            $this->agendaService->send($id);
+            $this->agendaService->send($agendaId);
 
             return response()->json([
                 'message' => 'La agenda se envio correctamente.',
@@ -307,7 +322,10 @@ class AgendaController extends Controller
 
     public function agendaActividadesData(Request $request): JsonResponse
     {
-        $agendaId = $request->integer('agenda_id');
+        $agendaId = $request->filled('agenda_id')
+            ? decrypt_id((string) $request->query('agenda_id'))
+            : null;
+
         $tipo = strtoupper((string) $request->query('tipo', 'D'));
         $data = $this->agendaActividadService->getAllForDataTable($agendaId, $tipo);
 
@@ -331,18 +349,21 @@ class AgendaController extends Controller
                     : ($desde ?: $hasta);
             })
             ->addColumn('acciones', function ($row) {
+                $encryptedId = e(encrypt_id((int) $row->id));
+
                 return '<div class="d-flex gap-2">'
-                    . '<button type="button" class="btn btn-warning btn-sm btn-editar-actividad" data-action="edit-activity" data-id="' . $row->id . '">Editar</button>'
-                    . '<button type="button" class="btn btn-danger btn-sm btn-eliminar-actividad" data-action="delete-activity" data-id="' . $row->id . '">Eliminar</button>'
+                    . '<button type="button" class="btn btn-warning btn-sm btn-editar-actividad" data-action="edit-activity" data-id="' . $encryptedId . '">Editar</button>'
+                    . '<button type="button" class="btn btn-danger btn-sm btn-eliminar-actividad" data-action="delete-activity" data-id="' . $encryptedId . '">Eliminar</button>'
                     . '</div>';
             })
             ->rawColumns(['acciones'])
             ->make(true);
     }
 
-    public function showActividad(int $id): JsonResponse
+    public function showActividad(string $id): JsonResponse
     {
-        $actividad = $this->agendaActividadService->findById($id);
+        $activityId = decrypt_id($id);
+        $actividad = $this->agendaActividadService->findById($activityId);
 
         if (! $actividad) {
             return response()->json([
@@ -350,7 +371,11 @@ class AgendaController extends Controller
             ], 404);
         }
 
-        return response()->json($actividad);
+        $data = (array) $actividad;
+        $data['id'] = encrypt_id((int) $actividad->id);
+        $data['agenda_id'] = encrypt_id((int) $actividad->agenda_id);
+
+        return response()->json($data);
     }
 
     public function storeActividad(AgendaActividadStoreRequest $request): JsonResponse
@@ -362,23 +387,27 @@ class AgendaController extends Controller
 
         return response()->json([
             'message' => 'Actividad registrada correctamente.',
-            'actividad_id' => $actividadId,
+            'actividad_id' => encrypt_id($actividadId),
         ], 201);
     }
 
-    public function updateActividad(AgendaActividadStoreRequest $request, int $id): JsonResponse
+    public function updateActividad(AgendaActividadStoreRequest $request, string $id): JsonResponse
     {
-        $this->agendaActividadService->update($id, $request->validated());
+        $activityId = decrypt_id($id);
+
+        $this->agendaActividadService->update($activityId, $request->validated());
 
         return response()->json([
             'message' => 'Actividad actualizada correctamente.',
-            'actividad_id' => $id,
+            'actividad_id' => encrypt_id($activityId),
         ]);
     }
 
-    public function destroyActividad(int $id): JsonResponse
+    public function destroyActividad(string $id): JsonResponse
     {
-        $this->agendaActividadService->destroy($id);
+        $activityId = decrypt_id($id);
+
+        $this->agendaActividadService->destroy($activityId);
 
         return response()->json([
             'message' => 'Actividad eliminada correctamente.',
@@ -398,16 +427,31 @@ class AgendaController extends Controller
         );
     }
 
-    public function usuariosPorDepartamento($id): JsonResponse
+    public function usuariosPorDepartamento(string $id): JsonResponse
     {
+        $departamentoId = $this->resolveEncryptedOrNumericId($id);
+
         $usuarios = User::query()
             ->leftJoin('tipos_personal', 'users.tipo_personal_id', '=', 'tipos_personal.id')
-            ->where('users.departamento_id', $id)
+            ->where('users.departamento_id', $departamentoId)
             ->where('users.estado', 1)
             ->orderBy('users.name', 'asc')
             ->get(['users.id', 'users.name', 'tipos_personal.tipo as tipo_personal_nombre']);
 
         return response()->json($usuarios);
+    }
+
+    private function resolveEncryptedOrNumericId(string|int $value): int
+    {
+        if (is_int($value)) {
+            return $value;
+        }
+
+        if (ctype_digit($value)) {
+            return (int) $value;
+        }
+
+        return decrypt_id($value);
     }
 
 }
