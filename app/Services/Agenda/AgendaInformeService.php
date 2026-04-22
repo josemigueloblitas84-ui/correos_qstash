@@ -6,6 +6,7 @@ use App\Exceptions\AgendaInformeException;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use App\Services\Support\ActivityLogger;
 use Throwable;
 
 class AgendaInformeService
@@ -107,8 +108,22 @@ class AgendaInformeService
                 $fecha = $data['fecha'];
                 $hoy = now()->toDateString();
                 $ahora = now();
+                $programadasProcesadas = [];
+                $noProgramadasEliminadas = DB::table('agenda_actividad_informe')
+                    ->where('usuario_id', $userId)
+                    ->whereDate('fecha_actividad', $fecha)
+                    ->where('tipo_actividad', 'P')
+                    ->get(['id', 'agenda_id', 'actividad', 'departamento_id'])
+                    ->map(fn ($row) => (array) $row)
+                    ->all();
 
                 foreach ($data['programadas'] ?? [] as $item) {
+                    $existenteId = DB::table('agenda_actividad_informe')
+                        ->where('agenda_actividad_id', $item['agenda_actividad_id'])
+                        ->whereDate('fecha_actividad', $fecha)
+                        ->where('tipo_actividad', $item['tipo_actividad'])
+                        ->value('id');
+
                     DB::table('agenda_actividad_informe')->updateOrInsert(
                         [
                             'agenda_actividad_id' => $item['agenda_actividad_id'],
@@ -132,6 +147,15 @@ class AgendaInformeService
                             'created_at' => $ahora,
                         ]
                     );
+                    $programadasProcesadas[] = [
+                        'agenda_actividad_id' => (int) $item['agenda_actividad_id'],
+                        'agenda_id' => (int) $item['agenda_id'],
+                        'tipo_actividad' => $item['tipo_actividad'],
+                        'actividad' => trim($item['actividad']),
+                        'departamento_id' => (int) $item['departamento_id'],
+                        'estado' => !empty($item['estado']) ? 1 : 0,
+                        'accion' => $existenteId ? 'updated' : 'created',
+                    ];
                 }
 
                 DB::table('agenda_actividad_informe')
@@ -171,6 +195,33 @@ class AgendaInformeService
                 if (!empty($noProgramadas)) {
                     DB::table('agenda_actividad_informe')->insert($noProgramadas);
                 }
+                ActivityLogger::log(
+                    'Informe de agenda sincronizado',
+                    [
+                        'old' => [
+                            'no_programadas_reemplazadas' => $noProgramadasEliminadas,
+                        ],
+                        'attributes' => [
+                            'fecha' => $fecha,
+                            'user_id' => $userId,
+                            'programadas_count' => count($programadasProcesadas),
+                            'no_programadas_count' => count($noProgramadas),
+                            'programadas' => $programadasProcesadas,
+                            'no_programadas_nuevas' => array_map(
+                                fn ($item) => [
+                                    'agenda_id' => (int) $item['agenda_id'],
+                                    'actividad' => $item['actividad'],
+                                    'departamento_id' => (int) $item['departamento_id'],
+                                ],
+                                $noProgramadas
+                            ),
+                        ],
+                    ],
+                    null,
+                    null,
+                    'agenda_informes',
+                    'synced'
+                );
             });
         } catch (AgendaInformeException $exception) {
             throw $exception;
@@ -205,6 +256,25 @@ class AgendaInformeService
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+            ActivityLogger::log(
+                'Actividad no programada registrada',
+                [
+                    'attributes' => [
+                        'id' => $id,
+                        'agenda_id' => (int) $data['agenda_id'],
+                        'fecha_actividad' => $data['fecha'],
+                        'actividad' => trim($data['actividad']),
+                        'departamento_id' => (int) $data['departamento_id'],
+                        'departamento_nombre' => $departamento?->nombre_depa,
+                        'tipo_actividad' => 'P',
+                        'usuario_id' => $userId,
+                    ],
+                ],
+                null,
+                null,
+                'agenda_informes',
+                'created'
+            );
 
             return [
                 'id' => $id,

@@ -4,6 +4,7 @@ namespace App\Services\Reportes;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use App\Services\Support\ActivityLogger;
 
 class ReporteAgendaInformeService
 {
@@ -247,6 +248,25 @@ class ReporteAgendaInformeService
                     'usuario_actualizador_id' => $validadorId,
                     'updated_at' => now(),
                 ]);
+                ActivityLogger::log(
+                    'Informe de agenda validado',
+                    [
+                        'attributes' => [
+                            'fecha_actividad' => $fechaActividad,
+                            'usuario_id' => $usuarioId,
+                            'validador_id' => $validadorId,
+                            'agenda_id' => $agenda->agenda_id,
+                            'registro_horas_validada_id' => $registroHoraId,
+                            'actividad_ids' => $actividadIds,
+                            'total_horas' => $totalHoras,
+                            'validada_encargado' => 1,
+                        ],
+                    ],
+                    null,
+                    null,
+                    'agenda_informes',
+                    'validated'
+                );
         });
     }
 }

@@ -24,8 +24,32 @@ class ConfiguracionSistemaService
             return new ConfiguracionSistema($this->getDefaultAttributes());
         }
 
-        return ConfiguracionSistema::query()->first()
-            ?? ConfiguracionSistema::query()->create($this->getDefaultAttributes());
+        $configuracion = ConfiguracionSistema::query()->first();
+
+        if($configuracion) {
+            return $configuracion;
+        }
+
+        $configuracion = ConfiguracionSistema::query()->create($this->getDefaultAttributes());
+
+        ActivityLogger::log(
+            'Configuracion inicial del sistema creada',
+            [
+                'attributes' => [
+                    'id' => $configuracion->id,
+                    'nombre_institucion' => $configuracion->nombre_institucion,
+                    'correo_institucional' => $configuracion->correo_institucional,
+                    'celular_institucional' => $configuracion->celular_institucional,
+                    'logo_principal' => $configuracion->logo_principal,
+                    'logo_pdf' => $configuracion->logo_pdf,
+                ],
+            ],
+            $configuracion,
+            null,
+            'configuracion_sistema',
+            'created'
+        );
+        return $configuracion;
     }
 
     public function update(array $data): ConfiguracionSistema
@@ -181,15 +205,39 @@ class ConfiguracionSistemaService
 
             $absolutePath = public_path($normalizedPath);
 
-            if (File::exists($absolutePath)) {
-                File::delete($absolutePath);
+            if(File::exists($absolutePath) && File::delete($absolutePath)) {
+                ActivityLogger::log(
+                    'Archivo de configuracion eliminado',
+                    [
+                        'attributes' => [
+                            'path' => $normalizedPath,
+                            'disk' => 'public_path',
+                        ],
+                    ],
+                    null,
+                    null,
+                    'configuracion_sistema',
+                    'file_deleted'
+                );
             }
 
             return;
         }
 
-        if (Storage::disk(self::DISK)->exists($normalizedPath)) {
-            Storage::disk(self::DISK)->delete($normalizedPath);
+        if (Storage::disk(self::DISK)->exists($normalizedPath) && Storage::disk(self::DISK)->delete($normalizedPath)) {
+            ActivityLogger::log(
+                'Archivo de configuracion eliminado',
+                [
+                    'attributes' => [
+                        'path' => $normalizedPath,
+                        'disk' => self::DISK,
+                    ],
+                ],
+                null,
+                null,
+                'configuracion_sistema',
+                'file_deleted'
+            );
         }
     }
 

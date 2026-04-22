@@ -69,7 +69,7 @@ class AgendaActividadService
                 $agenda = $this->findAgendaOrFail((int) $data['agenda_id']);
                 [$fechaDel, $fechaHasta, $horaDesde, $horaHasta] = $this->resolveActivitySchedule($data, $agenda);
 
-                return DB::table('agenda_actividades')->insertGetId([
+                $actividadId = DB::table('agenda_actividades')->insertGetId([
                     'agenda_id' => $agenda->id,
                     'fecha_del' => $fechaDel,
                     'fecha_hasta' => $fechaHasta,
@@ -88,6 +88,28 @@ class AgendaActividadService
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
+                ActivityLogger::log(
+                    'Actividad de agenda creada',
+                    [
+                        'attributes' => [
+                            'id' => $actividadId,
+                            'agenda_id' => $agenda->id,
+                            'actividad' => trim($data['actividad']),
+                            'departamento_id' => $data['departamento_id'],
+                            'tipo_actividad' => $data['tipo_actividad'],
+                            'fecha_del' => $fechaDel,
+                            'fecha_hasta' => $fechaHasta,
+                            'hora_desde_actividad' => $horaDesde,
+                            'hora_hasta_actividad' => $horaHasta,
+                            'usuario_id' => $userId,
+                        ],
+                    ],
+                    null,
+                    null,
+                    'agenda_actividades',
+                    'created'
+                );
+                return $actividadId;
             });
         } catch (AgendaActividadException $exception) {
             throw $exception;
@@ -106,7 +128,7 @@ class AgendaActividadService
                 $agenda = $this->findAgendaOrFail((int) $data['agenda_id']);
                 [$fechaDel, $fechaHasta, $horaDesde, $horaHasta] = $this->resolveActivitySchedule($data, $agenda);
 
-                DB::table('agenda_actividades')
+                $updated = DB::table('agenda_actividades')
                     ->where('id', $actividad->id)
                     ->update([
                         'fecha_del' => $fechaDel,
@@ -118,6 +140,40 @@ class AgendaActividadService
                         'tipo_actividad' => $data['tipo_actividad'],
                         'updated_at' => now(),
                     ]);
+
+                if ($updated > 0) {
+                    ActivityLogger::log(
+                        'Actividad de agenda actualizada',
+                        [
+                            'old' => [
+                                'id' => $actividad->id,
+                                'agenda_id' => $actividad->agenda_id,
+                                'actividad' => $actividad->actividad,
+                                'departamento_id' => $actividad->departamento_id,
+                                'tipo_actividad' => $actividad->tipo_actividad,
+                                'fecha_del' => $actividad->fecha_del,
+                                'fecha_hasta' => $actividad->fecha_hasta,
+                                'hora_desde_actividad' => $actividad->hora_desde_actividad,
+                                'hora_hasta_actividad' => $actividad->hora_hasta_actividad,
+                            ],
+                            'attributes' => [
+                                'id' => $actividad->id,
+                                'agenda_id' => $agenda->id,
+                                'actividad' => trim($data['actividad']),
+                                'departamento_id' => $data['departamento_id'],
+                                'tipo_actividad' => $data['tipo_actividad'],
+                                'fecha_del' => $fechaDel,
+                                'fecha_hasta' => $fechaHasta,
+                                'hora_desde_actividad' => $horaDesde,
+                                'hora_hasta_actividad' => $horaHasta,
+                            ],
+                        ],
+                        null,
+                        null,
+                        'agenda_actividades',
+                        'updated'
+                    );
+                }
             });
         } catch (AgendaActividadException $exception) {
             throw $exception;
@@ -134,9 +190,32 @@ class AgendaActividadService
             DB::transaction(function () use ($id) {
                 $actividad = $this->findActivityOrFail($id);
 
-                DB::table('agenda_actividades')
+                $deleted = DB::table('agenda_actividades')
                     ->where('id', $actividad->id)
                     ->delete();
+                    if ($deleted > 0) {
+                        ActivityLogger::log(
+                            'Actividad de agenda eliminada',
+                            [
+                                'old' => [
+                                    'id' => $actividad->id,
+                                    'agenda_id' => $actividad->agenda_id,
+                                    'actividad' => $actividad->actividad,
+                                    'departamento_id' => $actividad->departamento_id,
+                                    'tipo_actividad' => $actividad->tipo_actividad,
+                                    'fecha_del' => $actividad->fecha_del,
+                                    'fecha_hasta' => $actividad->fecha_hasta,
+                                    'hora_desde_actividad' => $actividad->hora_desde_actividad,
+                                    'hora_hasta_actividad' => $actividad->hora_hasta_actividad,
+                                    'usuario_id' => $actividad->usuario_id,
+                                ],
+                            ],
+                            null,
+                            null,
+                            'agenda_actividades',
+                            'deleted'
+                        );
+                    }
             });
         } catch (AgendaActividadException $exception) {
             throw $exception;
