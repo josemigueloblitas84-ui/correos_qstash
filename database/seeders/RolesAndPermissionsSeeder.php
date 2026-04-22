@@ -44,6 +44,9 @@ class RolesAndPermissionsSeeder extends Seeder
         $superAdminRole = Role::findOrCreate('SuperAdministrador', 'web');
         $superAdminRole->syncPermissions(Permission::query()->pluck('name')->all());
 
+        Role::findOrCreate('Usuario', 'web');
+        Role::findOrCreate('Validador', 'web');
+
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 }
