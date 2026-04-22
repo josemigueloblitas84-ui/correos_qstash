@@ -17,7 +17,7 @@ use App\Http\Controllers\Reportes\ReporteAgendaInformeController;
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes
+| Web Routes Oblitas
 |--------------------------------------------------------------------------
 */
 
