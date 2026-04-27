@@ -46,7 +46,7 @@ class PermisosController extends Controller
         $this->permisoService->storePermiso($request);
 
         return redirect()->route('permisos.index')
-            ->with('success', 'Permiso creado exitosamente');
+            ->with('permission_created', 'Permiso creado exitosamente');
     }
 
     // este metodo mostrara la vista de editar permisos
@@ -70,7 +70,7 @@ class PermisosController extends Controller
         $this->permisoService->updatePermiso($permiso, $request);
 
         return redirect()->route('permisos.index')
-            ->with('success', 'Permiso actualizado exitosamente');
+            ->with('permission_updated', 'Permiso actualizado exitosamente');
     }
 
     // este metodo eliminara el permiso de la base de datos
@@ -80,13 +80,17 @@ class PermisosController extends Controller
         $permiso = Permission::find($idPermiso);
 
         if ($permiso == null) {
-            session()->flash('error', 'El permiso no existe');
-            return response()->json(['status' => false]);
+            return response()->json([
+                'status' => false,
+                'message' => 'El permiso no existe.',
+            ], 404);
         }
 
         $this->permisoService->destroyPermiso($permiso);
 
-        session()->flash('success', 'Permiso eliminado exitosamente');
-        return response()->json(['status' => true]);
+        return response()->json([
+            'status' => true,
+            'message' => 'Permiso eliminado exitosamente.',
+        ]);
     }
 }

@@ -42,24 +42,51 @@
                                     @enderror
                                 </div>
 
-                                <div class="mb-3">
-                                    <label for="contrasenaUsuario" class="form-label fw-bold">Contraseña:</label>
-                                    <input type="password" class="form-control"
-                                        id="contrasenaUsuario" placeholder="Ingrese la contraseña del usuario"
-                                        name="contrasenaUsuario">
-                                    @error('contrasenaUsuario')
-                                        <small class="text-danger">{{ $message }}</small>
-                                    @enderror
-                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="contrasenaUsuario" class="form-label fw-bold">Contraseña:</label>
+                                            <div class="position-relative">
+                                                <input type="password" class="form-control pe-5"
+                                                    id="contrasenaUsuario" placeholder="Ingrese la contraseña del usuario"
+                                                    name="contrasenaUsuario">
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-link text-secondary position-absolute top-50 end-0 translate-middle-y me-2 p-0 js-toggle-password"
+                                                    data-target="contrasenaUsuario"
+                                                    aria-label="Mostrar u ocultar contraseña">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                            <small class="text-muted d-block mt-1">
+                                                Debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo.
+                                            </small>
+                                            @error('contrasenaUsuario')
+                                                <small class="text-danger">{{ $message }}</small>
+                                            @enderror
+                                        </div>
+                                    </div>
 
-                                <div class="mb-3">
-                                    <label for="confirmar_contrasenaUsuario" class="form-label fw-bold">Confirmar Contraseña:</label>
-                                    <input type="password" class="form-control"
-                                        id="confirmar_contrasenaUsuario" placeholder="Confirme la contraseña del usuario"
-                                        name="confirmar_contrasenaUsuario">
-                                    @error('confirmar_contrasenaUsuario')
-                                        <small class="text-danger">{{ $message }}</small>
-                                    @enderror
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="confirmar_contrasenaUsuario" class="form-label fw-bold">Confirmar Contraseña:</label>
+                                            <div class="position-relative">
+                                                <input type="password" class="form-control pe-5"
+                                                    id="confirmar_contrasenaUsuario" placeholder="Confirme la contraseña del usuario"
+                                                    name="confirmar_contrasenaUsuario">
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-link text-secondary position-absolute top-50 end-0 translate-middle-y me-2 p-0 js-toggle-password"
+                                                    data-target="confirmar_contrasenaUsuario"
+                                                    aria-label="Mostrar u ocultar confirmación de contraseña">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                            @error('confirmar_contrasenaUsuario')
+                                                <small class="text-danger">{{ $message }}</small>
+                                            @enderror
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="row">
@@ -157,3 +184,26 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.js-toggle-password').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    const targetId = this.getAttribute('data-target');
+                    const input = document.getElementById(targetId);
+                    const icon = this.querySelector('i');
+
+                    if (!input || !icon) {
+                        return;
+                    }
+
+                    const isPassword = input.type === 'password';
+                    input.type = isPassword ? 'text' : 'password';
+                    icon.classList.toggle('fa-eye', !isPassword);
+                    icon.classList.toggle('fa-eye-slash', isPassword);
+                });
+            });
+        });
+    </script>
+@endpush

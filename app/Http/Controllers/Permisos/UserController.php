@@ -73,7 +73,7 @@ class UserController extends Controller
     {
         $this->userService->userStore($request);
 
-        return redirect()->route('usuarios.index')->with('success', 'Usuario creado exitosamente');
+        return redirect()->route('usuarios.index')->with('user_created', 'Usuario creado exitosamente');
     }
 
     public function edit(string $id)
@@ -102,7 +102,7 @@ class UserController extends Controller
 
         $this->userService->userUpdate($usuario, $request);
 
-        return redirect()->route('usuarios.index')->with('success', 'Usuario actualizado exitosamente');
+        return redirect()->route('usuarios.index')->with('user_updated', 'Usuario actualizado exitosamente');
     }
 
     public function editPermisosEspeciales(string $id)

@@ -167,6 +167,36 @@
 @endpush
 
 @push('scripts')
+    @if (session('user_created'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Usuario creado',
+                    text: @json(session('user_created')),
+                    confirmButtonText: 'Aceptar',
+                    timer: 2600,
+                    timerProgressBar: true
+                });
+            });
+        </script>
+    @endif
+
+    @if (session('user_updated'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Usuario actualizado',
+                    text: @json(session('user_updated')),
+                    confirmButtonText: 'Aceptar',
+                    timer: 2600,
+                    timerProgressBar: true
+                });
+            });
+        </script>
+    @endif
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('.js-toggle-estado-usuario').forEach(function (input) {

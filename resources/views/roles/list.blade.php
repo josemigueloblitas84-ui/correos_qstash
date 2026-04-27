@@ -113,8 +113,46 @@
         });
     });
 
+    @if (session('role_created'))
+    document.addEventListener('DOMContentLoaded', function () {
+        Swal.fire({
+            icon: 'success',
+            title: 'Rol creado',
+            text: @json(session('role_created')),
+            confirmButtonText: 'Aceptar',
+            timer: 2600,
+            timerProgressBar: true
+        });
+    });
+    @endif
+
+    @if (session('role_updated'))
+    document.addEventListener('DOMContentLoaded', function () {
+        Swal.fire({
+            icon: 'success',
+            title: 'Rol actualizado',
+            text: @json(session('role_updated')),
+            confirmButtonText: 'Aceptar',
+            timer: 2600,
+            timerProgressBar: true
+        });
+    });
+    @endif
+
     function eliminarRol(id) {
-        if (confirm('¿Desea eliminar el rol?')) {
+        Swal.fire({
+            icon: 'warning',
+            title: '¿Desea eliminar el rol?',
+            text: 'Esta accion no se puede deshacer.',
+            showCancelButton: true,
+            confirmButtonText: 'Si, eliminar',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
+        }).then((result) => {
+            if (!result.isConfirmed) {
+                return;
+            }
+
             $.ajax({
                 url: '{{ route('roles.destroy') }}',
                 type: 'DELETE',
@@ -123,11 +161,30 @@
                 headers: {
                     'X-CSRF-TOKEN': "{{ csrf_token() }}"
                 },
-                success: function() {
-                    window.location.href = '{{ route('roles.index') }}';
+                success: function(response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Rol eliminado',
+                        text: response.message,
+                        confirmButtonText: 'Aceptar',
+                        timer: 2200,
+                        timerProgressBar: true
+                    }).then(() => {
+                        window.location.href = '{{ route('roles.index') }}';
+                    });
+                },
+                error: function(xhr) {
+                    const response = xhr.responseJSON || {};
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'No se pudo eliminar',
+                        text: response.message || 'Ocurrio un error al eliminar el rol.',
+                        confirmButtonText: 'Aceptar'
+                    });
                 }
             });
-        }
+        });
     }
 </script>
 @endpush

@@ -60,13 +60,25 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="contrasenaUsuario" class="form-label">Nueva contrasena:</label>
+                                    <label for="contrasenaUsuario" class="form-label">Nueva contraseña:</label>
+                                    <div class="position-relative">
                                     <input
                                         name="contrasenaUsuario"
                                         id="contrasenaUsuario"
                                         type="password"
                                         placeholder="Deje en blanco para mantener la actual"
-                                        class="form-control @error('contrasenaUsuario') is-invalid @enderror">
+                                        class="form-control pe-5 @error('contrasenaUsuario') is-invalid @enderror">
+                                    <button
+                                        type="button"
+                                        class="btn btn-link text-secondary position-absolute top-50 end-0 translate-middle-y me-2 p-0 js-toggle-password"
+                                        data-target="contrasenaUsuario"
+                                        aria-label="Mostrar u ocultar contraseña">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    </div>
+                                    <small class="text-muted d-block mt-1">
+                                        Si actualiza la contraseña, debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo.
+                                    </small>
 
                                     @error('contrasenaUsuario')
                                         <div class="invalid-feedback d-block">
@@ -78,13 +90,22 @@
 
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="confirmar_contrasenaUsuario" class="form-label">Confirmar nueva contrasena:</label>
+                                    <label for="confirmar_contrasenaUsuario" class="form-label">Confirmar nueva contraseña:</label>
+                                    <div class="position-relative">
                                     <input
                                         name="confirmar_contrasenaUsuario"
                                         id="confirmar_contrasenaUsuario"
                                         type="password"
-                                        placeholder="Repita la nueva contrasena"
-                                        class="form-control @error('confirmar_contrasenaUsuario') is-invalid @enderror">
+                                        placeholder="Repita la nueva contraseña"
+                                        class="form-control pe-5 @error('confirmar_contrasenaUsuario') is-invalid @enderror">
+                                    <button
+                                        type="button"
+                                        class="btn btn-link text-secondary position-absolute top-50 end-0 translate-middle-y me-2 p-0 js-toggle-password"
+                                        data-target="confirmar_contrasenaUsuario"
+                                        aria-label="Mostrar u ocultar confirmación de contraseña">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    </div>
 
                                     @error('confirmar_contrasenaUsuario')
                                         <div class="invalid-feedback d-block">
@@ -247,3 +268,26 @@
     </div>
 
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.js-toggle-password').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    const targetId = this.getAttribute('data-target');
+                    const input = document.getElementById(targetId);
+                    const icon = this.querySelector('i');
+
+                    if (!input || !icon) {
+                        return;
+                    }
+
+                    const isPassword = input.type === 'password';
+                    input.type = isPassword ? 'text' : 'password';
+                    icon.classList.toggle('fa-eye', !isPassword);
+                    icon.classList.toggle('fa-eye-slash', isPassword);
+                });
+            });
+        });
+    </script>
+@endpush

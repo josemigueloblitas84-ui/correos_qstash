@@ -47,7 +47,7 @@ class RolController extends Controller
         $this->rolService->storeRol($request);
 
         return redirect()->route('roles.index')
-            ->with('success', 'Rol creado exitosamente');
+            ->with('role_created', 'Rol creado exitosamente');
     }
 
     public function edit(string $id)
@@ -73,7 +73,7 @@ class RolController extends Controller
         $this->rolService->updateRol($role, $request);
 
         return redirect()->route('roles.index')
-            ->with('success', 'Rol actualizado exitosamente');
+            ->with('role_updated', 'Rol actualizado exitosamente');
     }
 
     public function destroy(Request $request)
@@ -82,15 +82,17 @@ class RolController extends Controller
         $role = Role::find($idRol);
 
         if ($role == null) {
-            session()->flash('error', 'Rol no encontrado');
-
-            return response()->json(['status' => false]);
+            return response()->json([
+                'status' => false,
+                'message' => 'Rol no encontrado.',
+            ], 404);
         }
 
         $this->rolService->destroyRol($role);
 
-        session()->flash('success', 'Rol eliminado exitosamente');
-
-        return response()->json(['status' => true]);
+        return response()->json([
+            'status' => true,
+            'message' => 'Rol eliminado exitosamente.',
+        ]);
     }
 }
