@@ -23,6 +23,8 @@ class UserService
         $usuario->password = Hash::make($request->contrasenaUsuario);
         $usuario->departamento_id = $request->departamento_id;
         $usuario->tipo_personal_id = $request->tipo_personal_id;
+        $usuario->institucion_id = $request->institucion_id;
+        $usuario->sede_id = $request->sede_id;
         $usuario->cod_estudiante = $request->cod_estudiante;
         $usuario->cantidad_horas_totales = $request->cantidad_horas_totales;
         $usuario->celular = $request->celular;
@@ -39,6 +41,8 @@ class UserService
                     'id' => $usuario->id,
                     'name' => $usuario->name,
                     'email' => $usuario->email,
+                    'institucion_id' => $usuario->institucion_id,
+                    'sede_id' => $usuario->sede_id,
                     'cod_estudiante' => $usuario->cod_estudiante,
                     'cantidad_horas_totales' => $usuario->cantidad_horas_totales,
                     'celular' => $usuario->celular,
@@ -62,6 +66,8 @@ class UserService
             'email' => $usuario->email,
             'departamentos_id' => $usuario->departamento_id,
             'tipo_personal_id' => $usuario->tipo_personal_id,
+            'institucion_id' => $usuario->institucion_id,
+            'sede_id' => $usuario->sede_id,
             'cod_estudiante' => $usuario->cod_estudiante,
             'cantidad_horas_totales' => $usuario->cantidad_horas_totales,
             'celular' => $usuario->celular,
@@ -73,6 +79,8 @@ class UserService
         $usuario->email = $request->email;
         $usuario->departamento_id = $request->departamento_id;
         $usuario->tipo_personal_id = $request->tipo_personal_id;
+        $usuario->institucion_id = $request->institucion_id;
+        $usuario->sede_id = $request->sede_id;
         $usuario->cod_estudiante = $request->cod_estudiante;
         $usuario->cantidad_horas_totales = $request->cantidad_horas_totales;
         $usuario->celular = $request->celular;
@@ -95,6 +103,8 @@ class UserService
                     'email' => $usuario->email,
                     'departamento_id' => $usuario->departamento_id,
                     'tipo_personal_id' => $usuario->tipo_personal_id,
+                    'institucion_id' => $usuario->institucion_id,
+                    'sede_id' => $usuario->sede_id,
                     'cod_estudiante' => $usuario->cod_estudiante,
                     'cantidad_horas_totales' => $usuario->cantidad_horas_totales,
                     'celular' => $usuario->celular,

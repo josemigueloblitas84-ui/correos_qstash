@@ -98,6 +98,11 @@
                                     </div>
                                 </div>
 
+                                @include('usuarios.partials.institucion-sede-fields', [
+                                    'selectedInstitucionId' => old('institucion_id'),
+                                    'selectedSedeId' => old('sede_id'),
+                                ])
+
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="mb-3">

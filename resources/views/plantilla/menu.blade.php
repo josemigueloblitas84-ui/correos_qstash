@@ -138,6 +138,22 @@
                     @endcan
                 </li>
                 <li class="nav-item">
+                    @can('ver instituciones')
+                    <a href="{{ route('instituciones.index') }}" class="nav-link {{ request()->routeIs('instituciones.*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-university"></i>
+                        <p>Instituciones</p>
+                    </a>
+                    @endcan
+                </li>
+                <li class="nav-item">
+                    @can('ver sedes')
+                    <a href="{{ route('sedes.index') }}" class="nav-link {{ request()->routeIs('sedes.*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-map-marker-alt"></i>
+                        <p>Sedes</p>
+                    </a>
+                    @endcan
+                </li>
+                <li class="nav-item">
                     @can('ver tipos de personal')
                     <a href="{{ route('tipos-personal.index') }}" class="nav-link {{ request()->routeIs('tipos-personal.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-user-graduate"></i>

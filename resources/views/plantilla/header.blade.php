@@ -135,7 +135,28 @@
             </li> --}}
             <!--end::Notifications Dropdown Menu-->
 
-            <!--begin::Fullscreen Toggle-->
+
+
+            <li class="nav-item d-flex align-items-center me-2 me-md-3">
+                <div class="text-end lh-sm">
+                    <span class="d-none d-md-inline fw-semibold text-body-secondary">
+                        {{ $authUserUbicacion->institucion_nombre ?? 'Sin institucion' }}
+                        -
+                        {{ $authUserUbicacion->sede_nombre ?? 'Sin sede' }}
+                    </span>
+
+                    <div class="d-flex d-md-none flex-column text-end">
+                        <span class="fw-semibold text-body-secondary">
+                            {{ $authUserUbicacion->institucion_nombre ?? 'Sin institucion' }}
+                        </span>
+                        <span class="small text-muted">
+                            {{ $authUserUbicacion->sede_nombre ?? 'Sin sede' }}
+                        </span>
+                    </div>
+                </div>
+            </li>
+
+              <!--begin::Fullscreen Toggle-->
             <li class="nav-item">
                 <a class="nav-link" href="#" data-lte-toggle="fullscreen">
                     <i data-lte-icon="maximize" class="bi bi-arrows-fullscreen"></i>

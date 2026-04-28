@@ -11,6 +11,8 @@ use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\Agenda\DepartamentoController;
+use App\Http\Controllers\Agenda\InstitucionController;
+use App\Http\Controllers\Agenda\SedeController;
 use App\Http\Controllers\Agenda\TipoPersonalController;
 use App\Http\Controllers\Agenda\InformeController;
 use App\Http\Controllers\Reportes\ReporteAgendaInformeController;
@@ -76,6 +78,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('usuarios')->name('usuarios.')->controller(UserController::class)->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
+        Route::get('/institucion/{id}/sedes', 'sedesPorInstitucion')->whereNumber('id')->name('sedes.institucion');
         Route::post('/', 'store')->name('store');
         Route::get('/{id}/edit', 'edit')->name('edit');
         Route::post('/{id}', 'update')->name('update');
@@ -120,6 +123,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/{id}', 'update')->name('update');
         Route::get('/{id}', 'show')->name('show');
         Route::patch('/{id}/toggle-status', 'toggleStatus')->name('toggle-status');
+        Route::delete('/{id}', 'destroy')->name('destroy');
+    });
+
+    Route::prefix('instituciones')->name('instituciones.')->controller(InstitucionController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/data', 'data')->name('data');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{id}/sedes', 'editSedes')->name('sedes.edit');
+        Route::put('/{id}/sedes', 'updateSedes')->name('sedes.update');
+        Route::get('/{id}', 'show')->name('show');
+        Route::put('/{id}', 'update')->name('update');
+        Route::delete('/{id}', 'destroy')->name('destroy');
+    });
+
+    Route::prefix('sedes')->name('sedes.')->controller(SedeController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/data', 'data')->name('data');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{id}', 'show')->name('show');
+        Route::put('/{id}', 'update')->name('update');
         Route::delete('/{id}', 'destroy')->name('destroy');
     });
 
