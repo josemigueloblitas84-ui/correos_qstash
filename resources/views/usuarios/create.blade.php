@@ -2,6 +2,28 @@
 
 @section('title', 'Usuarios / Crear')
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('assets/css/passValidator.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/plugins/flag-icon-css/css/flag-icons.min.css') }}">
+@endpush
+
+@php
+    $phoneUtil = \libphonenumber\PhoneNumberUtil::getInstance();
+
+    $countryOptions = collect($phoneUtil->getSupportedRegions())
+        ->mapWithKeys(function (string $region) use ($phoneUtil) {
+            $countryName = \Locale::getDisplayRegion('-' . $region, 'es') ?: $region;
+            $dialCode = $phoneUtil->getCountryCodeForRegion($region);
+
+            return [
+                $region => $countryName . ' (+' . $dialCode . ')',
+            ];
+        })
+        ->sort()
+        ->all();
+@endphp
+
 @section('content')
 
     <div class="app-content-header">
@@ -46,13 +68,13 @@
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label for="contrasenaUsuario" class="form-label fw-bold">Contraseña:</label>
-                                            <div class="position-relative">
-                                                <input type="password" class="form-control pe-5"
+                                            <div class="password-input-wrap">
+                                                <input type="password" class="form-control password-field @error('contrasenaUsuario') is-invalid @enderror"
                                                     id="contrasenaUsuario" placeholder="Ingrese la contraseña del usuario"
                                                     name="contrasenaUsuario">
                                                 <button
                                                     type="button"
-                                                    class="btn btn-link text-secondary position-absolute top-50 end-0 translate-middle-y me-2 p-0 js-toggle-password"
+                                                    class="btn btn-link text-secondary js-toggle-password password-toggle-btn"
                                                     data-target="contrasenaUsuario"
                                                     aria-label="Mostrar u ocultar contraseña">
                                                     <i class="fas fa-eye"></i>
@@ -61,6 +83,32 @@
                                             <small class="text-muted d-block mt-1">
                                                 Debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo.
                                             </small>
+                                            <div class="mt-2">
+                                                <div class="password-strength-wrap">
+                                                    <div class="progress password-progress">
+                                                        <div id="passwordStrengthBar"
+                                                            class="progress-bar bg-danger"
+                                                            role="progressbar"
+                                                            style="width: 0%;"
+                                                            aria-valuemin="0"
+                                                            aria-valuemax="100"
+                                                            aria-valuenow="0">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="password-markers" id="passwordRules">
+                                                        <span id="rule-length" class="password-marker" title="Mínimo 8 caracteres">8</span>
+                                                        <span id="rule-upper" class="password-marker" title="Al menos 1 mayúscula">A</span>
+                                                        <span id="rule-lower" class="password-marker" title="Al menos 1 minúscula">a</span>
+                                                        <span id="rule-number" class="password-marker" title="Al menos 1 número">1</span>
+                                                        <span id="rule-special" class="password-marker" title="Al menos 1 carácter especial">*</span>
+                                                    </div>
+                                                </div>
+
+                                                <small id="passwordStrengthText" class="text-muted d-block mt-2">
+                                                    Seguridad de contraseña: 0%
+                                                </small>
+                                            </div>
                                             @error('contrasenaUsuario')
                                                 <small class="text-danger">{{ $message }}</small>
                                             @enderror
@@ -70,13 +118,13 @@
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label for="confirmar_contrasenaUsuario" class="form-label fw-bold">Confirmar Contraseña:</label>
-                                            <div class="position-relative">
-                                                <input type="password" class="form-control pe-5"
+                                            <div class="password-input-wrap">
+                                                <input type="password" class="form-control password-field @error('confirmar_contrasenaUsuario') is-invalid @enderror"
                                                     id="confirmar_contrasenaUsuario" placeholder="Confirme la contraseña del usuario"
                                                     name="confirmar_contrasenaUsuario">
                                                 <button
                                                     type="button"
-                                                    class="btn btn-link text-secondary position-absolute top-50 end-0 translate-middle-y me-2 p-0 js-toggle-password"
+                                                    class="btn btn-link text-secondary js-toggle-password password-toggle-btn"
                                                     data-target="confirmar_contrasenaUsuario"
                                                     aria-label="Mostrar u ocultar confirmación de contraseña">
                                                     <i class="fas fa-eye"></i>
@@ -153,22 +201,62 @@
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label for="celular" class="form-label fw-bold">Celular:</label>
-                                            <input value="{{ old('celular') }}" type="text" inputmode="numeric" maxlength="12" pattern="[0-9]*" class="form-control"
-                                                id="celular" name="celular" placeholder="Ingrese el celular">
-                                            @error('celular')
-                                                <small class="text-danger">{{ $message }}</small>
-                                            @enderror
+                                            <div class="row g-2">
+                                                <div class="col-md-5">
+                                                    <select
+                                                        id="celular_country"
+                                                        name="celular_country"
+                                                        class="form-select js-country-select @error('celular_country') is-invalid @enderror">
+                                                        <option value="">Seleccione un pais</option>
+                                                        @foreach ($countryOptions as $countryCode => $countryLabel)
+                                                            <option value="{{ $countryCode }}" {{ old('celular_country') === $countryCode ? 'selected' : '' }}>
+                                                                {{ $countryLabel }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                    @error('celular_country')
+                                                        <small class="text-danger">{{ $message }}</small>
+                                                    @enderror
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <input value="{{ old('celular') }}" type="text" inputmode="numeric" pattern="[0-9]*" class="form-control @error('celular') is-invalid @enderror"
+                                                        id="celular" name="celular" placeholder="Ej. 71234567">
+                                                    @error('celular')
+                                                        <small class="text-danger">{{ $message }}</small>
+                                                    @enderror
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label for="telefono_contacto" class="form-label fw-bold">Teléfono de Contacto:</label>
-                                            <input value="{{ old('telefono_contacto') }}" type="number" min="0" max="2147483647" step="1" class="form-control"
-                                                id="telefono_contacto" name="telefono_contacto" placeholder="Ingrese el teléfono de contacto">
-                                            @error('telefono_contacto')
-                                                <small class="text-danger">{{ $message }}</small>
-                                            @enderror
+                                            <div class="row g-2">
+                                                <div class="col-md-5">
+                                                    <select
+                                                        id="telefono_contacto_country"
+                                                        name="telefono_contacto_country"
+                                                        class="form-select js-country-select @error('telefono_contacto_country') is-invalid @enderror">
+                                                        <option value="">Seleccione un pais</option>
+                                                        @foreach ($countryOptions as $countryCode => $countryLabel)
+                                                            <option value="{{ $countryCode }}" {{ old('telefono_contacto_country') === $countryCode ? 'selected' : '' }}>
+                                                                {{ $countryLabel }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                    @error('telefono_contacto_country')
+                                                        <small class="text-danger">{{ $message }}</small>
+                                                    @enderror
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <input value="{{ old('telefono_contacto') }}" type="text" inputmode="numeric" pattern="[0-9]*" class="form-control @error('telefono_contacto') is-invalid @enderror"
+                                                        id="telefono_contacto" name="telefono_contacto" placeholder="Ej. 22123456">
+                                                    @error('telefono_contacto')
+                                                        <small class="text-danger">{{ $message }}</small>
+                                                    @enderror
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -186,24 +274,7 @@
 @endsection
 
 @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.js-toggle-password').forEach(function (button) {
-                button.addEventListener('click', function () {
-                    const targetId = this.getAttribute('data-target');
-                    const input = document.getElementById(targetId);
-                    const icon = this.querySelector('i');
-
-                    if (!input || !icon) {
-                        return;
-                    }
-
-                    const isPassword = input.type === 'password';
-                    input.type = isPassword ? 'text' : 'password';
-                    icon.classList.toggle('fa-eye', !isPassword);
-                    icon.classList.toggle('fa-eye-slash', isPassword);
-                });
-            });
-        });
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="{{ asset('assets/js/passValidator-unicode.js') }}"></script>
+    <script src="{{ asset('assets/js/phone-country-select.js') }}"></script>
 @endpush
