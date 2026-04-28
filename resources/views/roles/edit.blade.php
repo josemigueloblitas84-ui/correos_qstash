@@ -27,7 +27,7 @@
             <div class="card card-primary">
                 <div class="card-body">
 
-                    <form action="{{ route('roles.update', $role->id) }}" method="POST">
+                    <form action="{{ route('roles.update', $encryptedId) }}" method="POST">
                         @csrf
 
                         <div class="mb-3">

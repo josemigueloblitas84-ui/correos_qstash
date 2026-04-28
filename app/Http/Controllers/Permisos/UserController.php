@@ -85,12 +85,13 @@ class UserController extends Controller
     {
         $this->userService->userStore($request);
 
-        return redirect()->route('usuarios.index')->with('success', 'Usuario creado exitosamente');
+        return redirect()->route('usuarios.index')->with('user_created', 'Usuario creado exitosamente');
     }
 
     public function edit(string $id)
     {
-        $usuario = User::findOrFail($id);
+        $idUsuario = decrypt_id($id);
+        $usuario = User::findOrFail($idUsuario);
         $roles = Role::orderBy('name', 'asc')->get();
         $departamentos = $this->departamentoService->getActiveForSelect();
         $instituciones = $this->institucionService->getForSelect();
@@ -103,16 +104,19 @@ class UserController extends Controller
             'departamentos' => $departamentos,
             'instituciones' => $instituciones,
             'tiposPersonal' => $tiposPersonal,
-            'hasRoles' => $hasRoles
+            'hasRoles' => $hasRoles,
+            'encryptedId' => encrypt_id((int) $usuario->id),
         ]);
     }
 
     public function update(UserUpdateRequest $request, string $id)
     {
-        $usuario = User::findOrFail($id);
+        $idUsuario = decrypt_id($id);
+        $usuario = User::findOrFail($idUsuario);
+
         $this->userService->userUpdate($usuario, $request);
 
-        return redirect()->route('usuarios.index')->with('success', 'Usuario actualizado exitosamente');
+        return redirect()->route('usuarios.index')->with('user_updated', 'Usuario actualizado exitosamente');
     }
 
     public function sedesPorInstitucion(string $id): JsonResponse
@@ -135,7 +139,8 @@ class UserController extends Controller
 
     public function editPermisosEspeciales(string $id)
     {
-        $usuario = User::findOrFail($id);
+        $idUsuario = decrypt_id($id);
+        $usuario = User::findOrFail($idUsuario);
         $permisos = Permission::orderBy('name', 'asc')->get();
 
         $directPermissions = $usuario->getDirectPermissions()->pluck('name')->toArray();
@@ -146,12 +151,14 @@ class UserController extends Controller
             'permisos' => $permisos,
             'directPermissions' => $directPermissions,
             'rolePermissions' => $rolePermissions,
+            'encryptedId' => encrypt_id((int) $usuario->id),
         ]);
     }
 
     public function updatePermisosEspeciales(Request $request, string $id)
     {
-        $usuario = User::findOrFail($id);
+        $idUsuario = decrypt_id($id);
+        $usuario = User::findOrFail($idUsuario);
 
         $request->validate([
             'permisos' => ['nullable', 'array'],
@@ -170,17 +177,20 @@ class UserController extends Controller
 
     public function destroy(Request $request)
     {
-        $usuario = User::findOrFail($request->id);
+        $idUsuario = decrypt_id($request->id);
+        $usuario = User::findOrFail($idUsuario);
 
         $this->userService->deactivateUser($usuario);
 
         session()->flash('success', 'Usuario desactivado exitosamente');
+
         return response()->json(['status' => true]);
     }
 
     public function toggleStatus(string $id)
     {
-        $usuario = User::findOrFail($id);
+        $idUsuario = decrypt_id($id);
+        $usuario = User::findOrFail($idUsuario);
 
         $nuevoEstado = $this->userService->toggleStatus($usuario);
 
@@ -195,7 +205,8 @@ class UserController extends Controller
 
     public function editRoles(string $id)
     {
-        $usuario = User::findOrFail($id);
+        $idUsuario = decrypt_id($id);
+        $usuario = User::findOrFail($idUsuario);
         $roles = Role::orderBy('name', 'asc')->get();
         $currentRole = $usuario->roles->first()?->name;
 
@@ -203,12 +214,14 @@ class UserController extends Controller
             'usuario' => $usuario,
             'roles' => $roles,
             'currentRole' => $currentRole,
+            'encryptedId' => encrypt_id((int) $usuario->id),
         ]);
     }
 
     public function updateRoles(Request $request, string $id)
     {
-        $usuario = User::findOrFail($id);
+        $idUsuario = decrypt_id($id);
+        $usuario = User::findOrFail($idUsuario);
 
         $request->validate([
             'role' => ['required', Rule::exists('roles', 'name')],
@@ -226,7 +239,8 @@ class UserController extends Controller
 
     public function editPersonalAsignado(string $id)
     {
-        $usuario = User::findOrFail($id);
+        $idUsuario = decrypt_id($id);
+        $usuario = User::findOrFail($idUsuario);
 
         $usuariosDisponibles = $this->userService->getAssignableUsers($usuario->id);
         $usuariosAsignados = $this->userService->getAssignedUserIds($usuario->id);
@@ -235,12 +249,14 @@ class UserController extends Controller
             'usuario' => $usuario,
             'usuariosDisponibles' => $usuariosDisponibles,
             'usuariosAsignados' => $usuariosAsignados,
+            'encryptedId' => encrypt_id((int) $usuario->id),
         ]);
     }
 
     public function updatePersonalAsignado(AsignarPersonalRequest $request, string $id)
     {
-        $usuario = User::findOrFail($id);
+        $idUsuario = decrypt_id($id);
+        $usuario = User::findOrFail($idUsuario);
 
         $this->userService->syncAssignedPersonal(
             $usuario,

@@ -11,10 +11,6 @@
                     <h1>Permisos / Editar</h1>
                 </div>
                 <div class="col-sm-6 text-end">
-                    {{--<a href="{{ route('permisos.index') }}" 
-                       class="btn btn-primary">
-                        Volver
-                    </a>--}}
                 </div>
             </div>
         </div>
@@ -25,17 +21,17 @@
             <div class="card">
                 <div class="card-body">
 
-                    <form action="{{ route('permisos.update', $permiso->id) }}" method="POST">
+                    <form action="{{ route('permisos.update', $encryptedId) }}" method="POST">
                         @csrf
 
                         <div class="mb-3">
                             <label for="name" class="form-label fw-bold">Nombre:</label>
 
-                            <input 
-                                value="{{ old('name', $permiso->name) }}" 
-                                name="name" 
-                                id="name" 
-                                type="text" 
+                            <input
+                                value="{{ old('name', $permiso->name) }}"
+                                name="name"
+                                id="name"
+                                type="text"
                                 class="form-control"
                                 placeholder="Ingrese el nombre"
                             >

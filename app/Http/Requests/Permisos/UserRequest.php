@@ -27,7 +27,13 @@ class UserRequest extends FormRequest
         return [
             'nombreUsuario' => 'required|min:3',
             'correoUsuario' => 'required|email|unique:users,email',
-            'contrasenaUsuario' => 'required|min:8|same:confirmar_contrasenaUsuario',
+            'contrasenaUsuario' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/^(?=.*\p{Lu})(?=.*\p{Ll})(?=.*\d)(?=.*[\p{P}\p{S}])[\p{Latin}\d\p{P}\p{S}]+$/u',
+                'same:confirmar_contrasenaUsuario',
+            ],
             'confirmar_contrasenaUsuario' => 'required',
             'departamento_id' => 'required|exists:departamentos,id',
             'tipo_personal_id' => 'required|exists:tipos_personal,id',
@@ -37,16 +43,14 @@ class UserRequest extends FormRequest
             'cantidad_horas_totales' => 'nullable|integer|min:0|digits_between:1,10|max:2147483647',
             'celular' => [
                 'nullable',
-                'integer',
-                'min:0',
-                'digits_between:1,12',
-                function ($attribute, $value, $fail) {
-                    if ($value !== null && (int) $value > 2147483647) {
-                        $fail('El celular no puede superar 12 digitos y debe estar dentro del limite permitido por el sistema.');
-                    }
-                },
+                'string',
+                'max:30',
+                'regex:/^\d+$/',
+                'phone',
             ],
-            'telefono_contacto' => 'nullable|integer|min:0|digits_between:1,10|max:2147483647',
+            'celular_country' => 'nullable|required_with:celular|string|size:2',
+            'telefono_contacto' => 'nullable|string|max:30|regex:/^\d+$/|phone',
+            'telefono_contacto_country' => 'nullable|required_with:telefono_contacto|string|size:2',
         ];
     }
 
@@ -58,10 +62,11 @@ class UserRequest extends FormRequest
             'correoUsuario.required' => 'El correo electronico es obligatorio.',
             'correoUsuario.email' => 'El correo electronico debe ser una direccion de correo valida.',
             'correoUsuario.unique' => 'El correo electronico ya esta en uso.',
-            'contrasenaUsuario.required' => 'La contrasena es obligatoria.',
-            'contrasenaUsuario.min' => 'La contrasena debe tener al menos :min caracteres.',
-            'contrasenaUsuario.same' => 'Las contrasenas no coinciden.',
-            'confirmar_contrasenaUsuario.required' => 'Debe confirmar la contrasena.',
+            'contrasenaUsuario.required' => 'La contraseña es obligatoria.',
+            'contrasenaUsuario.min' => 'La contraseña debe tener al menos :min caracteres.',
+            'contrasenaUsuario.regex' => 'La contraseña solo puede contener letras latinas, números y símbolos, e incluir al menos una mayúscula, una minúscula, un número y un símbolo.',
+            'contrasenaUsuario.same' => 'Las contraseñas no coinciden.',
+            'confirmar_contrasenaUsuario.required' => 'Debe confirmar la contraseña.',
             'departamento_id.required' => 'Debe seleccionar un departamento.',
             'departamento_id.exists' => 'El departamento seleccionado no es valido.',
             'tipo_personal_id.required' => 'Debe seleccionar un tipo de personal.',
@@ -79,13 +84,16 @@ class UserRequest extends FormRequest
             'cantidad_horas_totales.min' => 'La cantidad de horas totales no puede ser negativa.',
             'cantidad_horas_totales.digits_between' => 'La cantidad de horas totales no puede superar :max digitos.',
             'cantidad_horas_totales.max' => 'La cantidad de horas totales no puede exceder el limite permitido.',
-            'celular.integer' => 'El celular debe ser un numero entero.',
-            'celular.min' => 'El celular no puede ser negativo.',
-            'celular.digits_between' => 'El celular no puede superar 12 digitos.',
-            'telefono_contacto.integer' => 'El telefono de contacto debe ser un numero entero.',
-            'telefono_contacto.min' => 'El telefono de contacto no puede ser negativo.',
-            'telefono_contacto.digits_between' => 'El telefono de contacto no puede superar :max digitos.',
-            'telefono_contacto.max' => 'El telefono de contacto no puede exceder el limite permitido.',
+            'celular.max' => 'El celular no puede superar :max caracteres.',
+            'celular.regex' => 'El celular solo puede contener numeros.',
+            'celular.phone' => 'El celular debe ser un numero valido para el pais seleccionado.',
+            'celular_country.required_with' => 'Debe seleccionar el pais del celular.',
+            'celular_country.size' => 'El pais del celular debe tener un codigo ISO de 2 letras.',
+            'telefono_contacto.max' => 'El telefono de contacto no puede superar :max caracteres.',
+            'telefono_contacto.regex' => 'El telefono de contacto solo puede contener numeros.',
+            'telefono_contacto.phone' => 'El telefono de contacto debe ser un numero valido para el pais seleccionado.',
+            'telefono_contacto_country.required_with' => 'Debe seleccionar el pais del telefono de contacto.',
+            'telefono_contacto_country.size' => 'El pais del telefono de contacto debe tener un codigo ISO de 2 letras.',
         ];
     }
 }

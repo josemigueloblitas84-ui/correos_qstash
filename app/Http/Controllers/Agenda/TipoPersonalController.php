@@ -24,6 +24,7 @@ class TipoPersonalController extends Controller
             'update',
             'destroy',
         ]);
+
         $this->tipoPersonalService = $tipoPersonalService;
     }
 
@@ -38,9 +39,11 @@ class TipoPersonalController extends Controller
 
         return DataTables::of($tipos)
             ->addColumn('acciones', function ($row) {
+                $encryptedId = e(encrypt_id((int) $row->id));
+
                 return '
-                    <button type="button" class="btn btn-warning btn-sm btn-editar" data-id="' . $row->id . '">Editar</button>
-                    <button type="button" class="btn btn-danger btn-sm btn-eliminar" data-id="' . $row->id . '">Eliminar</button>
+                    <button type="button" class="btn btn-warning btn-sm btn-editar" data-id="' . $encryptedId . '">Editar</button>
+                    <button type="button" class="btn btn-danger btn-sm btn-eliminar" data-id="' . $encryptedId . '">Eliminar</button>
                 ';
             })
             ->editColumn('created_at', function ($row) {
@@ -59,15 +62,16 @@ class TipoPersonalController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Tipo de personal creado correctamente.',
-            'id' => $id,
+            'id' => encrypt_id($id),
         ]);
     }
 
-    public function show($id): JsonResponse
+    public function show(string $id): JsonResponse
     {
-        $tipo = $this->tipoPersonalService->findById((int) $id);
+        $idTipoPersonal = decrypt_id($id);
+        $tipo = $this->tipoPersonalService->findById((int) $idTipoPersonal);
 
-        if (!$tipo) {
+        if (! $tipo) {
             return response()->json([
                 'status' => false,
                 'message' => 'El tipo de personal no existe.',
@@ -76,22 +80,27 @@ class TipoPersonalController extends Controller
 
         return response()->json([
             'status' => true,
-            'data' => $tipo,
+            'data' => [
+                'id' => encrypt_id((int) $tipo->id),
+                'tipo' => $tipo->tipo,
+                'created_at' => $tipo->created_at,
+            ],
         ]);
     }
 
-    public function update(TipoPersonalUpdateRequest $request, $id): JsonResponse
+    public function update(TipoPersonalUpdateRequest $request, string $id): JsonResponse
     {
-        $tipo = $this->tipoPersonalService->findById((int) $id);
+        $idTipoPersonal = decrypt_id($id);
+        $tipo = $this->tipoPersonalService->findById((int) $idTipoPersonal);
 
-        if (!$tipo) {
+        if (! $tipo) {
             return response()->json([
                 'status' => false,
                 'message' => 'El tipo de personal no existe.',
             ], 404);
         }
 
-        $this->tipoPersonalService->update((int) $id, $request->validated());
+        $this->tipoPersonalService->update((int) $idTipoPersonal, $request->validated());
 
         return response()->json([
             'status' => true,
@@ -99,18 +108,19 @@ class TipoPersonalController extends Controller
         ]);
     }
 
-    public function destroy($id): JsonResponse
+    public function destroy(string $id): JsonResponse
     {
-        $tipo = $this->tipoPersonalService->findById((int) $id);
+        $idTipoPersonal = decrypt_id($id);
+        $tipo = $this->tipoPersonalService->findById((int) $idTipoPersonal);
 
-        if (!$tipo) {
+        if (! $tipo) {
             return response()->json([
                 'status' => false,
                 'message' => 'El tipo de personal no existe.',
             ], 404);
         }
 
-        $this->tipoPersonalService->destroy((int) $id);
+        $this->tipoPersonalService->destroy((int) $idTipoPersonal);
 
         return response()->json([
             'status' => true,

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Permisos;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
 use App\Http\Requests\Permisos\PermisoStoreRequest;
@@ -47,43 +46,51 @@ class PermisosController extends Controller
         $this->permisoService->storePermiso($request);
 
         return redirect()->route('permisos.index')
-            ->with('success', 'Permiso creado exitosamente');
+            ->with('permission_created', 'Permiso creado exitosamente');
     }
 
     // este metodo mostrara la vista de editar permisos
     public function edit($id)
     {
-        $permiso = Permission::findOrfail($id);
+        $idPermiso = decrypt_id($id);
+        $permiso = Permission::findOrfail($idPermiso);
+
         return view('permisos.edit', [
-            'permiso' => $permiso
+            'permiso' => $permiso,
+            'encryptedId' => encrypt_id((int) $permiso->id),
         ]);
     }
 
     // este metodo actualizara el permiso en la base de datos
     public function update(string $id, PermisoUpdateRequest $request)
     {
-        $permiso = Permission::findOrFail($id);
+        $idPermiso = decrypt_id($id);
+        $permiso = Permission::findOrFail($idPermiso);
 
         $this->permisoService->updatePermiso($permiso, $request);
 
         return redirect()->route('permisos.index')
-            ->with('success', 'Permiso actualizado exitosamente');
+            ->with('permission_updated', 'Permiso actualizado exitosamente');
     }
 
     // este metodo eliminara el permiso de la base de datos
     public function destroy(Request $request)
     {
-        $id = $request->id;
-        $permiso = Permission::findOrfail($id);
+        $idPermiso = decrypt_id($request->id);
+        $permiso = Permission::find($idPermiso);
 
         if ($permiso == null) {
-            session()->flash('error', 'El permiso no existe');
-            return response()->json(['status' => false]);
+            return response()->json([
+                'status' => false,
+                'message' => 'El permiso no existe.',
+            ], 404);
         }
 
         $this->permisoService->destroyPermiso($permiso);
 
-        session()->flash('success', 'Permiso eliminado exitosamente');
-        return response()->json(['status' => true]);
+        return response()->json([
+            'status' => true,
+            'message' => 'Permiso eliminado exitosamente.',
+        ]);
     }
 }

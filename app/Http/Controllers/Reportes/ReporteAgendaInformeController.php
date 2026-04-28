@@ -69,7 +69,9 @@ class ReporteAgendaInformeController extends Controller
                         <span class="badge-fecha badge-fecha-hasta">' . e($hasta) . '</span>';
             })
             ->addColumn('acciones', function ($row) {
-                return '<button type="button" class="btn-accion-imprimir btn-preview-agenda" data-id="' . $row->id . '" title="Imprimir">
+                $encryptedId = e(encrypt_id((int) $row->id));
+
+                return '<button type="button" class="btn-accion-imprimir btn-preview-agenda" data-id="' . $encryptedId . '" title="Imprimir">
                             <i class="fas fa-print"></i>
                         </button>';
             })
@@ -105,17 +107,19 @@ class ReporteAgendaInformeController extends Controller
                 return $row->equipo_nombre ?? 'Sin equipo';
             })
             ->addColumn('visualizar', function ($row) {
+                $encryptedUserId = e(encrypt_id((int) $row->usuario_id));
+
                 return '<button
                             type="button"
                             class="btn-accion-imprimir btn-preview-informe"
                             data-fecha="' . e($row->fecha_actividad) . '"
-                            data-usuario="' . e($row->usuario_id) . '"
+                            data-usuario="' . $encryptedUserId . '"
                             title="Visualizar">
                             <i class="fas fa-print"></i>
                         </button>';
             })
             ->addColumn('validar', function ($row) use ($canValidateInforme) {
-                if (!$canValidateInforme) {
+                if (! $canValidateInforme) {
                     return '';
                 }
 
@@ -123,22 +127,25 @@ class ReporteAgendaInformeController extends Controller
                     return '<span class="estado-validada">Validada</span>';
                 }
 
+                $encryptedUserId = e(encrypt_id((int) $row->usuario_id));
+
                 return '<button
                             type="button"
                             class="btn-validar"
                             data-fecha="' . e($row->fecha_actividad) . '"
-                            data-usuario="' . e($row->usuario_id) . '"
+                            data-usuario="' . $encryptedUserId . '"
                             title="Validar">V</button>';
             })
             ->rawColumns(['visualizar', 'validar'])
             ->make(true);
     }
 
-    public function previewAgenda(int $id)
+    public function previewAgenda(string $id)
     {
-        $previewData = $this->agendaService->getPreviewData($id);
+        $agendaId = decrypt_id($id);
+        $previewData = $this->agendaService->getPreviewData($agendaId);
 
-        if (!$previewData) {
+        if (! $previewData) {
             abort(404, 'La agenda no existe.');
         }
 
@@ -146,22 +153,24 @@ class ReporteAgendaInformeController extends Controller
 
         return Pdf::loadView('agenda.partials.agenda-preview-document', $previewData)
             ->setPaper('a4', 'portrait')
-            ->stream('agenda-' . $id . '.pdf');
+            ->stream('agenda-' . $agendaId . '.pdf');
     }
 
     public function previewInforme(Request $request)
     {
         $request->validate([
             'fecha' => ['required', 'date'],
-            'usuario_id' => ['required', 'integer'],
+            'usuario_id' => ['required', 'string'],
         ]);
+
+        $usuarioId = decrypt_id($request->usuario_id);
 
         $previewData = $this->reporteAgendaInformeService->getInformePreviewData(
             $request->fecha,
-            (int) $request->usuario_id
+            $usuarioId
         );
 
-        if (!$previewData) {
+        if (! $previewData) {
             abort(404, 'El informe no existe.');
         }
 
@@ -178,12 +187,14 @@ class ReporteAgendaInformeController extends Controller
 
         $request->validate([
             'fecha' => ['required', 'date'],
-            'usuario_id' => ['required', 'integer'],
+            'usuario_id' => ['required', 'string'],
         ]);
+
+        $usuarioId = decrypt_id($request->usuario_id);
 
         $this->reporteAgendaInformeService->validateInforme(
             $request->fecha,
-            (int) $request->usuario_id,
+            $usuarioId,
             (int) auth()->id()
         );
 

@@ -3,11 +3,19 @@
 namespace App\Http\Requests\Agenda;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class TipoPersonalStoreRequest extends FormRequest
 {
     public function authorize(): bool
     {
+        if (! $this->ajax()) {
+            throw new HttpResponseException(
+                response()->json([
+                    'message' => 'No puedes acceder a esta ruta.'
+                ], 403)
+            );
+        }
         return true;
     }
 

@@ -40,13 +40,13 @@
                             <td>{{ $permiso->created_at->format('d / M / Y H:i:s') }}</td>
                             <td>
                                 @can('editar permisos')
-                                <a href="{{ route('permisos.edit', $permiso->id) }}" class="btn btn-warning btn-sm">
+                                <a href="{{ route('permisos.edit', encrypt_id($permiso->id)) }}" class="btn btn-warning btn-sm">
                                     Editar
                                 </a>
                                 @endcan
 
                                 @can('eliminar permisos')
-                                <button onclick="eliminarPermiso({{ $permiso->id }})" class="btn btn-danger btn-sm">
+                                <button onclick="eliminarPermiso('{{ encrypt_id($permiso->id) }}')" class="btn btn-danger btn-sm">
                                     Eliminar
                                 </button>
                                 @endcan
@@ -64,11 +64,52 @@
 
 @endsection
 
-
 @push('scripts')
+@if (session('permission_created'))
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        Swal.fire({
+            icon: 'success',
+            title: 'Permiso creado',
+            text: @json(session('permission_created')),
+            confirmButtonText: 'Aceptar',
+            timer: 2600,
+            timerProgressBar: true
+        });
+    });
+</script>
+@endif
+
+@if (session('permission_updated'))
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        Swal.fire({
+            icon: 'success',
+            title: 'Permiso actualizado',
+            text: @json(session('permission_updated')),
+            confirmButtonText: 'Aceptar',
+            timer: 2600,
+            timerProgressBar: true
+        });
+    });
+</script>
+@endif
+
 <script>
     function eliminarPermiso(id) {
-        if (confirm('¿Desea eliminar el permiso?')) {
+        Swal.fire({
+            icon: 'warning',
+            title: '¿Desea eliminar el permiso?',
+            text: 'Esta accion no se puede deshacer.',
+            showCancelButton: true,
+            confirmButtonText: 'Si, eliminar',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
+        }).then((result) => {
+            if (!result.isConfirmed) {
+                return;
+            }
+
             $.ajax({
                 url: '{{ route('permisos.destroy') }}',
                 type: 'DELETE',
@@ -76,11 +117,30 @@
                 headers: {
                     'X-CSRF-TOKEN': "{{ csrf_token() }}"
                 },
-                success: function () {
-                    location.reload();
+                success: function (response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Permiso eliminado',
+                        text: response.message,
+                        confirmButtonText: 'Aceptar',
+                        timer: 2200,
+                        timerProgressBar: true
+                    }).then(() => {
+                        location.reload();
+                    });
+                },
+                error: function (xhr) {
+                    const response = xhr.responseJSON || {};
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'No se pudo eliminar',
+                        text: response.message || 'Ocurrio un error al eliminar el permiso.',
+                        confirmButtonText: 'Aceptar'
+                    });
                 }
             });
-        }
+        });
     }
 </script>
 @endpush

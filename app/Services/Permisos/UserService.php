@@ -28,7 +28,9 @@ class UserService
         $usuario->cod_estudiante = $request->cod_estudiante;
         $usuario->cantidad_horas_totales = $request->cantidad_horas_totales;
         $usuario->celular = $request->celular;
+        $usuario->celular_country = $request->celular_country;
         $usuario->telefono_contacto = $request->telefono_contacto;
+        $usuario->telefono_contacto_country = $request->telefono_contacto_country;
         $usuario->estado = 1;
         $usuario->save();
 
@@ -46,7 +48,9 @@ class UserService
                     'cod_estudiante' => $usuario->cod_estudiante,
                     'cantidad_horas_totales' => $usuario->cantidad_horas_totales,
                     'celular' => $usuario->celular,
+                    'celular_country' => $usuario->celular_country,
                     'telefono_contacto' => $usuario->telefono_contacto,
+                    'telefono_contacto_country' => $usuario->telefono_contacto_country,
                     'estado' => (int) $usuario->estado,
                     'roles' => $usuario->roles->pluck('name')->values()->all(),
                 ],
@@ -71,7 +75,9 @@ class UserService
             'cod_estudiante' => $usuario->cod_estudiante,
             'cantidad_horas_totales' => $usuario->cantidad_horas_totales,
             'celular' => $usuario->celular,
+            'celular_country' => $usuario->celular_country,
             'telefono_contacto' => $usuario->telefono_contacto,
+            'telefono_contacto_country' => $usuario->telefono_contacto_country,
             'roles' => $usuario->roles()->pluck('name')->values()->all(),
         ];
 
@@ -84,7 +90,9 @@ class UserService
         $usuario->cod_estudiante = $request->cod_estudiante;
         $usuario->cantidad_horas_totales = $request->cantidad_horas_totales;
         $usuario->celular = $request->celular;
+        $usuario->celular_country = $request->celular_country;
         $usuario->telefono_contacto = $request->telefono_contacto;
+        $usuario->telefono_contacto_country = $request->telefono_contacto_country;
 
         if ($request->filled('contrasenaUsuario')) {
             $usuario->password = Hash::make($request->contrasenaUsuario);
@@ -108,7 +116,9 @@ class UserService
                     'cod_estudiante' => $usuario->cod_estudiante,
                     'cantidad_horas_totales' => $usuario->cantidad_horas_totales,
                     'celular' => $usuario->celular,
+                    'celular_country' => $usuario->celular_country,
                     'telefono_contacto' => $usuario->telefono_contacto,
+                    'telefono_contacto_country' => $usuario->telefono_contacto_country,
                     'roles' => $usuario->roles->pluck('name')->values()->all(),
                 ],
             ],

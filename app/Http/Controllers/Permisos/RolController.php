@@ -6,24 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Permisos\RolStoreRequest;
 use App\Http\Requests\Permisos\RolUpdateRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use App\Services\Permisos\RolService;
 
 class RolController extends Controller
 {
-
     protected RolService $rolService;
 
     public function __construct(RolService $rolService)
     {
         $this->rolService = $rolService;
 
-        /*$this->middleware('permission:crear roles')->only(['create', 'store']);
-        $this->middleware('permission:editar roles')->only(['edit', 'update']);
-        $this->middleware('permission:editar roles')->only(['edit']);
-        $this->middleware('permission:eliminar roles')->only('destroy');*/
         $this->middleware('permission:ver roles')->only(['index']);
         $this->middleware('permission:crear roles')->only(['create', 'store']);
         $this->middleware('permission:editar roles')->only(['edit', 'update']);
@@ -33,6 +27,7 @@ class RolController extends Controller
     public function index()
     {
         $roles = Role::orderBy('name', 'ASC')->paginate(10);
+
         return view('roles.list', [
             'roles' => $roles
         ]);
@@ -41,6 +36,7 @@ class RolController extends Controller
     public function create()
     {
         $permisos = Permission::orderBy('name', 'ASC')->get();
+
         return view('roles.create', [
             'permisos' => $permisos
         ]);
@@ -51,45 +47,52 @@ class RolController extends Controller
         $this->rolService->storeRol($request);
 
         return redirect()->route('roles.index')
-            ->with('success', 'Rol creado exitosamente');
+            ->with('role_created', 'Rol creado exitosamente');
     }
 
-    public function edit($id)
+    public function edit(string $id)
     {
-        $role = Role::findOrFail($id);
+        $idRol = decrypt_id($id);
+        $role = Role::findOrFail($idRol);
         $hasPermisos = $role->permissions->pluck('name');
         $permisos = Permission::orderBy('name', 'ASC')->get();
 
         return view('roles.edit', [
             'permisos' => $permisos,
             'hasPermisos' => $hasPermisos,
-            'role' => $role
+            'role' => $role,
+            'encryptedId' => encrypt_id((int) $role->id),
         ]);
     }
 
-    public function update(String $id, RolUpdateRequest $request)
+    public function update(string $id, RolUpdateRequest $request)
     {
-        $role = Role::findOrFail($id);
+        $idRol = decrypt_id($id);
+        $role = Role::findOrFail($idRol);
 
         $this->rolService->updateRol($role, $request);
 
         return redirect()->route('roles.index')
-            ->with('success', 'Rol actualizado exitosamente');
+            ->with('role_updated', 'Rol actualizado exitosamente');
     }
 
     public function destroy(Request $request)
     {
-        $id = $request->id;
-        $role = Role::find($id);
+        $idRol = decrypt_id($request->id);
+        $role = Role::find($idRol);
 
         if ($role == null) {
-            session()->flash('error', 'Rol no encontrado');
-            return response()->json(['status' => false]);
+            return response()->json([
+                'status' => false,
+                'message' => 'Rol no encontrado.',
+            ], 404);
         }
 
         $this->rolService->destroyRol($role);
 
-        session()->flash('success', 'Rol eliminado exitosamente');
-        return response()->json(['status' => true]);
+        return response()->json([
+            'status' => true,
+            'message' => 'Rol eliminado exitosamente.',
+        ]);
     }
 }

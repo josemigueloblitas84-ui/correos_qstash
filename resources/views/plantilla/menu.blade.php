@@ -379,12 +379,6 @@
                                         <p>Login</p>
                                     </a>
                                 </li>
-                                <li class="nav-item">
-                                    <a href="./examples/register.html" class="nav-link">
-                                        <i class="nav-icon bi bi-circle"></i>
-                                        <p>Register</p>
-                                    </a>
-                                </li>
                             </ul>
                         </li>
                         <li class="nav-item">
@@ -400,12 +394,6 @@
                                     <a href="./examples/login-v2.html" class="nav-link">
                                         <i class="nav-icon bi bi-circle"></i>
                                         <p>Login</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="./examples/register-v2.html" class="nav-link">
-                                        <i class="nav-icon bi bi-circle"></i>
-                                        <p>Register</p>
                                     </a>
                                 </li>
                             </ul>

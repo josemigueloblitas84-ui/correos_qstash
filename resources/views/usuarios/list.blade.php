@@ -73,7 +73,7 @@
                                         <td>
                                             <div class="d-flex flex-wrap gap-2 align-items-center">
                                                 @can('editar usuarios')
-                                                    <a href="{{ route('usuarios.edit', $usuario->id) }}"
+                                                    <a href="{{ route('usuarios.edit', encrypt_id($usuario->id)) }}"
                                                         class="btn btn-sm btn-primary">
                                                         Editar
                                                     </a>
@@ -89,13 +89,13 @@
                                                     <ul class="dropdown-menu dropdown-menu-end">
                                                         <li>
                                                             <a class="dropdown-item"
-                                                                href="{{ route('usuarios.roles.edit', $usuario->id) }}">
+                                                                href="{{ route('usuarios.roles.edit', encrypt_id($usuario->id)) }}">
                                                                 Roles
                                                             </a>
                                                         </li>
                                                         <li>
                                                             <a class="dropdown-item"
-                                                                href="{{ route('usuarios.personal.edit', $usuario->id) }}">
+                                                                href="{{ route('usuarios.personal.edit', encrypt_id($usuario->id)) }}">
                                                                 Asignar personal
                                                             </a>
                                                         </li>
@@ -103,7 +103,7 @@
                                                         @can('asignar permiso especial')
                                                             <li>
                                                                 <a class="dropdown-item"
-                                                                    href="{{ route('usuarios.permisos.edit', $usuario->id) }}">
+                                                                    href="{{ route('usuarios.permisos.edit', encrypt_id($usuario->id)) }}">
                                                                     Permisos especiales
                                                                 </a>
                                                             </li>
@@ -116,9 +116,9 @@
                                                         <input
                                                             type="checkbox"
                                                             class="form-check-input js-toggle-estado-usuario"
-                                                            data-id="{{ $usuario->id }}"
+                                                            data-id="{{ encrypt_id($usuario->id) }}"
                                                             {{ (int) $usuario->estado === 1 ? 'checked' : '' }}>
-                                                        <label class="form-check-label small {{(int) $usuario->estado === 1? 'text-success' : 'text-danger'}}">
+                                                        <label class="form-check-label small {{ (int) $usuario->estado === 1 ? 'text-success' : 'text-danger' }}">
                                                             {{ (int) $usuario->estado === 1 ? 'Activo' : 'Inactivo' }}
                                                         </label>
                                                     </div>
@@ -171,6 +171,36 @@
 @endpush
 
 @push('scripts')
+    @if (session('user_created'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Usuario creado',
+                    text: @json(session('user_created')),
+                    confirmButtonText: 'Aceptar',
+                    timer: 2600,
+                    timerProgressBar: true
+                });
+            });
+        </script>
+    @endif
+
+    @if (session('user_updated'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Usuario actualizado',
+                    text: @json(session('user_updated')),
+                    confirmButtonText: 'Aceptar',
+                    timer: 2600,
+                    timerProgressBar: true
+                });
+            });
+        </script>
+    @endif
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('.js-toggle-estado-usuario').forEach(function (input) {
@@ -194,11 +224,11 @@
                         beforeSend: function () {
                             self.disabled = true;
                         },
-                        success: function (response) {
+                        success: function () {
                             if (label) {
                                 label.textContent = checked ? 'Activo' : 'Inactivo';
                                 label.classList.remove('text-success', 'text-danger');
-                                label.classList.add(checked ? 'text-success' : 'text-danger')
+                                label.classList.add(checked ? 'text-success' : 'text-danger');
                             }
                         },
                         error: function () {

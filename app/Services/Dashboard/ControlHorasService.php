@@ -236,7 +236,7 @@ class ControlHorasService
     {
         $texto = trim((string) $actividad->actividad);
 
-        return trim($actividad->agenda_id . ' ' . $actividad->id . ' ' . $texto);
+        return $texto !== '' ? $texto : 'Sin actividad';
     }
 
     private function formatTime(?string $time): string

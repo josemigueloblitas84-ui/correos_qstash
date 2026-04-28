@@ -45,7 +45,7 @@
                 </div>
 
                 <div class="card-body">
-                    <form action="{{ route('usuarios.personal.update', $usuario->id) }}" method="POST" id="formAsignarPersonal">
+                    <form action="{{ route('usuarios.personal.update', $encryptedId) }}" method="POST" id="formAsignarPersonal">
                         @csrf
 
                         <div class="mb-3">

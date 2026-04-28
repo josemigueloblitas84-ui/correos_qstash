@@ -1,0 +1,75 @@
+.password-input-wrap {
+    position: relative;
+}
+
+.password-field {
+    padding-right: 4.5rem;
+}
+
+.password-toggle-btn {
+    position: absolute;
+    top: 50%;
+    right: 0.35rem;
+    transform: translateY(-50%);
+    width: 2.5rem;
+    height: calc(100% - 0.5rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-left: 1px solid #dcdfe3;
+    border-radius: 0;
+    text-decoration: none;
+    z-index: 3;
+}
+
+.password-toggle-btn:focus {
+    box-shadow: none;
+}
+
+.password-field.is-invalid {
+    padding-right: 6rem;
+    background-position: right 3rem center;
+}
+
+.password-strength-wrap {
+    position: relative;
+    margin-top: 10px;
+}
+
+.password-progress {
+    height: 20px;
+    border-radius: 999px;
+    overflow: hidden;
+    background-color: #e9ecef;
+}
+
+.password-markers {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    pointer-events: none;
+}
+
+.password-marker {
+    font-size: 16px;
+    font-weight: 700;
+    color: #adb5bd;
+    opacity: 0.35;
+    transform: scale(0.9);
+    transition: all 0.2s ease;
+    pointer-events: auto;
+    cursor: default;
+    line-height: 14px;
+}
+
+.password-marker.is-active {
+    color: #fff;
+    opacity: 1;
+    transform: scale(1);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}

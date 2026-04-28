@@ -16,7 +16,7 @@
                 <h3 class="card-title">Asignar Rol a {{ $usuario->name }}</h3>
             </div>
 
-            <form action="{{ route('usuarios.roles.update', $usuario->id) }}" method="POST">
+            <form action="{{ route('usuarios.roles.update', $encryptedId) }}" method="POST">
                 @csrf
 
                 <div class="card-body">
