@@ -167,6 +167,20 @@
 @endpush
 
 @push('scripts')
+    @if (session('role_assigned'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                Swal.fire({
+                    icon: 'success',
+                    title: @json(session('role_assigned')),
+                    confirmButtonText: 'Aceptar',
+                    timer: 2600,
+                    timerProgressBar: true
+                });
+            });
+        </script>
+    @endif
+
     @if (session('user_created'))
         <script>
             document.addEventListener('DOMContentLoaded', function () {
