@@ -234,7 +234,7 @@ class UserController extends Controller
 
         return redirect()
             ->route('usuarios.index')
-            ->with('success', 'Rol asignado correctamente.');
+            ->with('role_assigned', 'Rol asignado exitosamente.');
     }
 
     public function editPersonalAsignado(string $id)

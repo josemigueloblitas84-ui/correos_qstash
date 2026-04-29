@@ -39,7 +39,7 @@ class UserRequest extends FormRequest
             'tipo_personal_id' => 'required|exists:tipos_personal,id',
             'institucion_id' => ['required', 'integer', 'exists:instituciones,id'],
             'sede_id' => ['bail', 'required', 'integer', 'exists:sedes,id', new SedePerteneceAInstitucion($this->input('institucion_id'))],
-            'cod_estudiante' => 'required|string|max:30',
+            'cod_estudiante' => 'required|string|max:30|unique:users,cod_estudiante',
             'cantidad_horas_totales' => 'nullable|integer|min:0|digits_between:1,10|max:2147483647',
             'celular' => [
                 'nullable',
@@ -80,6 +80,7 @@ class UserRequest extends FormRequest
             'cod_estudiante.required' => 'El código de estudiante es obligatorio.',
             'cod_estudiante.string' => 'El codigo de estudiante debe ser texto.',
             'cod_estudiante.max' => 'El codigo de estudiante no debe superar :max caracteres.',
+            'cod_estudiante.unique' => 'El CI o documento de identidad ya esta en uso.',
             'cantidad_horas_totales.integer' => 'La cantidad de horas totales debe ser un numero entero.',
             'cantidad_horas_totales.min' => 'La cantidad de horas totales no puede ser negativa.',
             'cantidad_horas_totales.digits_between' => 'La cantidad de horas totales no puede superar :max digitos.',

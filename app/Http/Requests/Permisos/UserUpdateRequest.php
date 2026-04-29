@@ -36,7 +36,7 @@ class UserUpdateRequest extends FormRequest
             'tipo_personal_id' => ['required', Rule::exists('tipos_personal', 'id')],
             'institucion_id' => ['required', 'integer', Rule::exists('instituciones', 'id')],
             'sede_id' => ['bail', 'required', 'integer', Rule::exists('sedes', 'id'), new SedePerteneceAInstitucion($this->input('institucion_id'))],
-            'cod_estudiante' => ['required', 'string', 'max:30'],
+            'cod_estudiante' => ['required', 'string', 'max:30', Rule::unique('users', 'cod_estudiante')->ignore($id)],
             'cantidad_horas_totales' => ['nullable', 'integer', 'min:0', 'digits_between:1,10', 'max:2147483647'],
             'celular' => [
                 'nullable',
@@ -76,6 +76,7 @@ class UserUpdateRequest extends FormRequest
             'cod_estudiante.required' => 'El código de estudiante es obligatorio.',
             'cod_estudiante.string' => 'El codigo de estudiante debe ser texto.',
             'cod_estudiante.max' => 'El codigo de estudiante no debe superar :max caracteres.',
+            'cod_estudiante.unique' => 'El CI o documento de identidad ya esta en uso.',
             'cantidad_horas_totales.integer' => 'La cantidad de horas totales debe ser un numero entero.',
             'cantidad_horas_totales.min' => 'La cantidad de horas totales no puede ser negativa.',
             'cantidad_horas_totales.digits_between' => 'La cantidad de horas totales no puede superar :max digitos.',
