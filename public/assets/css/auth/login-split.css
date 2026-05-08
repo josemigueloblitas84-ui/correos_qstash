@@ -280,32 +280,34 @@ body.auth-split-page {
     }
 
     .auth-split__brand-shell {
-        width: min(100%, 16.5rem);
+        width: min(100%, 32rem);
     }
 
     .auth-split__brand-panel {
+        flex-direction: row;
         gap: 1rem;
-        padding: 1.8rem 1.15rem;
+        padding: 1.4rem 1.2rem;
         border-radius: 1.6rem;
     }
 
     .auth-split__logo {
-        max-width: 11.1rem;
-        height: 6.1rem;
+        width: 50%;
+        max-width: none;
+        height: 5.8rem;
     }
 
     .auth-split__logo--top {
-        max-width: 8.4rem;
-        height: 5rem;
+        max-width: none;
+        height: 5.8rem;
     }
 
     .auth-split__logo--bottom {
-        max-width: 11.8rem;
-        height: 6.8rem;
+        max-width: none;
+        height: 5.8rem;
     }
 
     .auth-split__logo-divider {
-        width: 82%;
+        display: none;
     }
 
     .auth-split__card {

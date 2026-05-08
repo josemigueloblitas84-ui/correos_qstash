@@ -1,0 +1,107 @@
+.app-footer-custom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
+  align-items: center;
+}
+
+.app-footer-custom__copy,
+.app-footer-custom__rights {
+  min-width: 0;
+}
+
+.app-sidebar-brand-text {
+  display: -webkit-box;
+  overflow: hidden;
+  line-height: 1.15;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  line-clamp: 2;
+}
+
+.app-sidebar .sidebar-wrapper {
+  padding-bottom: 1rem;
+}
+
+.app-sidebar .nav-header {
+  margin: 0.85rem 0.75rem 0.35rem;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.56);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.app-sidebar .nav-item > .nav-link {
+  min-height: 2.35rem;
+  margin: 0.1rem 0.5rem;
+  border-radius: 0.5rem;
+}
+
+.app-sidebar .nav-link p {
+  font-size: 0.92rem;
+  line-height: 1.2;
+}
+
+.app-sidebar .nav-icon {
+  width: 1.35rem;
+  margin-right: 0.45rem;
+  text-align: center;
+}
+
+.app-sidebar .nav-link.active {
+  font-weight: 700;
+}
+
+@media (max-width: 575.98px) {
+  .app-footer-custom {
+    justify-content: center;
+    text-align: center;
+    font-size: 0.875rem;
+    line-height: 1.35;
+    padding: 0.75rem 0.875rem;
+  }
+
+  .app-footer-custom__copy,
+  .app-footer-custom__rights {
+    width: 100%;
+  }
+
+  .dt-container .dt-layout-row {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .dt-container .dt-layout-cell {
+    width: 100%;
+    text-align: center;
+  }
+
+  .dt-container .dt-search {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .dt-container .dt-search input {
+    width: min(100%, 14rem);
+  }
+
+  .dt-container .dt-paging .pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .dt-container .dt-paging .first,
+  .dt-container .dt-paging .last,
+  .dt-container .dt-paging .page-item:not(:has(.previous)):not(:has(.next)):not(:has(.first)):not(:has(.last)) {
+    display: none;
+  }
+
+  .dt-container .dt-length,
+  .dt-container .dt-info {
+    text-align: center;
+  }
+}

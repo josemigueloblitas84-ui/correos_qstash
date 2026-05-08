@@ -50,6 +50,7 @@
   <!--end::Required Plugin(AdminLTE)-->
   <!--Letrita del sistema-->
   <link rel="stylesheet" href="{{ asset('assets/css/gloBal-font.css') }}">
+  <link rel="stylesheet" href="{{ asset('assets/css/app-layout.css') }}">
 
   <!-- apexcharts -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.css"
@@ -75,7 +76,7 @@
 <!--end::Head-->
 <!--begin::Body-->
 
-<body class="hold-transition sidebar-mini">
+<body class="layout-fixed sidebar-expand-lg sidebar-mini bg-body-tertiary">
   <!--begin::App Wrapper-->
   <div class="app-wrapper">
     <!--begin::Header-->
@@ -85,20 +86,20 @@
     @include('plantilla.menu')
     <!--end::Sidebar-->
     <!--begin::App Main-->
-    <div class="content-wrapper">
+    <main class="app-main">
       @yield('content')
-    </div>
+    </main>
     <!--end::App Main-->
     <!--begin::Footer-->
-    <footer class="app-footer">
+    <footer class="app-footer app-footer-custom">
       <!--begin::To the end-->
       <!--end::To the end-->
       <!--begin::Copyright-->
-      <strong>
+      <strong class="app-footer-custom__copy">
         Copyright &copy; 2025-2026&nbsp;
         <span>Fundación Unifranz</span>
       </strong>
-      Todos los derechos reservados.
+      <span class="app-footer-custom__rights">Todos los derechos reservados.</span>
       <!--end::Copyright-->
     </footer>
     <!--end::Footer-->
@@ -173,10 +174,10 @@
         lengthChange: true,
         pageLength: 10,
         autoWidth: false,
+        pagingType: 'full_numbers',
         layout: {
-          topStart: {
-            buttons: ['copy', 'csv', 'excel', 'pdf', 'print', 'colvis']
-          },
+          topStart: null,
+          topEnd: 'search',
           bottomStart: ['pageLength', 'info'],
           bottomEnd: 'paging'
         },

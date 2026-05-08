@@ -8,7 +8,7 @@
                 class="brand-image opacity-75 shadow" />
             <!--end::Brand Image-->
             <!--begin::Brand Text-->
-            <span class="brand-text fw-light" style="white-space: normal; line-height: 1.15;">{{ $systemConfig['nombre_institucion'] }}</span>
+            <span class="brand-text fw-light app-sidebar-brand-text">{{ $systemConfig['nombre_institucion'] }}</span>
             <!--end::Brand Text-->
         </a>
         <!--end::Brand Link-->
@@ -36,52 +36,118 @@
                         <p>Panel de control</p>
                     </a>
                 </li>
-                <li class="nav-header">Roles y Permisos</li>
-                <li class="nav-item">
+                @canany(['ver agenda', 'ver informe agenda', 'ver reporte agenda informe'])
+                    <li class="nav-header">Gestion</li>
+                    @can('ver agenda')
+                        <li class="nav-item">
+                            <a href="{{ route('agenda.create') }}" class="nav-link {{ request()->routeIs('agenda.*') ? 'active' : '' }}">
+                                <i class="nav-icon far fa-file-alt"></i>
+                                <p>Agendar</p>
+                            </a>
+                        </li>
+                    @endcan
+                    @can('ver informe agenda')
+                        <li class="nav-item">
+                            <a href="{{ route('informe-agenda.index') }}" class="nav-link {{ request()->routeIs('informe-agenda.*') ? 'active' : ''}}">
+                                <i class="nav-icon fas fa-tasks"></i>
+                                <p>Informes</p>
+                            </a>
+                        </li>
+                    @endcan
+                    @can('ver reporte agenda informe')
+                        <li class="nav-item">
+                            <a href="{{route('reporte-agenda-informe.index') }}" class="nav-link {{ request()->routeIs('reporte-agenda-informe.*') ? 'active' : ''}}">
+                                <i class="nav-icon fas fa-chart-bar"></i>
+                                <p>Reportes</p>
+                            </a>
+                        </li>
+                    @endcan
+                @endcanany
+
+                @canany(['ver departamentos', 'ver instituciones', 'ver sedes', 'ver tipos de personal'])
+                    <li class="nav-header">Catalogos</li>
+                    @can('ver departamentos')
+                        <li class="nav-item">
+                            <a href="{{ route('departamentos.index') }}" class="nav-link {{ request()->routeIs('departamentos.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-building"></i>
+                                <p>Departamentos</p>
+                            </a>
+                        </li>
+                    @endcan
+                    @can('ver instituciones')
+                        <li class="nav-item">
+                            <a href="{{ route('instituciones.index') }}" class="nav-link {{ request()->routeIs('instituciones.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-university"></i>
+                                <p>Instituciones</p>
+                            </a>
+                        </li>
+                    @endcan
+                    @can('ver sedes')
+                        <li class="nav-item">
+                            <a href="{{ route('sedes.index') }}" class="nav-link {{ request()->routeIs('sedes.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-map-marker-alt"></i>
+                                <p>Sedes</p>
+                            </a>
+                        </li>
+                    @endcan
+                    @can('ver tipos de personal')
+                        <li class="nav-item">
+                            <a href="{{ route('tipos-personal.index') }}" class="nav-link {{ request()->routeIs('tipos-personal.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-user-graduate"></i>
+                                <p>Tipos de personal</p>
+                            </a>
+                        </li>
+                    @endcan
+                @endcanany
+
+                @canany(['ver usuarios', 'ver roles', 'ver permisos', 'ver logs', 'configurar sistema'])
+                    <li class="nav-header">Administracion</li>
                     @can('ver usuarios')
-                    <a href="{{ route('usuarios.index') }}"
-                        class="nav-link {{ request()->routeIs('usuarios.index') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-users"></i>
-                        <p>Usuarios</p>
-                    </a>
+                        <li class="nav-item">
+                            <a href="{{ route('usuarios.index') }}"
+                                class="nav-link {{ request()->routeIs('usuarios.index') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-users"></i>
+                                <p>Usuarios</p>
+                            </a>
+                        </li>
                     @endcan
-                </li>
-                <li class="nav-item">
-                    @can('ver permisos')
-                    <a href="{{ route('permisos.index') }}"
-                        class="nav-link {{ request()->routeIs('permisos.index') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-user-lock"></i>
-                        <p>Permisos</p>
-                    </a>
-                    @endcan
-                </li>
-                <li class="nav-item">
                     @can('ver roles')
-                    <a href="{{ route('roles.index') }}"
-                        class="nav-link {{ request()->routeIs('roles.index') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-user-tag"></i>
-                        <p>Roles</p>
-                    </a>
+                        <li class="nav-item">
+                            <a href="{{ route('roles.index') }}"
+                                class="nav-link {{ request()->routeIs('roles.index') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-user-tag"></i>
+                                <p>Roles</p>
+                            </a>
+                        </li>
                     @endcan
-                </li>
-                <li class="nav-item">
+                    @can('ver permisos')
+                        <li class="nav-item">
+                            <a href="{{ route('permisos.index') }}"
+                                class="nav-link {{ request()->routeIs('permisos.index') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-user-lock"></i>
+                                <p>Permisos</p>
+                            </a>
+                        </li>
+                    @endcan
                     @can('ver logs')
-                    <a href="{{ route('logs.index')}}"
-                    class="nav-link {{request()->routeIs('logs.index') ? 'active' : '' }}">
-                    <i class="nav-icon fas fa-history"></i>
-                    <p>Historial de Actividad</p>
-                    </a>
+                        <li class="nav-item">
+                            <a href="{{ route('logs.index')}}"
+                            class="nav-link {{request()->routeIs('logs.index') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-history"></i>
+                                <p>Historial</p>
+                            </a>
+                        </li>
                     @endcan
-                </li>
-                <li class="nav-item">
                     @can('configurar sistema')
-                    <a href="{{ route('configuracion-sistema.edit') }}"
-                    class="nav-link {{ request()->routeIs('configuracion-sistema.*') ? 'active' : '' }}">
-                    <i class="nav-icon fas fa-cogs"></i>
-                    <p>Configuracion del Sistema</p>
-                    </a>
+                        <li class="nav-item">
+                            <a href="{{ route('configuracion-sistema.edit') }}"
+                            class="nav-link {{ request()->routeIs('configuracion-sistema.*') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-cogs"></i>
+                                <p>Configuracion</p>
+                            </a>
+                        </li>
                     @endcan
-                </li>
+                @endcanany
                 {{-- <li class="nav-item">
                     @can('qstash')
                     <a href="#" class="nav-link">
@@ -121,62 +187,7 @@
                         </p>
                     </a>
                 </li> --}}
-                <li class="nav-item">
-                    @can('ver agenda')
-                    <a href="{{ route('agenda.create') }}" class="nav-link {{ request()->routeIs('agenda.*') ? 'active' : '' }}">
-                        <i class="nav-icon far fa-file-alt"></i>
-                        <p>Agendar</p>
-                    </a>
-                    @endcan
-                </li>
-                <li class="nav-item">
-                    @can('ver departamentos')
-                    <a href="{{ route('departamentos.index') }}" class="nav-link {{ request()->routeIs('departamentos.*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-building"></i>
-                        <p>Departamentos</p>
-                    </a>
-                    @endcan
-                </li>
-                <li class="nav-item">
-                    @can('ver instituciones')
-                    <a href="{{ route('instituciones.index') }}" class="nav-link {{ request()->routeIs('instituciones.*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-university"></i>
-                        <p>Instituciones</p>
-                    </a>
-                    @endcan
-                </li>
-                <li class="nav-item">
-                    @can('ver sedes')
-                    <a href="{{ route('sedes.index') }}" class="nav-link {{ request()->routeIs('sedes.*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-map-marker-alt"></i>
-                        <p>Sedes</p>
-                    </a>
-                    @endcan
-                </li>
-                <li class="nav-item">
-                    @can('ver tipos de personal')
-                    <a href="{{ route('tipos-personal.index') }}" class="nav-link {{ request()->routeIs('tipos-personal.*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-user-graduate"></i>
-                        <p>Tipo de Personal</p>
-                    </a>
-                    @endcan
-                </li>
-                <li class="nav-item">
-                    @can('ver informe agenda')
-                    <a href=" {{route('informe-agenda.index') }}" class="nav-link {{ request()->routeIs('informe-agenda.*') ? 'active' : ''}}">
-                        <i class="nav-icon fas fa-tasks"></i>
-                        <p>Informe de Agenda</p>
-                    </a>
-                    @endcan
-                </li>
-                <li class="nav-item">
-                    @can('ver reporte agenda informe')
-                    <a href="{{route('reporte-agenda-informe.index') }}" class="nav-link {{ request()->routeIs('reporte-agenda-informe.*') ? 'active' : ''}}">
-                        <i class="nav-icon fas fa-chart-bar"></i>
-                        <p>Reporte de Agenda/Informe</p>
-                    </a>
-                    @endcan
-                </li>
+                <li class="nav-header">Ayuda</li>
                 <li class="nav-item">
                     <a href="{{ route('larecipe.index') }}" class="nav-link {{ request()->routeIs('larecipe.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-book"></i>

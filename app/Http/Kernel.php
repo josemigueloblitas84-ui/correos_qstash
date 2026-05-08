@@ -64,7 +64,7 @@ class Kernel extends HttpKernel
         'signed' => \App\Http\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-        'qstash' => \App\Http\Middleware\qstashMiddleware::class,
+        // 'qstash' => \App\Http\Middleware\qstashMiddleware::class,
         'jwt' => \App\Http\Middleware\JwtMiddleware::class,
 
         // Spatie Permission
