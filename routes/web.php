@@ -14,6 +14,7 @@ use App\Http\Controllers\Agenda\DepartamentoController;
 use App\Http\Controllers\Agenda\TipoPersonalController;
 use App\Http\Controllers\Agenda\InformeController;
 use App\Http\Controllers\Reportes\ReporteAgendaInformeController;
+use App\Http\Controllers\Certificado\CertificadoPlantillaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -151,6 +152,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/agenda/{id}/preview', 'previewAgenda')->name('agenda.preview');
         Route::get('/informe/preview', 'previewInforme')->name('informe.preview');
         Route::post('/informe/validar', 'validarInforme')->name('informe.validar');
+    });
+
+    Route::prefix('certificados')->name('certificados.')->controller(CertificadoPlantillaController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('/plantillas', 'store')->name('plantillas.store');
+        Route::get('/plantillas/{archivo}', 'show')->name('plantillas.show');
+        Route::get('/plantillas/{archivo}/edit', 'edit')->name('plantillas.edit');
     });
 });
 

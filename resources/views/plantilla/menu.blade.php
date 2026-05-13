@@ -36,9 +36,8 @@
                         <p>Panel de control</p>
                     </a>
                 </li>
-                <li class="nav-header">Roles y Permisos</li>
+                @can('ver usuarios')
                 <li class="nav-item">
-                    @can('ver usuarios')
                     <a href="{{ route('usuarios.index') }}"
                         class="nav-link {{ request()->routeIs('usuarios.index') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-users"></i>
@@ -46,8 +45,9 @@
                     </a>
                     @endcan
                 </li>
+                @can('ver permisos')
+                <li class="nav-header">Roles y Permisos</li>
                 <li class="nav-item">
-                    @can('ver permisos')
                     <a href="{{ route('permisos.index') }}"
                         class="nav-link {{ request()->routeIs('permisos.index') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-user-lock"></i>
@@ -160,6 +160,12 @@
                         <p>Reporte de Agenda/Informe</p>
                     </a>
                     @endcan
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('certificados.index') }}" class="nav-link {{ request()->routeIs('certificados.*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-certificate"></i>
+                        <p>Certificado</p>
+                    </a>
                 </li>
                 <li class="nav-item">
                     <a href="{{ route('larecipe.index') }}" class="nav-link {{ request()->routeIs('larecipe.*') ? 'active' : '' }}">

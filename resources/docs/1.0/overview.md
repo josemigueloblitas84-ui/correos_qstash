@@ -55,6 +55,8 @@ Los módulos disponibles pueden variar segun el rol y los permisos de cada usuar
 - Historial de actividad
 - Agendar
 - Departamentos
+- Instituciones
+- Sedes
 - Tipo de personal
 - Informe de agenda
 - Reporte de agenda e informe
