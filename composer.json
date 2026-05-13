@@ -17,6 +17,7 @@
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
         "propaganistas/laravel-phone": "5.3.6",
+        "simplesoftwareio/simple-qrcode": "^4.2",
         "spatie/laravel-activitylog": "^4.12",
         "spatie/laravel-permission": "^6.24",
         "symfony/dom-crawler": "6.4.34",
