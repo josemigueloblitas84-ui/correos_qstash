@@ -156,9 +156,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::prefix('certificados')->name('certificados.')->controller(CertificadoPlantillaController::class)->group(function () {
         Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
         Route::post('/plantillas', 'store')->name('plantillas.store');
         Route::get('/plantillas/{archivo}', 'show')->name('plantillas.show');
         Route::get('/plantillas/{archivo}/edit', 'edit')->name('plantillas.edit');
+        Route::post('/plantillas/{archivo}/estructura', 'saveStructure')->name('plantillas.estructura.store');
+        Route::get('/plantillas/{archivo}/mi-certificado', 'downloadMyCertificate')->name('plantillas.mi-certificado');
     });
 });
 
