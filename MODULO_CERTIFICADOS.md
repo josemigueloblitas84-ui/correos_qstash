@@ -783,6 +783,26 @@ Se guardan en:
 
 - `storage/app/public/certificados/emitidos`
 
+## 17.1 Configuracion de IP local para pruebas con QR
+
+Para que el QR pudiera abrirse correctamente desde un celular dentro de la misma red, se ajusto la configuracion local del proyecto para no depender de `localhost`.
+
+Se hizo lo siguiente:
+
+- en `.env` se cambio `APP_URL` para usar la IP local de la maquina
+- en este caso se uso:
+  - `http://192.168.100.89:8000`
+- Laravel se levanto escuchando en red local con:
+  - `php artisan serve --host=0.0.0.0 --port=8000`
+- se habilito el puerto `8000` en el firewall de Windows
+- el celular y la PC debian estar conectados a la misma red WiFi
+
+Esto permitio que:
+
+- el QR dejara de apuntar a `localhost`
+- el celular pudiera abrir la URL publica de verificacion
+- la ruta `/certificados/verificar/{hash}` funcionara correctamente fuera del navegador de la PC
+
 ## 18. Archivos eliminados o descartados
 
 Estos ya no forman parte del flujo activo:
@@ -928,4 +948,3 @@ Si se sigue ampliando el modulo, los siguientes puntos naturales serian:
 - mejorar reportes de verificaciones
 - agregar revocacion manual de certificados
 - agregar filtros por usuario, fecha y estado en certificados emitidos
-
