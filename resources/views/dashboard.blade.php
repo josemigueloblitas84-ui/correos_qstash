@@ -74,6 +74,7 @@
                         </svg>
                     </div>
                 </div>
+
             </div>
 
             <div class="card dashboard-hours-table-card mt-4">

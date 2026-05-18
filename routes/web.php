@@ -32,6 +32,9 @@ Route::get('/', function () {
         : redirect('/login');
 });
 
+Route::get('/certificados/verificar/{hash}', [CertificadoPlantillaController::class, 'verifyCertificate'])
+    ->name('certificados.verificar');
+
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -157,12 +160,32 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('certificados')->name('certificados.')->controller(CertificadoPlantillaController::class)->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
+        Route::post('/qr-preview', 'previewQr')->name('qr.preview');
         Route::post('/plantillas', 'store')->name('plantillas.store');
         Route::get('/plantillas/{archivo}', 'show')->name('plantillas.show');
         Route::get('/plantillas/{archivo}/edit', 'edit')->name('plantillas.edit');
+        Route::get('/plantillas/{archivo}/preview', 'previewCertificate')->name('plantillas.preview');
         Route::post('/plantillas/{archivo}/estructura', 'saveStructure')->name('plantillas.estructura.store');
-        Route::get('/plantillas/{archivo}/mi-certificado', 'downloadMyCertificate')->name('plantillas.mi-certificado');
     });
+
+    Route::get('/mis-certificados', [CertificadoPlantillaController::class, 'indexUserCertificates'])
+        ->middleware('permission:descargar certificado')
+        ->name('mis-certificados.index');
+    Route::get('/mis-certificados/{archivo}/emitir', [CertificadoPlantillaController::class, 'showGenerateCertificatePage'])
+        ->middleware('permission:descargar certificado')
+        ->name('mis-certificados.emitir');
+    Route::get('/mis-certificados/{archivo}/payload', [CertificadoPlantillaController::class, 'downloadMyCertificate'])
+        ->middleware('permission:descargar certificado')
+        ->name('mis-certificados.payload');
+    Route::post('/mis-certificados/emisiones/{emitido}/archivo', [CertificadoPlantillaController::class, 'storeIssuedCertificateFile'])
+        ->middleware('permission:descargar certificado')
+        ->name('mis-certificados.emitidos.archivo.store');
+    Route::get('/mis-certificados/emisiones/{emitido}/descargar-pdf', [CertificadoPlantillaController::class, 'showIssuedCertificateDownloadPage'])
+        ->middleware('permission:descargar certificado')
+        ->name('mis-certificados.emitidos.descargar');
+    Route::get('/mis-certificados/emisiones/{emitido}/payload-descarga', [CertificadoPlantillaController::class, 'getIssuedCertificateDownloadPayload'])
+        ->middleware('permission:descargar certificado')
+        ->name('mis-certificados.emitidos.payload');
 });
 
 require __DIR__ . '/auth.php';

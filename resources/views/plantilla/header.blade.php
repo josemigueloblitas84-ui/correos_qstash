@@ -144,6 +144,27 @@
             </li>
             <!--end::Fullscreen Toggle-->
 
+            @can('descargar certificado')
+                <li class="nav-item">
+                    @if (!empty($dashboardCertificate['available']) && !empty($dashboardCertificate['emit_url']))
+                        <a
+                            class="nav-link d-flex align-items-center gap-1"
+                            href="{{ $dashboardCertificate['emit_url'] }}"
+                            title="Emitir certificado">
+                            <i class="bi bi-file-earmark-arrow-down"></i>
+                            <span class="d-none d-md-inline">Emitir certificado</span>
+                        </a>
+                    @else
+                        <span
+                            class="nav-link d-flex align-items-center gap-1 text-secondary"
+                            title="No hay certificado disponible">
+                            <i class="bi bi-file-earmark-x"></i>
+                            <span class="d-none d-md-inline">Sin certificado</span>
+                        </span>
+                    @endif
+                </li>
+            @endcan
+
             <!--begin::User Menu Dropdown-->
             <li class="nav-item dropdown">
                 <a class="nav-link" data-bs-toggle="dropdown" href="#">

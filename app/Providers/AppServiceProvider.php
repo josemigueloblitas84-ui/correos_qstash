@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\Certificado\CertificadoPlantillaService;
 use App\Services\ConfiguracionSistemaService;
 use App\Support\Larecipe\DocumentationRepository as CustomDocumentationRepository;
 use BinaryTorch\LaRecipe\DocumentationRepository as BaseDocumentationRepository;
@@ -32,6 +33,19 @@ class AppServiceProvider extends ServiceProvider
                 'systemConfig',
                 app(ConfiguracionSistemaService::class)->getPresentationData()
             );
+        });
+
+        View::composer('plantilla.header', function ($view) {
+            $dashboardCertificate = auth()->check()
+                ? app(CertificadoPlantillaService::class)->getUserDashboardCertificateData()
+                : [
+                    'available' => false,
+                    'download_url' => null,
+                    'nombre' => null,
+                    'archivo' => null,
+                ];
+
+            $view->with('dashboardCertificate', $dashboardCertificate);
         });
     }
 }

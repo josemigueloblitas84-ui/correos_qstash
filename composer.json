@@ -11,6 +11,7 @@
         "php": "^8.1",
         "barryvdh/laravel-dompdf": "^3.1",
         "binarytorch/larecipe": "^2.9",
+        "chillerlan/php-qrcode": "5.0",
         "firebase/php-jwt": "^7.0",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^10.10",

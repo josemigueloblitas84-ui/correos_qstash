@@ -70,10 +70,10 @@
 
                             <form id="certificadoEditorForm" autocomplete="off">
                                 <div class="certificado-section mb-4">
-                                    <div class="certificado-section__header">
-                                        <h6 class="mb-0">Textos</h6>
-                                        <span class="badge text-bg-primary" id="contadorTextos">0 / 5</span>
-                                    </div>
+                                <div class="certificado-section__header">
+                                    <h6 class="mb-0">Textos</h6>
+                                    <span class="badge text-bg-primary" id="contadorTextos">0</span>
+                                </div>
                                     <div id="listaTextos" class="certificado-field-list"></div>
                                 </div>
 
@@ -130,9 +130,9 @@
                                     Guardar estructura
                                 </button>
 
-                                <a href="{{ $downloadMyCertificateUrl }}" target="_blank" class="btn btn-outline-danger btn-sm">
-                                    Probar descarga
-                                </a>
+                                <button type="button" class="btn btn-outline-danger btn-sm" id="btnDescargarCertificado">
+                                    Vista previa PDF
+                                </button>
                             </div>
                         </div>
 
@@ -172,22 +172,28 @@
 @endsection
 
 @push('styles')
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;600;700&family=Poppins:wght@400;500;600;700&family=Roboto+Slab:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('assets/css/certificados.css') }}">
 @endpush
 
 @push('scripts')
     <script>
         window.certificadoEditorConfig = {
-            maxTextos: 5,
+            maxTextos: null,
             maxCamposDinamicos: 10,
             maxFirmas: 5,
             maxQr: 1,
             maxImagenes: null,
-            pageSize: 'a4',
-            pageOrientation: 'horizontal',
-            canvasWidth: 1120,
-            canvasHeight: 792,
+            pageSize: @json($editorPage['size']),
+            pageOrientation: @json($editorPage['orientation']),
+            canvasWidth: @json($editorPage['canvas_width']),
+            canvasHeight: @json($editorPage['canvas_height']),
+            initialStructure: @json($initialStructure),
             saveStructureUrl: @json($saveStructureUrl),
+            previewCertificateUrl: @json($previewCertificateUrl),
+            qrPreviewUrl: @json($qrPreviewUrl),
             csrfToken: @json(csrf_token()),
             defaultTextoLabel: 'Texto editable',
             defaultCampoDinamicoLabel: 'nombre_completo',
@@ -202,5 +208,6 @@
         };
     </script>
     <script src="https://cdn.jsdelivr.net/npm/fabric@5.3.0/dist/fabric.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script src="{{ asset('assets/js/certificados.js') }}"></script>
 @endpush
