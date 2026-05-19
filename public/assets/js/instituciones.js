@@ -3,11 +3,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const tableElement = document.getElementById('tablaInstituciones');
     const createForm = document.getElementById('formCrearInstitucion');
     const editForm = document.getElementById('formEditarInstitucion');
-    const assignmentForm = document.getElementById('formSedesInstitucion');
     const editIdField = document.getElementById('editar_id');
-    const assignmentIdField = document.getElementById('sedes_institucion_id');
-    const assignmentNameField = document.getElementById('sedes_institucion_nombre');
-    const assignmentList = document.getElementById('listaSedesInstitucion');
+    const adminForm = document.getElementById('formCrearAdministrador');
+    const adminTenantIdField = document.getElementById('administrador_tenant_id');
+    const adminInstitutionField = document.getElementById('administrador_institucion');
 
     if (!tableElement || typeof $ === 'undefined' || !$.fn.DataTable) {
         return;
@@ -15,10 +14,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const createModalElement = document.getElementById('modalCrearInstitucion');
     const editModalElement = document.getElementById('modalEditarInstitucion');
-    const assignmentModalElement = document.getElementById('modalSedesInstitucion');
+    const adminModalElement = document.getElementById('modalCrearAdministrador');
     const createModal = createModalElement ? bootstrap.Modal.getOrCreateInstance(createModalElement) : null;
     const editModal = editModalElement ? bootstrap.Modal.getOrCreateInstance(editModalElement) : null;
-    const assignmentModal = assignmentModalElement ? bootstrap.Modal.getOrCreateInstance(assignmentModalElement) : null;
+    const adminModal = adminModalElement ? bootstrap.Modal.getOrCreateInstance(adminModalElement) : null;
 
     const table = $('#tablaInstituciones').DataTable({
         processing: true,
@@ -32,7 +31,8 @@ document.addEventListener('DOMContentLoaded', function () {
         columns: [
             { data: 'id', name: 'id' },
             { data: 'nombre', name: 'nombre' },
-            { data: 'sedes', name: 'sedes', orderable: false, searchable: false },
+            { data: 'dominios', name: 'dominios', orderable: false, searchable: false },
+            { data: 'base_datos', name: 'base_datos', orderable: false, searchable: false },
             { data: 'created_at', name: 'created_at' },
             { data: 'acciones', name: 'acciones', orderable: false, searchable: false },
         ],
@@ -71,9 +71,8 @@ document.addEventListener('DOMContentLoaded', function () {
         clearValidation(form, prefix);
 
         Object.keys(errors || {}).forEach(function (field) {
-            const normalizedField = field.includes('.') ? field.split('.')[0] : field;
-            const input = form.querySelector('[name="' + field + '"]') || form.querySelector('[name="' + normalizedField + '[]"]') || form.querySelector('[name="' + normalizedField + '"]');
-            const errorContainer = document.getElementById(prefix + field) || document.getElementById(prefix + normalizedField);
+            const input = form.querySelector('[name="' + field + '"]');
+            const errorContainer = document.getElementById(prefix + field);
 
             if (input) {
                 input.classList.add('is-invalid');
@@ -126,57 +125,21 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    function resetAssignmentForm() {
-        if (!assignmentForm) {
+    function resetAdminForm() {
+        if (!adminForm) {
             return;
         }
 
-        assignmentForm.reset();
-        clearValidation(assignmentForm, 'error_asignar_');
+        adminForm.reset();
+        clearValidation(adminForm, 'error_admin_');
 
-        if (assignmentIdField) {
-            assignmentIdField.value = '';
+        if (adminTenantIdField) {
+            adminTenantIdField.value = '';
         }
 
-        if (assignmentNameField) {
-            assignmentNameField.textContent = '-';
+        if (adminInstitutionField) {
+            adminInstitutionField.value = '';
         }
-
-        if (assignmentList) {
-            assignmentList.innerHTML = '';
-        }
-    }
-
-    function renderSedeOptions(sedes) {
-        if (!assignmentList) {
-            return;
-        }
-
-        assignmentList.innerHTML = '';
-
-        if (!Array.isArray(sedes) || sedes.length === 0) {
-            assignmentList.innerHTML = '<div class="alert alert-secondary mb-0">No hay sedes registradas.</div>';
-            return;
-        }
-
-        sedes.forEach(function (sede) {
-            const wrapper = document.createElement('label');
-            wrapper.className = 'form-check d-flex align-items-center gap-2 border rounded px-3 py-2';
-
-            const input = document.createElement('input');
-            input.type = 'checkbox';
-            input.className = 'form-check-input mt-0';
-            input.name = 'sedes[]';
-            input.value = sede.id;
-            input.checked = Boolean(sede.checked);
-
-            const text = document.createElement('span');
-            text.textContent = sede.nombre || '';
-
-            wrapper.appendChild(input);
-            wrapper.appendChild(text);
-            assignmentList.appendChild(wrapper);
-        });
     }
 
     if (createModalElement) {
@@ -187,8 +150,8 @@ document.addEventListener('DOMContentLoaded', function () {
         editModalElement.addEventListener('hidden.bs.modal', resetEditForm);
     }
 
-    if (assignmentModalElement) {
-        assignmentModalElement.addEventListener('hidden.bs.modal', resetAssignmentForm);
+    if (adminModalElement) {
+        adminModalElement.addEventListener('hidden.bs.modal', resetAdminForm);
     }
 
     if (createForm) {
@@ -206,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 beforeSend: function () {
                     Swal.fire({
                         title: 'Guardando...',
-                        text: 'Registrando institucion',
+                        text: 'Creando institucion, dominio y base tenant',
                         allowOutsideClick: false,
                         didOpen: function () {
                             Swal.showLoading();
@@ -261,14 +224,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 Swal.close();
 
                 const data = response.data || {};
+                const tenantIdField = document.getElementById('editar_tenant_id');
                 const nombreField = document.getElementById('editar_nombre');
+                const domainField = document.getElementById('editar_domain');
 
                 if (editIdField) {
                     editIdField.value = data.id || '';
                 }
 
+                if (tenantIdField) {
+                    tenantIdField.value = data.id || '';
+                }
+
                 if (nombreField) {
                     nombreField.value = data.nombre || '';
+                }
+
+                if (domainField) {
+                    domainField.value = data.domain || '';
                 }
 
                 if (editModal) {
@@ -277,6 +250,79 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             error: function (xhr) {
                 handleAjaxError(xhr, editForm || createForm, 'error_editar_', 'No se pudo cargar la institucion seleccionada.');
+            },
+        });
+    });
+
+    $('#tablaInstituciones').on('click', '.btn-conectar', function () {
+        const id = this.getAttribute('data-id');
+        const nombre = this.getAttribute('data-nombre') || id;
+
+        if (!id || !config.connectUrlTemplate) {
+            return;
+        }
+
+        const tenantWindow = window.open('about:blank', '_blank');
+
+        if (tenantWindow) {
+            tenantWindow.opener = null;
+            tenantWindow.document.title = 'Conectando...';
+            tenantWindow.document.body.innerHTML = '<p style="font-family: sans-serif; padding: 24px;">Conectando con la institucion...</p>';
+        }
+
+        $.ajax({
+            url: buildUrl(config.connectUrlTemplate, id),
+            type: 'POST',
+            data: {
+                _token: config.csrfToken,
+            },
+            headers: {
+                'X-CSRF-TOKEN': config.csrfToken,
+            },
+            beforeSend: function () {
+                Swal.fire({
+                    title: 'Conectando...',
+                    text: 'Cargando modulos y registros de ' + nombre,
+                    allowOutsideClick: false,
+                    didOpen: function () {
+                        Swal.showLoading();
+                    },
+                });
+            },
+            success: function (response) {
+                Swal.close();
+
+                if (response.redirect_url) {
+                    if (tenantWindow) {
+                        tenantWindow.location.href = response.redirect_url;
+                    } else {
+                        window.location.href = response.redirect_url;
+                    }
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Conexion abierta',
+                        text: 'El tenant se abrio en una nueva pestana.',
+                        timer: 1500,
+                        showConfirmButton: false,
+                    });
+                    return;
+                }
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Conectado',
+                    text: response.message || 'Conexion establecida con la institucion.',
+                    timer: 1500,
+                    showConfirmButton: false,
+                });
+            },
+            error: function (xhr) {
+                if (tenantWindow) {
+                    tenantWindow.close();
+                }
+
+                handleAjaxError(xhr, editForm || createForm, 'error_editar_', 'No se pudo conectar con la institucion.');
             },
         });
     });
@@ -331,6 +377,77 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    $('#tablaInstituciones').on('click', '.btn-administrador', function () {
+        const id = this.getAttribute('data-id');
+        const nombre = this.getAttribute('data-nombre') || id;
+
+        if (!id || !adminForm) {
+            return;
+        }
+
+        resetAdminForm();
+
+        if (adminTenantIdField) {
+            adminTenantIdField.value = id;
+        }
+
+        if (adminInstitutionField) {
+            adminInstitutionField.value = nombre;
+        }
+
+        if (adminModal) {
+            adminModal.show();
+        }
+    });
+
+    if (adminForm) {
+        adminForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const id = adminTenantIdField ? adminTenantIdField.value : '';
+            if (!id) {
+                return;
+            }
+
+            clearValidation(adminForm, 'error_admin_');
+
+            $.ajax({
+                url: buildUrl(config.adminStoreUrlTemplate, id),
+                type: 'POST',
+                data: $(adminForm).serialize(),
+                headers: {
+                    'X-CSRF-TOKEN': config.csrfToken,
+                },
+                beforeSend: function () {
+                    Swal.fire({
+                        title: 'Creando administrador...',
+                        text: 'Preparando roles, permisos y usuario dentro de la institucion',
+                        allowOutsideClick: false,
+                        didOpen: function () {
+                            Swal.showLoading();
+                        },
+                    });
+                },
+                success: function (response) {
+                    Swal.close();
+
+                    if (adminModal) {
+                        adminModal.hide();
+                    }
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Correcto',
+                        text: response.message || 'Administrador creado correctamente.',
+                    });
+                },
+                error: function (xhr) {
+                    handleAjaxError(xhr, adminForm, 'error_admin_', 'No se pudo crear el administrador.');
+                },
+            });
+        });
+    }
+
     $('#tablaInstituciones').on('click', '.btn-eliminar', function () {
         const id = this.getAttribute('data-id');
 
@@ -340,10 +457,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         Swal.fire({
             icon: 'warning',
-            title: 'Eliminar institucion',
-            text: 'Esta accion no se puede deshacer.',
+            title: 'Dar de baja institucion',
+            text: 'La institucion dejara de aparecer y no podra ingresar por su dominio, pero su base de datos tenant se conservara.',
             showCancelButton: true,
-            confirmButtonText: 'Si, eliminar',
+            confirmButtonText: 'Si, dar de baja',
             cancelButtonText: 'Cancelar',
         }).then(function (result) {
             if (!result.isConfirmed) {
@@ -362,8 +479,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 beforeSend: function () {
                     Swal.fire({
-                        title: 'Eliminando...',
-                        text: 'Procesando la eliminacion de la institucion',
+                        title: 'Procesando...',
+                        text: 'Dando de baja la institucion',
                         allowOutsideClick: false,
                         didOpen: function () {
                             Swal.showLoading();
@@ -377,111 +494,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     Swal.fire({
                         icon: 'success',
                         title: 'Correcto',
-                        text: response.message || 'Institucion eliminada correctamente.',
+                        text: response.message || 'Institucion dada de baja correctamente.',
                     });
                 },
                 error: function (xhr) {
-                    handleAjaxError(xhr, editForm || createForm, 'error_editar_', 'No se pudo eliminar la institucion.');
+                    handleAjaxError(xhr, editForm || createForm, 'error_editar_', 'No se pudo dar de baja la institucion.');
                 },
             });
         });
     });
-
-    $('#tablaInstituciones').on('click', '.btn-sedes', function () {
-        const id = this.getAttribute('data-id');
-
-        if (!id) {
-            return;
-        }
-
-        resetAssignmentForm();
-
-        $.ajax({
-            url: buildUrl(config.sedesEditUrlTemplate, id),
-            type: 'GET',
-            beforeSend: function () {
-                Swal.fire({
-                    title: 'Cargando...',
-                    text: 'Obteniendo sedes de la institucion',
-                    allowOutsideClick: false,
-                    didOpen: function () {
-                        Swal.showLoading();
-                    },
-                });
-            },
-            success: function (response) {
-                Swal.close();
-
-                const data = response.data || {};
-                const institucion = data.institucion || {};
-
-                if (assignmentIdField) {
-                    assignmentIdField.value = institucion.id || '';
-                }
-
-                if (assignmentNameField) {
-                    assignmentNameField.textContent = institucion.nombre || '-';
-                }
-
-                renderSedeOptions(data.sedes || []);
-
-                if (assignmentModal) {
-                    assignmentModal.show();
-                }
-            },
-            error: function (xhr) {
-                handleAjaxError(xhr, assignmentForm || editForm || createForm, 'error_asignar_', 'No se pudo cargar la asignacion de sedes.');
-            },
-        });
-    });
-
-    if (assignmentForm) {
-        assignmentForm.addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            const id = assignmentIdField ? assignmentIdField.value : '';
-            if (!id) {
-                return;
-            }
-
-            clearValidation(assignmentForm, 'error_asignar_');
-
-            $.ajax({
-                url: buildUrl(config.sedesUpdateUrlTemplate, id),
-                type: 'POST',
-                data: $(assignmentForm).serialize() + '&_method=PUT',
-                headers: {
-                    'X-CSRF-TOKEN': config.csrfToken,
-                },
-                beforeSend: function () {
-                    Swal.fire({
-                        title: 'Guardando...',
-                        text: 'Actualizando sedes de la institucion',
-                        allowOutsideClick: false,
-                        didOpen: function () {
-                            Swal.showLoading();
-                        },
-                    });
-                },
-                success: function (response) {
-                    Swal.close();
-
-                    if (assignmentModal) {
-                        assignmentModal.hide();
-                    }
-
-                    table.ajax.reload(null, false);
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Correcto',
-                        text: response.message || 'Sedes asignadas correctamente.',
-                    });
-                },
-                error: function (xhr) {
-                    handleAjaxError(xhr, assignmentForm, 'error_asignar_', 'No se pudieron asignar las sedes.');
-                },
-            });
-        });
-    }
 });

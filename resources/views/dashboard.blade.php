@@ -145,7 +145,7 @@
                 </div>
                 <div class="modal-body control-horas-modal__body">
                     <iframe
-                        src="{{ route('dashboard.control-horas.preview') }}"
+                        src="{{ url('/dashboard/control-horas/preview') }}"
                         class="control-horas-frame"
                         title="Vista previa control de horas">
                     </iframe>

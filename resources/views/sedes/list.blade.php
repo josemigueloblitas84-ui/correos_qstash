@@ -100,5 +100,5 @@
         csrfToken: '{{ csrf_token() }}',
     };
 </script>
-<script src="{{ asset('assets/js/sedes.js') }}"></script>
+<script src="{{ global_asset('assets/js/sedes.js') }}"></script>
 @endpush

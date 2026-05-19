@@ -244,7 +244,7 @@ class ConfiguracionSistemaService
     private function buildImageUrl(string $path): string
     {
         if ($this->isPublicAssetPath($path)) {
-            return asset($path);
+            return global_asset($path);
         }
 
         return Storage::disk(self::DISK)->url($path);

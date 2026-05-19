@@ -6,9 +6,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('app.name') }}</title>
-    <link rel="stylesheet" href="{{ asset('assets/plugins/fontawesome-free/css/all.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/gloBal-font.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/adminlte.min.css') }}">
+    <link rel="stylesheet" href="{{ global_asset('assets/plugins/fontawesome-free/css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ global_asset('assets/css/gloBal-font.css') }}">
+    <link rel="stylesheet" href="{{ global_asset('assets/css/adminlte.min.css') }}">
     @stack('styles')
 </head>
 
@@ -24,9 +24,9 @@
     </div>
 @endif
 
-<script src="{{ asset('assets/plugins/jquery/jquery.min.js') }}"></script>
-<script src="{{ asset('assets/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-<script src="{{ asset('assets/js/adminlte.min.js') }}"></script>
+<script src="{{ global_asset('assets/plugins/jquery/jquery.min.js') }}"></script>
+<script src="{{ global_asset('assets/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ global_asset('assets/js/adminlte.min.js') }}"></script>
 
 <script>
 document.addEventListener("click", function (e) {

@@ -33,6 +33,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'ver agenda',
             'ver departamentos',
             'ver tipos de personal',
+            'ver sedes',
+            'crear sedes',
+            'editar sedes',
+            'eliminar sedes',
             'ver informe agenda',
             'ver reporte agenda informe',
         ];

@@ -156,6 +156,14 @@
                 </div>
             </li>
 
+            @if (tenancy()->initialized && session('central_impersonation'))
+                <li class="nav-item d-none d-lg-flex align-items-center me-2">
+                    <span class="badge text-bg-warning">
+                        Conectado desde Central
+                    </span>
+                </li>
+            @endif
+
               <!--begin::Fullscreen Toggle-->
             <li class="nav-item">
                 <a class="nav-link" href="#" data-lte-toggle="fullscreen">
@@ -173,14 +181,7 @@
                 </a>
 
                 <div class="dropdown-menu dropdown-menu-end">
-                    <a href="{{ route('profile.show') }}" class="dropdown-item">
-                        <i class="bi bi-person-gear me-2"></i>
-                        Perfil
-                    </a>
-
-                    <div class="dropdown-divider"></div>
-
-                    <form method="POST" action="{{ route('logout') }}" class="dropdown-item p-0">
+                    <form method="POST" action="{{ url('/logout') }}" class="dropdown-item p-0">
                         @csrf
                         <button type="submit" class="btn btn-link w-100 text-start"
                             style="text-decoration: none; color: #666;">

@@ -33,8 +33,8 @@ class Handler extends ExceptionHandler
             }
 
             return auth()->check()
-                ? redirect()->route('dashboard')->with('error', 'La ruta o el identificador no es valido.')
-                : redirect()->route('login');
+                ? redirect(tenancy()->initialized ? '/dashboard' : '/instituciones')->with('error', 'La ruta o el identificador no es valido.')
+                : redirect('/login');
         });
     }
 }

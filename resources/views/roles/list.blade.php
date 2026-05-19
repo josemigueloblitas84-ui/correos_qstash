@@ -101,7 +101,7 @@
             autoWidth: false,
             buttons: ['copy', 'csv', 'excel', 'pdf', 'print', 'colvis'],
             language: {
-                url: "{{ asset('assets/datatables/i18n/es-ES.json') }}"
+                url: "{{ global_asset('assets/datatables/i18n/es-ES.json') }}"
             },
             columnDefs: [
                 { responsivePriority: 1, targets: 2 },

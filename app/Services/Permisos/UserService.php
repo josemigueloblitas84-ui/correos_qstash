@@ -8,6 +8,7 @@ use App\Http\Requests\Permisos\UserRequest;
 use App\Http\Requests\Permisos\UserUpdateRequest;
 use App\Services\Support\ActivityLogger;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class UserService
 {
@@ -23,7 +24,6 @@ class UserService
         $usuario->password = Hash::make($request->contrasenaUsuario);
         $usuario->departamento_id = $request->departamento_id;
         $usuario->tipo_personal_id = $request->tipo_personal_id;
-        $usuario->institucion_id = $request->institucion_id;
         $usuario->sede_id = $request->sede_id;
         $usuario->cod_estudiante = $request->cod_estudiante;
         $usuario->cantidad_horas_totales = $request->cantidad_horas_totales;
@@ -43,7 +43,6 @@ class UserService
                     'id' => $usuario->id,
                     'name' => $usuario->name,
                     'email' => $usuario->email,
-                    'institucion_id' => $usuario->institucion_id,
                     'sede_id' => $usuario->sede_id,
                     'cod_estudiante' => $usuario->cod_estudiante,
                     'cantidad_horas_totales' => $usuario->cantidad_horas_totales,
@@ -70,7 +69,6 @@ class UserService
             'email' => $usuario->email,
             'departamentos_id' => $usuario->departamento_id,
             'tipo_personal_id' => $usuario->tipo_personal_id,
-            'institucion_id' => $usuario->institucion_id,
             'sede_id' => $usuario->sede_id,
             'cod_estudiante' => $usuario->cod_estudiante,
             'cantidad_horas_totales' => $usuario->cantidad_horas_totales,
@@ -85,7 +83,6 @@ class UserService
         $usuario->email = $request->email;
         $usuario->departamento_id = $request->departamento_id;
         $usuario->tipo_personal_id = $request->tipo_personal_id;
-        $usuario->institucion_id = $request->institucion_id;
         $usuario->sede_id = $request->sede_id;
         $usuario->cod_estudiante = $request->cod_estudiante;
         $usuario->cantidad_horas_totales = $request->cantidad_horas_totales;
@@ -111,7 +108,6 @@ class UserService
                     'email' => $usuario->email,
                     'departamento_id' => $usuario->departamento_id,
                     'tipo_personal_id' => $usuario->tipo_personal_id,
-                    'institucion_id' => $usuario->institucion_id,
                     'sede_id' => $usuario->sede_id,
                     'cod_estudiante' => $usuario->cod_estudiante,
                     'cantidad_horas_totales' => $usuario->cantidad_horas_totales,
@@ -182,6 +178,12 @@ class UserService
     public function getAssignableUsers(int $userId)
     {
         return User::query()
+            ->when(Schema::hasColumn('users', 'is_central_user'), function ($query) {
+                $query->where('users.is_central_user', false);
+            })
+            ->when(session('central_impersonation_email'), function ($query, $email) {
+                $query->where('users.email', '<>', $email);
+            })
             ->leftJoin('departamentos', 'users.departamento_id', '=', 'departamentos.id')
             ->leftJoin('tipos_personal', 'users.tipo_personal_id', '=', 'tipos_personal.id')
             ->select(

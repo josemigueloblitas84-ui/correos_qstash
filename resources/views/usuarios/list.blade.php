@@ -32,7 +32,6 @@
                                 <th>Correo</th>
                                 <th>Departamento</th>
                                 <th>Tipo de Personal</th>
-                                <th>Institucion</th>
                                 <th>Sede</th>
                                 <th>Rol</th>
                                 <th width="320">Permisos Directos</th>
@@ -53,7 +52,6 @@
                                         <td>{{ $usuario->email }}</td>
                                         <td>{{ $usuario->departamento_nombre ?? 'Sin departamento' }}</td>
                                         <td>{{ $usuario->tipo_personal_nombre ?? 'Sin tipo' }}</td>
-                                        <td>{{ $usuario->institucion_nombre ?? 'Sin institucion' }}</td>
                                         <td>{{ $usuario->sede_nombre ?? 'Sin sede' }}</td>
                                         <td>
                                             <span class="badge text-bg-info">
@@ -129,7 +127,7 @@
                                 @endforeach
                             @else
                                 <tr>
-                                    <td colspan="11" class="text-center py-4">
+                                    <td colspan="10" class="text-center py-4">
                                         No hay usuarios registrados.
                                     </td>
                                 </tr>

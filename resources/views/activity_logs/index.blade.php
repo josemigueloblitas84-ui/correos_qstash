@@ -130,7 +130,7 @@ $(document).ready(function () {
         ],
         order: [[0, 'desc']],
         language: {
-            url: '{{ asset('assets/datatables/i18n/es-ES.json') }}'
+            url: '{{ global_asset('assets/datatables/i18n/es-ES.json') }}'
         }
     });
 
@@ -170,4 +170,3 @@ $(document).on('click', '.ver-propiedades', function () {
 });
 </script>
 @endpush
-

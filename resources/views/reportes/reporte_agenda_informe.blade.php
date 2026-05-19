@@ -167,8 +167,8 @@
 @endsection
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/reporte_agenda_informe.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/plugins/jquery-ui/jquery-ui.min.css') }}">
+    <link rel="stylesheet" href="{{ global_asset('assets/css/reporte_agenda_informe.css') }}">
+    <link rel="stylesheet" href="{{ global_asset('assets/plugins/jquery-ui/jquery-ui.min.css') }}">
 @endpush
 
 @push('scripts')
@@ -183,6 +183,6 @@
             canValidateInforme: @json($canValidateInforme)
         };
     </script>
-    <script src="{{ asset('assets/plugins/jquery-ui/jquery-ui.min.js') }}"></script>
-    <script src="{{ asset('assets/js/reporte_agenda_informe.js') }}"></script>
+    <script src="{{ global_asset('assets/plugins/jquery-ui/jquery-ui.min.js') }}"></script>
+    <script src="{{ global_asset('assets/js/reporte_agenda_informe.js') }}"></script>
 @endpush

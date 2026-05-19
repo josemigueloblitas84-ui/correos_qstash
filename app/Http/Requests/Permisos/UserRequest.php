@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\Permisos;
 
-use App\Rules\SedePerteneceAInstitucion;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UserRequest extends FormRequest
@@ -37,8 +36,7 @@ class UserRequest extends FormRequest
             'confirmar_contrasenaUsuario' => 'required',
             'departamento_id' => 'required|exists:departamentos,id',
             'tipo_personal_id' => 'required|exists:tipos_personal,id',
-            'institucion_id' => ['required', 'integer', 'exists:instituciones,id'],
-            'sede_id' => ['bail', 'required', 'integer', 'exists:sedes,id', new SedePerteneceAInstitucion($this->input('institucion_id'))],
+            'sede_id' => ['bail', 'required', 'integer', 'exists:sedes,id'],
             'cod_estudiante' => 'required|string|max:30|unique:users,cod_estudiante',
             'cantidad_horas_totales' => 'nullable|integer|min:0|digits_between:1,10|max:2147483647',
             'celular' => [
@@ -71,9 +69,6 @@ class UserRequest extends FormRequest
             'departamento_id.exists' => 'El departamento seleccionado no es valido.',
             'tipo_personal_id.required' => 'Debe seleccionar un tipo de personal.',
             'tipo_personal_id.exists' => 'El tipo de personal seleccionado no es valido.',
-            'institucion_id.required' => 'Debe seleccionar una institucion.',
-            'institucion_id.integer' => 'La institucion seleccionada no es valida.',
-            'institucion_id.exists' => 'La institucion seleccionada no existe.',
             'sede_id.required' => 'Debe seleccionar una sede.',
             'sede_id.integer' => 'La sede seleccionada no es valida.',
             'sede_id.exists' => 'La sede seleccionada no existe.',

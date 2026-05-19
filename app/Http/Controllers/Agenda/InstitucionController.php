@@ -3,40 +3,43 @@
 namespace App\Http\Controllers\Agenda;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Agenda\InstitucionSedesUpdateRequest;
+use App\Http\Requests\Agenda\InstitucionAdministradorStoreRequest;
 use App\Http\Requests\Agenda\InstitucionStoreRequest;
 use App\Http\Requests\Agenda\InstitucionUpdateRequest;
 use App\Services\Agenda\InstitucionService;
+use App\Services\Central\TenantLoginLinkService;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Throwable;
 use Yajra\DataTables\Facades\DataTables;
 
 class InstitucionController extends Controller
 {
     protected InstitucionService $institucionService;
 
-    public function __construct(InstitucionService $institucionService)
+    public function __construct(
+        InstitucionService $institucionService,
+        private TenantLoginLinkService $tenantLoginLinkService
+    )
     {
         $this->middleware('permission:ver instituciones')->only([
             'index',
             'data',
             'show',
+            'connect',
         ]);
         $this->middleware('permission:crear instituciones')->only([
             'store',
+            'storeAdministrator',
         ]);
         $this->middleware('permission:editar instituciones')->only([
             'update',
         ]);
         $this->middleware('permission:eliminar instituciones')->only([
             'destroy',
-        ]);
-        $this->middleware('permission:asignar sedes a instituciones')->only([
-            'editSedes',
-            'updateSedes',
         ]);
 
         $this->institucionService = $institucionService;
@@ -52,40 +55,42 @@ class InstitucionController extends Controller
         $this->ensureAjaxRequest($request);
 
         $instituciones = $this->institucionService->getAllForDataTable();
-        $canAssignSedes = Gate::allows('asignar sedes a instituciones');
-
         return DataTables::of($instituciones)
-            ->addColumn('sedes', function ($row) {
-                if ((int) ($row->sedes_count ?? 0) === 0 || ! $row->sedes_nombres) {
-                    return '<span class="badge bg-secondary">Sin sedes</span>';
+            ->addColumn('dominios', function ($row) {
+                if (! $row->dominios) {
+                    return '<span class="badge bg-secondary">Sin dominio</span>';
                 }
 
-                $sedes = array_values(array_filter(explode('||', (string) $row->sedes_nombres)));
+                $domains = array_values(array_filter(explode('||', (string) $row->dominios)));
                 $badges = array_map(
-                    fn ($sede) => '<span class="badge bg-info text-dark me-1 mb-1">' . e($sede) . '</span>',
-                    $sedes
+                    fn ($domain) => '<span class="badge bg-info text-dark me-1 mb-1">' . e($domain) . '</span>',
+                    $domains
                 );
 
                 return implode('', $badges);
             })
-            ->addColumn('acciones', function ($row) use ($canAssignSedes) {
-                $encryptedId = encrypt_id((int) $row->id);
-                $assignButton = '';
+            ->addColumn('base_datos', function ($row) {
+                return e(config('tenancy.database.prefix') . $row->id . config('tenancy.database.suffix'));
+            })
+            ->addColumn('acciones', function ($row) {
+                $domains = array_values(array_filter(explode('||', (string) $row->dominios)));
+                $primaryDomain = $domains[0] ?? null;
 
-                if ($canAssignSedes) {
-                    $assignButton = '
-                    <button type="button" class="btn btn-info btn-sm btn-sedes" data-id="' . $encryptedId . '">
-                        Asignar Sedes
-                    </button>';
-                }
+                $administrarButton = $primaryDomain
+                    ? '<button type="button" class="btn btn-success btn-sm btn-conectar" data-id="' . e($row->id) . '" data-nombre="' . e($row->nombre) . '">Conectar</button>'
+                    : '<button type="button" class="btn btn-success btn-sm" disabled>Conectar</button>';
 
                 return '
-                    <button type="button" class="btn btn-warning btn-sm btn-editar" data-id="' . $encryptedId . '">
+                    ' . $administrarButton . '
+                    <button type="button" class="btn btn-primary btn-sm btn-administrador" data-id="' . e($row->id) . '" data-nombre="' . e($row->nombre) . '">
+                        Crear administrador
+                    </button>
+                    <button type="button" class="btn btn-warning btn-sm btn-editar" data-id="' . e($row->id) . '">
                         Editar
                     </button>
-                    <button type="button" class="btn btn-danger btn-sm btn-eliminar" data-id="' . $encryptedId . '">
-                        Eliminar
-                    </button>' . $assignButton . '
+                    <button type="button" class="btn btn-danger btn-sm btn-eliminar" data-id="' . e($row->id) . '">
+                        Desactivar
+                    </button>
                 ';
             })
             ->editColumn('created_at', function ($row) {
@@ -93,27 +98,104 @@ class InstitucionController extends Controller
                     ? date('d/m/Y H:i:s', strtotime($row->created_at))
                     : '';
             })
-            ->rawColumns(['sedes', 'acciones'])
+            ->rawColumns(['dominios', 'acciones'])
             ->make(true);
     }
 
     public function store(InstitucionStoreRequest $request): JsonResponse
     {
-        $id = $this->institucionService->store($request->validated());
+        $tenant = $this->institucionService->store($request->validated());
 
         return response()->json([
             'status' => true,
             'message' => 'Institucion creada correctamente.',
-            'id' => encrypt_id($id),
+            'id' => $tenant->id,
+        ]);
+    }
+
+    public function storeAdministrator(InstitucionAdministradorStoreRequest $request, string $id): JsonResponse
+    {
+        $institucion = $this->institucionService->findById($id);
+
+        if (! $institucion) {
+            return response()->json([
+                'status' => false,
+                'message' => 'La institucion no existe.',
+            ], 404);
+        }
+
+        try {
+            $administrator = $this->institucionService->createAdministrator($id, $request->validated());
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return response()->json([
+                'status' => false,
+                'message' => 'No se pudo crear el administrador en la base de datos de la institucion.',
+            ], 500);
+        }
+
+        if (! $administrator) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No se pudo crear el administrador.',
+            ], 500);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Administrador creado correctamente.',
+            'data' => $administrator,
+        ]);
+    }
+
+    public function connect(Request $request, string $id): JsonResponse
+    {
+        $this->ensureAjaxRequest($request);
+
+        $institucion = $this->institucionService->findById($id);
+
+        if (! $institucion) {
+            return response()->json([
+                'status' => false,
+                'message' => 'La institucion no existe.',
+            ], 404);
+        }
+
+        $user = Auth::user();
+
+        if (! $user || ! method_exists($user, 'hasRole') || ! $user->hasRole('SuperAdministrador')) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Solo un SuperAdministrador central puede conectarse a un tenant.',
+            ], 403);
+        }
+
+        $loginUrl = $this->tenantLoginLinkService->createLoginUrl($institucion, $user, $request);
+
+        if (! $loginUrl) {
+            return response()->json([
+                'status' => false,
+                'message' => 'La institucion no tiene un dominio configurado.',
+            ], 422);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Redirigiendo al tenant.',
+            'tenant' => [
+                'id' => $institucion->id,
+                'nombre' => $institucion->nombre,
+            ],
+            'redirect_url' => $loginUrl,
         ]);
     }
 
     public function show(Request $request, string $id): JsonResponse
     {
-        $idInstitucion = decrypt_id($id);
         $this->ensureAjaxRequest($request);
 
-        $institucion = $this->institucionService->findById($idInstitucion);
+        $institucion = $this->institucionService->findById($id);
 
         if (! $institucion) {
             return response()->json([
@@ -125,44 +207,17 @@ class InstitucionController extends Controller
         return response()->json([
             'status' => true,
             'data' => [
-                'id' => encrypt_id((int) $institucion->id),
+                'id' => $institucion->id,
                 'nombre' => $institucion->nombre,
+                'domain' => $this->institucionService->primaryDomain($institucion),
                 'created_at' => $institucion->created_at,
-            ],
-        ]);
-    }
-
-    public function editSedes(Request $request, string $id): JsonResponse
-    {
-        $idInstitucion = decrypt_id($id);
-        $this->ensureAjaxRequest($request);
-
-        $assignmentData = $this->institucionService->getSedeAssignmentData($idInstitucion);
-        $institucion = $assignmentData['institucion'];
-
-        if (! $institucion) {
-            return response()->json([
-                'status' => false,
-                'message' => 'La institucion no existe.',
-            ], 404);
-        }
-
-        return response()->json([
-            'status' => true,
-            'data' => [
-                'institucion' => [
-                    'id' => encrypt_id((int) $institucion->id),
-                    'nombre' => $institucion->nombre,
-                ],
-                'sedes' => $assignmentData['sedes'],
             ],
         ]);
     }
 
     public function update(InstitucionUpdateRequest $request, string $id): JsonResponse
     {
-        $idInstitucion = decrypt_id($id);
-        $institucion = $this->institucionService->findById($idInstitucion);
+        $institucion = $this->institucionService->findById($id);
 
         if (! $institucion) {
             return response()->json([
@@ -171,7 +226,7 @@ class InstitucionController extends Controller
             ], 404);
         }
 
-        $this->institucionService->update($idInstitucion, $request->validated());
+        $this->institucionService->update($id, $request->validated());
 
         return response()->json([
             'status' => true,
@@ -183,8 +238,7 @@ class InstitucionController extends Controller
     {
         $this->ensureAjaxRequest($request);
 
-        $idInstitucion = decrypt_id($id);
-        $institucion = $this->institucionService->findById($idInstitucion);
+        $institucion = $this->institucionService->findById($id);
 
         if (! $institucion) {
             return response()->json([
@@ -193,34 +247,11 @@ class InstitucionController extends Controller
             ], 404);
         }
 
-        $this->institucionService->destroy($idInstitucion);
+        $this->institucionService->destroy($id);
 
         return response()->json([
             'status' => true,
-            'message' => 'Institucion eliminada correctamente.',
-        ]);
-    }
-
-    public function updateSedes(InstitucionSedesUpdateRequest $request, string $id): JsonResponse
-    {
-        $idInstitucion = decrypt_id($id);
-        $institucion = $this->institucionService->findById($idInstitucion);
-
-        if (! $institucion) {
-            return response()->json([
-                'status' => false,
-                'message' => 'La institucion no existe.',
-            ], 404);
-        }
-
-        $this->institucionService->syncSedes(
-            $idInstitucion,
-            $request->validated('sedes') ?? []
-        );
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Sedes asignadas correctamente.',
+            'message' => 'Institucion dada de baja correctamente.',
         ]);
     }
 

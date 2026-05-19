@@ -97,5 +97,5 @@
         csrfToken: '{{ csrf_token() }}',
     };
 </script>
-<script src="{{ asset('assets/js/tipos-personal.js') }}"></script>
+<script src="{{ global_asset('assets/js/tipos-personal.js') }}"></script>
 @endpush

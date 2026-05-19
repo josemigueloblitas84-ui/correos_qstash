@@ -7,6 +7,14 @@ use Illuminate\Support\Facades\DB;
 
 class SedeService
 {
+    public function getForSelect()
+    {
+        return DB::table('sedes')
+            ->select('id', 'nombre')
+            ->orderBy('nombre', 'asc')
+            ->get();
+    }
+
     public function getAllForDataTable()
     {
         return DB::table('sedes')

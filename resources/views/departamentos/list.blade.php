@@ -128,7 +128,7 @@
 @endsection
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('assets/css/departamentos.css') }}">
+<link rel="stylesheet" href="{{ global_asset('assets/css/departamentos.css') }}">
 @endpush
 
 @push('scripts')
@@ -143,5 +143,5 @@
         csrfToken: '{{ csrf_token() }}',
     };
 </script>
-<script src="{{ asset('assets/js/departamentos.js') }}"></script>
+<script src="{{ global_asset('assets/js/departamentos.js') }}"></script>
 @endpush

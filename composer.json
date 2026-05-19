@@ -19,6 +19,7 @@
         "propaganistas/laravel-phone": "5.3.6",
         "spatie/laravel-activitylog": "^4.12",
         "spatie/laravel-permission": "^6.24",
+        "stancl/tenancy": "^3.10",
         "symfony/dom-crawler": "6.4.34",
         "yajra/laravel-datatables-oracle": "10.3.1"
     },

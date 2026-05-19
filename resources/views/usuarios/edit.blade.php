@@ -3,9 +3,9 @@
 @section('title', 'Editar Usuario')
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/passValidator.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/plugins/flag-icon-css/css/flag-icons.min.css') }}">
+    <link rel="stylesheet" href="{{ global_asset('assets/css/passValidator.css') }}">
+    <link rel="stylesheet" href="{{ global_asset('assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ global_asset('assets/plugins/flag-icon-css/css/flag-icons.min.css') }}">
 @endpush
 
 @php
@@ -217,7 +217,6 @@
                         </div>
 
                         @include('usuarios.partials.institucion-sede-fields', [
-                            'selectedInstitucionId' => old('institucion_id', $usuario->institucion_id),
                             'selectedSedeId' => old('sede_id', $usuario->sede_id),
                         ])
 
@@ -374,6 +373,6 @@
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="{{ asset('assets/js/passValidator-unicode.js') }}"></script>
-    <script src="{{ asset('assets/js/phone-country-select.js') }}"></script>
+    <script src="{{ global_asset('assets/js/passValidator-unicode.js') }}"></script>
+    <script src="{{ global_asset('assets/js/phone-country-select.js') }}"></script>
 @endpush

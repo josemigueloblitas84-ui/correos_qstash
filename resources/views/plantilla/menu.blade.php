@@ -1,8 +1,13 @@
+@php
+    $isTenantContext = tenancy()->initialized;
+    $brandUrl = $isTenantContext ? url('/dashboard') : url('/instituciones');
+@endphp
+
 <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
     <!--begin::Sidebar Brand-->
     <div class="sidebar-brand">
         <!--begin::Brand Link-->
-        <a href="{{route('dashboard')}}" class="brand-link">
+        <a href="{{ $brandUrl }}" class="brand-link">
             <!--begin::Brand Image-->
             <img src="{{ $systemConfig['logo_principal_url'] }}" alt="{{ $systemConfig['nombre_institucion'] }}"
                 class="brand-image opacity-75 shadow" />
@@ -23,15 +28,23 @@
                 <!--USER OPTIONAL-->
                 <li class="nav-item border-bottom mb-2">
                     <div class="nav-link d-flex align-items-center overflow-hidden">
-                        <img src="{{ asset('assets/img/user2-160x160.jpg') }}" class="rounded-circle flex-shrink-0" width="34"
+                        <img src="{{ global_asset('assets/img/user2-160x160.jpg') }}" class="rounded-circle flex-shrink-0" width="34"
                             height="34" alt="User Image">
                         <p class="mb-0 ms-2 text-white fw-semibold text-truncate">
                             {{ auth()->user()->name }}
                         </p>
                     </div>
                 </li>
+                @if (! $isTenantContext)
+                    <li class="nav-item">
+                        <a href="{{ url('/instituciones') }}" class="nav-link {{ request()->routeIs('instituciones.*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-university"></i>
+                            <p>Instituciones</p>
+                        </a>
+                    </li>
+                @else
                 <li class="nav-item">
-                    <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                    <a href="{{ $brandUrl }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                         <i class="nav-icon bi bi-speedometer"></i>
                         <p>Panel de control</p>
                     </a>
@@ -64,21 +77,13 @@
                     @endcan
                 @endcanany
 
-                @canany(['ver departamentos', 'ver instituciones', 'ver sedes', 'ver tipos de personal'])
+                @canany(['ver departamentos', 'ver sedes', 'ver tipos de personal'])
                     <li class="nav-header">Catalogos</li>
                     @can('ver departamentos')
                         <li class="nav-item">
                             <a href="{{ route('departamentos.index') }}" class="nav-link {{ request()->routeIs('departamentos.*') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-building"></i>
                                 <p>Departamentos</p>
-                            </a>
-                        </li>
-                    @endcan
-                    @can('ver instituciones')
-                        <li class="nav-item">
-                            <a href="{{ route('instituciones.index') }}" class="nav-link {{ request()->routeIs('instituciones.*') ? 'active' : '' }}">
-                                <i class="nav-icon fas fa-university"></i>
-                                <p>Instituciones</p>
                             </a>
                         </li>
                     @endcan
@@ -194,6 +199,7 @@
                         <p>Manual</p>
                     </a>
                 </li>
+                @endif
                 {{--<li class="nav-item">
                     <a href="./generate/theme.html" class="nav-link">
                         <i class="nav-icon bi bi-palette"></i>

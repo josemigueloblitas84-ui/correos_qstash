@@ -9,10 +9,10 @@ use App\Http\Requests\Permisos\UserUpdateRequest;
 use App\Http\Requests\Permisos\AsignarPersonalRequest;
 use App\Services\Permisos\UserService;
 use App\Services\Agenda\DepartamentoService;
-use App\Services\Agenda\InstitucionService;
+use App\Services\Agenda\SedeService;
 use App\Services\Agenda\TipoPersonalService;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -21,19 +21,18 @@ class UserController extends Controller
 {
     protected UserService $userService;
     protected DepartamentoService $departamentoService;
-    protected InstitucionService $institucionService;
+    protected SedeService $sedeService;
     protected TipoPersonalService $tipoPersonalService;
 
     public function __construct(
         UserService $userService,
         DepartamentoService $departamentoService,
-        InstitucionService $institucionService,
+        SedeService $sedeService,
         TipoPersonalService $tipoPersonalService
     ) {
         $this->middleware('permission:ver usuarios')->only('index');
         $this->middleware('permission:crear usuarios')->only(['create', 'store']);
         $this->middleware('permission:editar usuarios')->only(['edit', 'update', 'editRoles','updateRoles', 'editPersonalAsignado', 'updatePersonalAsignado']);
-        $this->middleware('permission:crear usuarios|editar usuarios')->only('sedesPorInstitucion');
         $this->middleware('permission:asignar permiso especial')->only([
             'editPermisosEspeciales',
             'updatePermisosEspeciales',
@@ -41,21 +40,25 @@ class UserController extends Controller
         $this->middleware('permission:eliminar usuarios')->only(['destroy', 'toggleStatus']);
         $this->userService = $userService;
         $this->departamentoService = $departamentoService;
-        $this->institucionService = $institucionService;
+        $this->sedeService = $sedeService;
         $this->tipoPersonalService = $tipoPersonalService;
     }
 
     public function index()
     {
         $usuarios = User::query()
+            ->when(Schema::hasColumn('users', 'is_central_user'), function ($query) {
+                $query->where('users.is_central_user', false);
+            })
+            ->when(session('central_impersonation_email'), function ($query, $email) {
+                $query->where('users.email', '<>', $email);
+            })
             ->leftJoin('departamentos', 'users.departamento_id', '=', 'departamentos.id')
-            ->leftJoin('instituciones', 'users.institucion_id', '=', 'instituciones.id')
             ->leftJoin('sedes', 'users.sede_id', '=', 'sedes.id')
             ->leftJoin('tipos_personal', 'users.tipo_personal_id', '=', 'tipos_personal.id')
             ->select(
                 'users.*',
                 'departamentos.nombre_depa as departamento_nombre',
-                'instituciones.nombre as institucion_nombre',
                 'sedes.nombre as sede_nombre',
                 'tipos_personal.tipo as tipo_personal_nombre'
             )
@@ -71,12 +74,12 @@ class UserController extends Controller
     public function create()
     {
         $departamentos = $this->departamentoService->getActiveForSelect();
-        $instituciones = $this->institucionService->getForSelect();
+        $sedes = $this->sedeService->getForSelect();
         $tiposPersonal = $this->tipoPersonalService->getForSelect();
 
         return view('usuarios.create', [
             'departamentos' => $departamentos,
-            'instituciones' => $instituciones,
+            'sedes' => $sedes,
             'tiposPersonal' => $tiposPersonal,
         ]);
     }
@@ -94,7 +97,7 @@ class UserController extends Controller
         $usuario = User::findOrFail($idUsuario);
         $roles = Role::orderBy('name', 'asc')->get();
         $departamentos = $this->departamentoService->getActiveForSelect();
-        $instituciones = $this->institucionService->getForSelect();
+        $sedes = $this->sedeService->getForSelect();
         $tiposPersonal = $this->tipoPersonalService->getForSelect();
         $hasRoles = $usuario->roles->pluck('id');
 
@@ -102,7 +105,7 @@ class UserController extends Controller
             'usuario' => $usuario,
             'roles' => $roles,
             'departamentos' => $departamentos,
-            'instituciones' => $instituciones,
+            'sedes' => $sedes,
             'tiposPersonal' => $tiposPersonal,
             'hasRoles' => $hasRoles,
             'encryptedId' => encrypt_id((int) $usuario->id),
@@ -117,24 +120,6 @@ class UserController extends Controller
         $this->userService->userUpdate($usuario, $request);
 
         return redirect()->route('usuarios.index')->with('user_updated', 'Usuario actualizado exitosamente');
-    }
-
-    public function sedesPorInstitucion(string $id): JsonResponse
-    {
-        $institucionId = (int) $id;
-        $institucion = $this->institucionService->findById($institucionId);
-
-        if (! $institucion) {
-            return response()->json([
-                'status' => false,
-                'message' => 'La institucion no existe.',
-            ], 404);
-        }
-
-        return response()->json([
-            'status' => true,
-            'data' => $this->institucionService->getSedesForSelectByInstitucion($institucionId),
-        ]);
     }
 
     public function editPermisosEspeciales(string $id)

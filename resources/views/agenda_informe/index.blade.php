@@ -195,7 +195,7 @@
 @endsection
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('assets/css/informe-agenda.css') }}">
+<link rel="stylesheet" href="{{ global_asset('assets/css/informe-agenda.css') }}">
 @endpush
 
 @push('scripts')
@@ -207,5 +207,5 @@
         storeNoProgramadaUrl: @json(route('informe-agenda.no-programada.store')),
     };
 </script>
-<script src="{{ asset('assets/js/informe-agenda.js') }}"></script>
+<script src="{{ global_asset('assets/js/informe-agenda.js') }}"></script>
 @endpush

@@ -1,5 +1,8 @@
 <?php
 
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
+
 return [
     /*
     |--------------------------------------------------------------------------
@@ -18,7 +21,11 @@ return [
         'path'    => '/resources/docs',
         'logout'    => '/logout',
         'landing' => 'overview',
-        'middleware' => ['web'],
+        'middleware' => [
+            'web',
+            InitializeTenancyByDomain::class,
+            PreventAccessFromCentralDomains::class,
+        ],
     ],
 
     /*

@@ -4,7 +4,7 @@
 @section('body_class', 'hold-transition auth-split-page')
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/auth/login-split.css') }}">
+    <link rel="stylesheet" href="{{ global_asset('assets/css/auth/login-split.css') }}">
 @endpush
 
 @section('content')
@@ -14,12 +14,12 @@
                 <div class="auth-split__brand-shell">
                     <div class="auth-split__brand-panel">
                         <img
-                            src="{{ asset('assets/img/logoFundacionTrans.png') }}"
+                            src="{{ global_asset('assets/img/logoFundacionTrans.png') }}"
                             alt="Logo institucional 1"
                             class="auth-split__logo auth-split__logo--top">
                         <span class="auth-split__logo-divider" aria-hidden="true"></span>
                         <img
-                            src="{{ asset('assets/img/unifranz_loguito.png') }}"
+                            src="{{ global_asset('assets/img/unifranz_loguito.png') }}"
                             alt="Logo institucional 2"
                             class="auth-split__logo auth-split__logo--bottom">
                     </div>
@@ -42,7 +42,7 @@
                         @endif
 
                         <div class="auth-split__form-shell">
-                            <form method="POST" action="{{ route('login') }}">
+                            <form method="POST" action="{{ url('/login') }}">
                                 @csrf
 
                                 <div class="auth-split__field">

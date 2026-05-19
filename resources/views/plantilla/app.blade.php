@@ -8,10 +8,11 @@
 
   <!--begin::Accessibility Meta Tags-->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="csrf-token" content="{{ csrf_token() }}" />
   <meta name="color-scheme" content="light dark" />
   <meta name="theme-color" content="#007bff" media="(prefers-color-scheme: light)" />
   <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
-  <link rel="icon" href="{{ asset('assets/img/funda.ico') }}" type="image/x-icon">
+  <link rel="icon" href="{{ global_asset('assets/img/funda.ico') }}" type="image/x-icon">
   <!--end::Accessibility Meta Tags-->
 
   <!--begin::Primary Meta Tags-->
@@ -26,7 +27,7 @@
   <!--begin::Accessibility Features-->
   <!-- Skip links will be dynamically added by accessibility.js -->
   <meta name="supported-color-schemes" content="light dark" />
-  <link rel="preload" href="{{ asset('adminlte/dist/css/adminlte.css') }}" as="style" />
+  <link rel="preload" href="{{ global_asset('adminlte/dist/css/adminlte.css') }}" as="style" />
   <!--end::Accessibility Features-->
 
   <!--begin::Fonts-->
@@ -46,11 +47,11 @@
   <!--end::Third Party Plugin(Bootstrap Icons)-->
 
   <!--begin::Required Plugin(AdminLTE)-->
-  <link rel="stylesheet" href="{{ asset('adminlte/dist/css/adminlte.css') }}" />
+  <link rel="stylesheet" href="{{ global_asset('adminlte/dist/css/adminlte.css') }}" />
   <!--end::Required Plugin(AdminLTE)-->
   <!--Letrita del sistema-->
-  <link rel="stylesheet" href="{{ asset('assets/css/gloBal-font.css') }}">
-  <link rel="stylesheet" href="{{ asset('assets/css/app-layout.css') }}">
+  <link rel="stylesheet" href="{{ global_asset('assets/css/gloBal-font.css') }}">
+  <link rel="stylesheet" href="{{ global_asset('assets/css/app-layout.css') }}">
 
   <!-- apexcharts -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.css"
@@ -60,7 +61,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/css/jsvectormap.min.css"
     integrity="sha256-+uGLJmmTKOqBr+2E6KDYs/NRsHxSkONXFHUL0fy2O/4=" crossorigin="anonymous" />
   <!--FONTAWESOME-->
-  <link rel="stylesheet" href="{{ asset('assets/plugins/fontawesome-free/css/all.min.css') }}">
+  <link rel="stylesheet" href="{{ global_asset('assets/plugins/fontawesome-free/css/all.min.css') }}">
   <!--DATABALES-->
   <!-- DataTables Bootstrap 5 -->
   <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap5.css">
@@ -115,7 +116,7 @@
   <!--end::Required Plugin(popperjs for Bootstrap 5)--><!--begin::Required Plugin(Bootstrap 5)-->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
   <!--end::Required Plugin(Bootstrap 5)--><!--begin::Required Plugin(AdminLTE)-->
-  <script src="{{ asset('adminlte/dist/js/adminlte.js') }}"></script>
+  <script src="{{ global_asset('adminlte/dist/js/adminlte.js') }}"></script>
   <!--end::Required Plugin(AdminLTE)--><!--begin::OverlayScrollbars Configure-->
   <script>
     const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
@@ -182,7 +183,7 @@
           bottomEnd: 'paging'
         },
         language: {
-          url: "{{ asset('assets/datatables/i18n/es-ES.json') }}"
+          url: "{{ global_asset('assets/datatables/i18n/es-ES.json') }}"
         }
       });
     }

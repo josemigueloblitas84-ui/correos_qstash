@@ -559,8 +559,8 @@
 
 @once
 @push('styles')
-<link rel="stylesheet" href="{{ asset('assets/css/form-v2.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/plugins/jquery-ui/jquery-ui.min.css') }}">
+<link rel="stylesheet" href="{{ global_asset('assets/css/form-v2.css') }}">
+<link rel="stylesheet" href="{{ global_asset('assets/plugins/jquery-ui/jquery-ui.min.css') }}">
 <style>
     .ui-autocomplete {
         z-index: 2000;
@@ -714,7 +714,7 @@
         currentUserHeader: @json($currentUser),
     };
 </script>
-<script src="{{ asset('assets/plugins/jquery-ui/jquery-ui.min.js') }}"></script>
-<script src="{{ asset('assets/js/form-v2.js') }}"></script>
+<script src="{{ global_asset('assets/plugins/jquery-ui/jquery-ui.min.js') }}"></script>
+<script src="{{ global_asset('assets/js/form-v2.js') }}"></script>
 @endpush
 @endonce

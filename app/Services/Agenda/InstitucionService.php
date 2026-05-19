@@ -2,272 +2,203 @@
 
 namespace App\Services\Agenda;
 
+use App\Models\Tenant;
+use App\Models\User;
 use App\Services\Support\ActivityLogger;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Hash;
+use Stancl\Tenancy\Database\Models\Domain;
 
 class InstitucionService
 {
-    public function getForSelect()
-    {
-        return DB::table('instituciones')
-            ->select('id', 'nombre')
-            ->orderBy('nombre', 'asc')
-            ->get();
-    }
-
     public function getAllForDataTable()
     {
-        return DB::table('instituciones')
-            ->leftJoin('institucion_sede', 'instituciones.id', '=', 'institucion_sede.institucion_id')
-            ->leftJoin('sedes', 'institucion_sede.sede_id', '=', 'sedes.id')
+        return DB::table('tenants')
+            ->leftJoin('domains', 'tenants.id', '=', 'domains.tenant_id')
+            ->whereNull('tenants.deleted_at')
             ->select(
-                'instituciones.id',
-                'instituciones.nombre',
-                'instituciones.created_at',
-                DB::raw('COUNT(sedes.id) as sedes_count'),
-                DB::raw("GROUP_CONCAT(sedes.nombre ORDER BY sedes.nombre SEPARATOR '||') as sedes_nombres")
+                'tenants.id',
+                'tenants.nombre',
+                'tenants.created_at',
+                DB::raw("GROUP_CONCAT(domains.domain ORDER BY domains.domain SEPARATOR '||') as dominios")
             )
-            ->groupBy('instituciones.id', 'instituciones.nombre', 'instituciones.created_at')
-            ->orderBy('instituciones.id', 'desc');
+            ->groupBy('tenants.id', 'tenants.nombre', 'tenants.created_at')
+            ->orderBy('tenants.created_at', 'desc');
     }
 
-    public function store(array $data): int
+    public function store(array $data): Tenant
     {
-        return DB::transaction(function () use ($data) {
-            $institucionId = DB::table('instituciones')->insertGetId([
-                'nombre' => $data['nombre'],
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+        $tenant = Tenant::create([
+            'id' => $data['id'],
+            'nombre' => $data['nombre'],
+        ]);
 
+        $tenant->domains()->create([
+            'domain' => $data['domain'],
+        ]);
+
+        ActivityLogger::log(
+            'Institucion tenant creada',
+            [
+                'attributes' => [
+                    'id' => $tenant->id,
+                    'nombre' => $tenant->nombre,
+                    'domain' => $data['domain'],
+                ],
+            ],
+            null,
+            null,
+            'instituciones',
+            'created'
+        );
+
+        return $tenant;
+    }
+
+    public function findById(string $id): ?Tenant
+    {
+        return Tenant::query()
+            ->with('domains')
+            ->whereKey($id)
+            ->first();
+    }
+
+    public function update(string $id, array $data): bool
+    {
+        $tenant = $this->findById($id);
+
+        if (! $tenant) {
+            return false;
+        }
+
+        $old = [
+            'id' => $tenant->id,
+            'nombre' => $tenant->nombre,
+            'domain' => $tenant->domains->first()?->domain,
+        ];
+
+        $tenant->update([
+            'nombre' => $data['nombre'],
+        ]);
+
+        $domain = $tenant->domains()->orderBy('id')->first();
+
+        if ($domain) {
+            $domain->update([
+                'domain' => $data['domain'],
+            ]);
+        } else {
+            $tenant->domains()->create([
+                'domain' => $data['domain'],
+            ]);
+        }
+
+        ActivityLogger::log(
+            'Institucion tenant actualizada',
+            [
+                'old' => $old,
+                'attributes' => [
+                    'id' => $tenant->id,
+                    'nombre' => $data['nombre'],
+                    'domain' => $data['domain'],
+                ],
+            ],
+            null,
+            null,
+            'instituciones',
+            'updated'
+        );
+
+        return true;
+    }
+
+    public function createAdministrator(string $id, array $data): ?array
+    {
+        $tenant = $this->findById($id);
+
+        if (! $tenant) {
+            return null;
+        }
+
+        $administrator = $tenant->run(function () use ($data) {
+            app(RolesAndPermissionsSeeder::class)->run();
+
+            $user = new User();
+            $user->name = $data['name'];
+            $user->email = $data['email'];
+            $user->password = Hash::make($data['password']);
+            $user->email_verified_at = now();
+            $user->estado = 1;
+            $user->save();
+
+            $user->assignRole('SuperAdministrador');
+
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+            ];
+        });
+
+        ActivityLogger::log(
+            'Administrador tenant creado',
+            [
+                'attributes' => [
+                    'tenant_id' => $tenant->id,
+                    'tenant_nombre' => $tenant->nombre,
+                    'admin_id' => $administrator['id'],
+                    'admin_name' => $administrator['name'],
+                    'admin_email' => $administrator['email'],
+                ],
+            ],
+            null,
+            null,
+            'instituciones',
+            'admin_created'
+        );
+
+        return $administrator;
+    }
+
+    public function destroy(string $id): bool
+    {
+        $tenant = $this->findById($id);
+
+        if (! $tenant) {
+            return false;
+        }
+
+        $old = [
+            'id' => $tenant->id,
+            'nombre' => $tenant->nombre,
+            'domains' => $tenant->domains->pluck('domain')->values()->all(),
+        ];
+
+        $deleted = (bool) $tenant->delete();
+
+        if ($deleted) {
             ActivityLogger::log(
-                'Institucion creada',
+                'Institucion tenant dada de baja',
                 [
-                    'attributes' => [
-                        'id' => $institucionId,
-                        'nombre' => $data['nombre'],
-                    ],
+                    'old' => $old,
                 ],
                 null,
                 null,
                 'instituciones',
-                'created'
+                'deactivated'
             );
-
-            return $institucionId;
-        });
-    }
-
-    public function findById(int $id)
-    {
-        return DB::table('instituciones')
-            ->where('id', $id)
-            ->first();
-    }
-
-    public function getSedesForSelectByInstitucion(int $institucionId)
-    {
-        return DB::table('institucion_sede')
-            ->join('sedes', 'institucion_sede.sede_id', '=', 'sedes.id')
-            ->where('institucion_sede.institucion_id', $institucionId)
-            ->select('sedes.id', 'sedes.nombre')
-            ->distinct()
-            ->orderBy('sedes.nombre', 'asc')
-            ->get()
-            ->map(function ($sede) {
-                return [
-                    'id' => (int) $sede->id,
-                    'nombre' => $sede->nombre,
-                ];
-            })
-            ->values()
-            ->all();
-    }
-
-    public function update(int $id, array $data): bool
-    {
-        return DB::transaction(function () use ($id, $data) {
-            $institucion = $this->findById($id);
-
-            $updated = DB::table('instituciones')
-                ->where('id', $id)
-                ->update([
-                    'nombre' => $data['nombre'],
-                    'updated_at' => now(),
-                ]) > 0;
-
-            if ($updated && $institucion) {
-                ActivityLogger::log(
-                    'Institucion actualizada',
-                    [
-                        'old' => [
-                            'id' => $institucion->id,
-                            'nombre' => $institucion->nombre,
-                        ],
-                        'attributes' => [
-                            'id' => $id,
-                            'nombre' => $data['nombre'],
-                        ],
-                    ],
-                    null,
-                    null,
-                    'instituciones',
-                    'updated'
-                );
-            }
-
-            return $updated;
-        });
-    }
-
-    public function destroy(int $id): bool
-    {
-        return DB::transaction(function () use ($id) {
-            $institucion = $this->findById($id);
-
-            $deleted = DB::table('instituciones')
-                ->where('id', $id)
-                ->delete() > 0;
-
-            if ($deleted && $institucion) {
-                ActivityLogger::log(
-                    'Institucion eliminada',
-                    [
-                        'old' => [
-                            'id' => $institucion->id,
-                            'nombre' => $institucion->nombre,
-                        ],
-                    ],
-                    null,
-                    null,
-                    'instituciones',
-                    'deleted'
-                );
-            }
-
-            return $deleted;
-        });
-    }
-
-    public function getSedeAssignmentData(int $id): array
-    {
-        $institucion = $this->findById($id);
-
-        if (! $institucion) {
-            return [
-                'institucion' => null,
-                'sedes' => [],
-            ];
         }
 
-        $assignedSedeIds = DB::table('institucion_sede')
-            ->where('institucion_id', $id)
-            ->pluck('sede_id')
-            ->map(fn ($sedeId) => (int) $sedeId)
-            ->all();
-
-        $sedes = DB::table('sedes')
-            ->select('id', 'nombre')
-            ->orderBy('nombre', 'asc')
-            ->get()
-            ->map(function ($sede) use ($assignedSedeIds) {
-                return [
-                    'id' => (int) $sede->id,
-                    'nombre' => $sede->nombre,
-                    'checked' => in_array((int) $sede->id, $assignedSedeIds, true),
-                ];
-            })
-            ->values()
-            ->all();
-
-        return [
-            'institucion' => $institucion,
-            'sedes' => $sedes,
-        ];
+        return $deleted;
     }
 
-    public function syncSedes(int $id, array $sedeIds = []): void
+    public function primaryDomain(Tenant $tenant): ?string
     {
-        DB::transaction(function () use ($id, $sedeIds) {
-            $institucion = $this->findById($id);
-            $currentSedeIds = DB::table('institucion_sede')
-                ->where('institucion_id', $id)
-                ->pluck('sede_id')
-                ->map(fn ($sedeId) => (int) $sedeId)
-                ->all();
-
-            $normalizedSedeIds = array_values(array_unique(array_map('intval', $sedeIds)));
-            $sedeIdsToInsert = array_values(array_diff($normalizedSedeIds, $currentSedeIds));
-            $sedeIdsToDelete = array_values(array_diff($currentSedeIds, $normalizedSedeIds));
-
-            if ($sedeIdsToDelete !== []) {
-                $usedSedeIds = DB::table('users')
-                    ->where('institucion_id', $id)
-                    ->whereIn('sede_id', $sedeIdsToDelete)
-                    ->pluck('sede_id')
-                    ->map(fn ($sedeId) => (int) $sedeId)
-                    ->unique()
-                    ->values()
-                    ->all();
-
-                if ($usedSedeIds !== []) {
-                    $usedSedeNames = DB::table('sedes')
-                        ->whereIn('id', $usedSedeIds)
-                        ->orderBy('nombre', 'asc')
-                        ->pluck('nombre')
-                        ->all();
-
-                    throw ValidationException::withMessages([
-                        'sedes' => 'No puedes quitar sedes que ya estan asignadas a usuarios: ' . implode(', ', $usedSedeNames) . '.',
-                    ]);
-                }
-            }
-
-            if ($sedeIdsToDelete !== []) {
-                DB::table('institucion_sede')
-                    ->where('institucion_id', $id)
-                    ->whereIn('sede_id', $sedeIdsToDelete)
-                    ->delete();
-            }
-
-            if ($sedeIdsToInsert !== []) {
-                $now = now();
-                $rows = [];
-
-                foreach ($sedeIdsToInsert as $sedeId) {
-                    $rows[] = [
-                        'institucion_id' => $id,
-                        'sede_id' => $sedeId,
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ];
-                }
-
-                DB::table('institucion_sede')->insert($rows);
-            }
-
-            if ($institucion) {
-                ActivityLogger::log(
-                    'Sedes de institucion actualizadas',
-                    [
-                        'old' => [
-                            'id' => $institucion->id,
-                            'nombre' => $institucion->nombre,
-                            'sedes' => $currentSedeIds,
-                        ],
-                        'attributes' => [
-                            'id' => $institucion->id,
-                            'nombre' => $institucion->nombre,
-                            'sedes' => $normalizedSedeIds,
-                        ],
-                    ],
-                    null,
-                    null,
-                    'instituciones',
-                    'sedes_updated'
-                );
-            }
-        });
+        return $tenant->domains->first()?->domain
+            ?? Domain::query()
+                ->where('tenant_id', $tenant->id)
+                ->orderBy('id')
+                ->value('domain');
     }
 }

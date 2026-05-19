@@ -100,7 +100,7 @@
 @endsection
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/asignacion_personal.css') }}">
+    <link rel="stylesheet" href="{{ global_asset('assets/css/asignacion_personal.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 @endpush
 
@@ -113,5 +113,5 @@
         };
     </script>
 
-    <script src="{{ asset('assets/js/asignacion_personal.js') }}"></script>
+    <script src="{{ global_asset('assets/js/asignacion_personal.js') }}"></script>
 @endpush
